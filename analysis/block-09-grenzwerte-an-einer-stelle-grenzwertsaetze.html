@@ -271,20 +271,26 @@
   <div class="variante aktiv">
     <div class="problemkasten">Was ist <span class="formel">f(2)</span> für <span class="formel">f(x) = <span class="bruch"><span class="z">x² + x − 6</span><span class="n">x − 2</span></span></span>?</div>
     <p class="pfrage">Setzt ein.</p>
-    <p class="pantwort">Im Nenner steht 0. <span class="formel">f(2)</span> existiert nicht, die Funktion hat an der Stelle 2 eine Lücke.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1">Im Nenner steht 0. <span class="formel">f(2)</span> existiert nicht, die Funktion hat an der Stelle 2 eine Lücke.</p>
     <p class="pfrage">Rechnet Werte dicht daneben aus, von links und von rechts.</p>
-    <p class="pantwort"><table class="wertereihe"><thead><tr><th>x</th><th>1,9</th><th>1,99</th><th>1,999</th><th>→ 2 ←</th><th>2,001</th><th>2,01</th><th>2,1</th></tr></thead><tbody><tr><td>f(x)</td><td>4,9</td><td>4,99</td><td>4,999</td><td>?</td><td>5,001</td><td>5,01</td><td>5,1</td></tr></tbody></table>Von beiden Seiten rücken die Werte an die 5 heran, obwohl es an der Stelle selbst keinen Wert gibt.</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2"><table class="wertereihe"><thead><tr><th>x</th><th>1,9</th><th>1,99</th><th>1,999</th><th>→ 2 ←</th><th>2,001</th><th>2,01</th><th>2,1</th></tr></thead><tbody><tr><td>f(x)</td><td>4,9</td><td>4,99</td><td>4,999</td><td>?</td><td>5,001</td><td>5,01</td><td>5,1</td></tr></tbody></table>Von beiden Seiten rücken die Werte an die 5 heran, obwohl es an der Stelle selbst keinen Wert gibt.</p>
     <p class="pfrage">Woher kommt die 5?</p>
-    <p class="pantwort"><span class="formel">x² + x − 6 = (x − 2)(x + 3)</span>, für <span class="formel">x ≠ 2</span> also <span class="formel">f(x) = x + 3</span>. Der Graph ist die Gerade <span class="formel">y = x + 3</span> mit einem herausgestochenen Punkt. Der <b>Grenzwert</b> ist 5, der <b>Funktionswert</b> existiert nicht. Dafür brauchen wir einen Begriff.</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3"><span class="formel">x² + x − 6 = (x − 2)(x + 3)</span>, für <span class="formel">x ≠ 2</span> also <span class="formel">f(x) = x + 3</span>. Der Graph ist die Gerade <span class="formel">y = x + 3</span> mit einem herausgestochenen Punkt. Der <b>Grenzwert</b> ist 5, der <b>Funktionswert</b> existiert nicht. Dafür brauchen wir einen Begriff.</p>
   </div>
   <div class="variante">
     <div class="problemkasten">„<span class="formel"><span class="bruch"><span class="z">x² − 36</span><span class="n">x − 6</span></span></span> hat an der Stelle 6 den Funktionswert 12.“</div>
     <p class="pfrage">Prüft durch Einsetzen.</p>
-    <p class="pantwort">Der Nenner wird 0. An der Stelle 6 gibt es <b>keinen</b> Funktionswert. Die Aussage ist falsch.</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4">Der Nenner wird 0. An der Stelle 6 gibt es <b>keinen</b> Funktionswert. Die Aussage ist falsch.</p>
     <p class="pfrage">Und trotzdem taucht die 12 auf. Wo?</p>
-    <p class="pantwort">Beim Kürzen: <span class="formel"><span class="bruch"><span class="z">(x − 6)(x + 6)</span><span class="n">x − 6</span></span> = x + 6</span> für <span class="formel">x ≠ 6</span>. Nähert sich x der 6, nähern sich die Werte der 12.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5">Beim Kürzen: <span class="formel"><span class="bruch"><span class="z">(x − 6)(x + 6)</span><span class="n">x − 6</span></span> = x + 6</span> für <span class="formel">x ≠ 6</span>. Nähert sich x der 6, nähern sich die Werte der 12.</p>
     <p class="pfrage">Wie muss man es also sagen?</p>
-    <p class="pantwort">Der <b>Grenzwert</b> für <span class="formel">x → 6</span> ist 12. Funktionswert und Grenzwert sind zwei verschiedene Dinge.</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6">Der <b>Grenzwert</b> für <span class="formel">x → 6</span> ist 12. Funktionswert und Grenzwert sind zwei verschiedene Dinge.</p>
   </div>
 </section>
 
@@ -354,7 +360,12 @@
   <div class="fehler"><p><strong>Typischer Fehler:</strong> Grenzwert und Funktionswert verwechseln.</p><p><strong>Richtig:</strong> <span class="formel"><span class="bruch"><span class="z">x² − 4</span><span class="n">x − 2</span></span></span> hat an der Stelle 2 den Grenzwert 4, aber keinen Funktionswert.</p></div>
 </section>
 
-
+<section class="slide">
+  <span class="phase">Buch</span>
+  <h2>Zum Üben — rotes Buch, Klasse 11</h2>
+  <p class="lead">Seitenzahlen nach der Kursausgabe. Beide Nummern mit Termumformung lösen (faktorisieren, kürzen, einsetzen), nicht mit der h-Methode.</p>
+  <ul style="font-size:1.15em;line-height:1.8"><li>S. 15 Nr. 6</li><li>S. 15 Nr. 7</li></ul>
+</section>
 
 <section class="slide">
   <h2 class="nur-arbeit">Aufgabengenerator: Hebbare Lücken</h2>

@@ -271,20 +271,26 @@
   <div class="variante aktiv">
     <div class="problemkasten">Wohin läuft <span class="formel">f(x) = 4 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span>, wenn x immer größer wird?</div>
     <p class="pfrage">Rechnet drei Werte aus: x = 10, x = 100, x = 1000.</p>
-    <p class="pantwort"><span class="formel">3,9</span> · <span class="formel">3,99</span> · <span class="formel">3,999</span> — die Werte rücken an die 4 heran.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1"><span class="formel">3,9</span> · <span class="formel">3,99</span> · <span class="formel">3,999</span> — die Werte rücken an die 4 heran.</p>
     <p class="pfrage">Wird die 4 irgendwann erreicht?</p>
-    <p class="pantwort">Nein. <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span></span> wird beliebig klein, aber nie null — für jedes x bleibt ein Rest. Die Werte <b>stabilisieren</b> sich bei 4, ohne sie anzunehmen.</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2">Nein. <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span></span> wird beliebig klein, aber nie null — für jedes x bleibt ein Rest. Die Werte <b>stabilisieren</b> sich bei 4, ohne sie anzunehmen.</p>
     <p class="pfrage">Von welcher Seite nähern sie sich?</p>
-    <p class="pantwort">Für <span class="formel">x &gt; 0</span> ist <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span> &gt; 0</span>, also <span class="formel">f(x) = 4 − (etwas Positives) &lt; 4</span> — <b>von unten</b>. Für diese Art von Aussage brauchen wir eine eigene Schreibweise.</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3">Für <span class="formel">x &gt; 0</span> ist <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span> &gt; 0</span>, also <span class="formel">f(x) = 4 − (etwas Positives) &lt; 4</span> — <b>von unten</b>. Für diese Art von Aussage brauchen wir eine eigene Schreibweise.</p>
   </div>
   <div class="variante">
     <div class="problemkasten">Was ist <span class="formel">f(∞)</span> für <span class="formel">f(x) = 4 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span>?</div>
     <p class="pfrage">Setzt ein.</p>
-    <p class="pantwort">Das geht nicht. <span class="formel">∞</span> ist keine Zahl und keine Stelle — man kann sie nicht einsetzen.</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4">Das geht nicht. <span class="formel">∞</span> ist keine Zahl und keine Stelle — man kann sie nicht einsetzen.</p>
     <p class="pfrage">Trotzdem sieht man am Graphen, dass sich etwas einpendelt. Was fehlt also?</p>
-    <p class="pantwort">Ein Begriff für „wohin die Werte laufen“, ohne dass man irgendwo einsetzt. Genau das leistet der <b>Grenzwert</b>.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5">Ein Begriff für „wohin die Werte laufen“, ohne dass man irgendwo einsetzt. Genau das leistet der <b>Grenzwert</b>.</p>
     <p class="pfrage">Wie schreibt man ihn?</p>
-    <p class="pantwort"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = 4</span>, gesprochen „Limes von f(x) für x gegen unendlich gleich 4“. Die Definition beantwortet damit eine Frage, die das Einsetzen offenlässt.</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = 4</span>, gesprochen „Limes von f(x) für x gegen unendlich gleich 4“. Die Definition beantwortet damit eine Frage, die das Einsetzen offenlässt.</p>
   </div>
 </section>
 
@@ -365,7 +371,12 @@
   <div class="fehler"><p><strong>Typischer Fehler:</strong> „Eine Asymptote darf der Graph nie berühren.“</p><p><strong>Richtig:</strong> Doch — eine Asymptote beschreibt das Verhalten <b>am Ende</b>, sie ist keine Schranke für einzelne Stellen. Ob ein Graph seine waagerechte Asymptote trifft, ist eine Frage an den konkreten Term (Aufgabe 12).</p></div>
 </section>
 
-
+<section class="slide">
+  <span class="phase">Buch</span>
+  <h2>Zum Üben — rotes Buch, Klasse 11</h2>
+  <p class="lead">Seitenzahlen nach der Kursausgabe. Alle Grenzprozesse laufen gegen ∞ oder −∞ — bei Nr. 10 sind nur die Teile a) bis c) dran, der Rest gehört zu Block 09.</p>
+  <ul style="font-size:1.15em;line-height:1.8"><li>S. 11 Nr. 2</li><li>S. 14 Übung 4</li><li>S. 15 Nr. 10 a–c</li></ul>
+</section>
 
 <section class="slide">
   <h2 class="nur-arbeit">Aufgabengenerator: Grenzverhalten gebrochenrationaler Funktionen</h2>

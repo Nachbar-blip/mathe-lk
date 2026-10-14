@@ -297,20 +297,26 @@
   <div class="variante aktiv">
     <div class="problemkasten">Bestimmt alle Nullstellen von <span class="formel">f(x) = x⁴ − 5x² + 4</span>.</div>
     <p class="pfrage">Was stört an dieser Gleichung?</p>
-    <p class="pantwort">Sie ist vom Grad 4. Eine Lösungsformel gibt es nur bis Grad 2 — hier greift keine der bekannten Formeln direkt.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1">Sie ist vom Grad 4. Eine Lösungsformel gibt es nur bis Grad 2 — hier greift keine der bekannten Formeln direkt.</p>
     <p class="pfrage">Schaut den Term genau an: welche Potenzen kommen vor?</p>
-    <p class="pantwort">Nur <span class="formel">x⁴</span> und <span class="formel">x²</span> — und <span class="formel">x⁴ = (x²)²</span>. Setzt man <span class="formel">u = x²</span>, entsteht <span class="formel">u² − 5u + 4 = 0</span>, also <span class="formel">u = 4</span> oder <span class="formel">u = 1</span>. Das ist wieder quadratisch.</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2">Nur <span class="formel">x⁴</span> und <span class="formel">x²</span> — und <span class="formel">x⁴ = (x²)²</span>. Setzt man <span class="formel">u = x²</span>, entsteht <span class="formel">u² − 5u + 4 = 0</span>, also <span class="formel">u = 4</span> oder <span class="formel">u = 1</span>. Das ist wieder quadratisch.</p>
     <p class="pfrage">Ist man damit fertig?</p>
-    <p class="pantwort">Nein — gesucht war x, nicht u. Rücksubstitution: <span class="formel">x² = 4</span> liefert <span class="formel">x = ±2</span>, <span class="formel">x² = 1</span> liefert <span class="formel">x = ±1</span>. Vier Nullstellen, und mehr kann eine Funktion vierten Grades gar nicht haben.</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3">Nein — gesucht war x, nicht u. Rücksubstitution: <span class="formel">x² = 4</span> liefert <span class="formel">x = ±2</span>, <span class="formel">x² = 1</span> liefert <span class="formel">x = ±1</span>. Vier Nullstellen, und mehr kann eine Funktion vierten Grades gar nicht haben.</p>
   </div>
   <div class="variante">
     <div class="problemkasten">Der Graph von <span class="formel">f(x) = (x + 1)(x − 2)²</span> berührt die x-Achse an einer Stelle und schneidet sie an einer anderen. Welche ist welche — ohne zu zeichnen?</div>
     <p class="pfrage">Wo liegen überhaupt die Nullstellen?</p>
-    <p class="pantwort">Ein Produkt ist null, wenn ein Faktor null ist: <span class="formel">x = −1</span> und <span class="formel">x = 2</span>. Die 2 steckt im Quadrat — sie zählt <b>doppelt</b>.</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4">Ein Produkt ist null, wenn ein Faktor null ist: <span class="formel">x = −1</span> und <span class="formel">x = 2</span>. Die 2 steckt im Quadrat — sie zählt <b>doppelt</b>.</p>
     <p class="pfrage">Was passiert mit dem Vorzeichen bei <span class="formel">x = 2</span>?</p>
-    <p class="pantwort"><span class="formel">(x − 2)²</span> ist links und rechts der 2 positiv. Das Vorzeichen von f ändert sich dort also nicht — der Graph kommt an die Achse und kehrt um: <b>Berührung</b>. Bei <span class="formel">x = −1</span> wechselt der einfache Faktor das Vorzeichen: <b>Schnitt</b>.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5"><span class="formel">(x − 2)²</span> ist links und rechts der 2 positiv. Das Vorzeichen von f ändert sich dort also nicht — der Graph kommt an die Achse und kehrt um: <b>Berührung</b>. Bei <span class="formel">x = −1</span> wechselt der einfache Faktor das Vorzeichen: <b>Schnitt</b>.</p>
     <p class="pfrage">Was leistet der Grad dabei?</p>
-    <p class="pantwort">Der Grad ist 3, und <span class="formel">1 + 2 = 3</span> — die Vielfachheiten summieren sich genau zum Grad. Grad und Vielfachheit steuern zusammen den ganzen Verlauf.</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6">Der Grad ist 3, und <span class="formel">1 + 2 = 3</span> — die Vielfachheiten summieren sich genau zum Grad. Grad und Vielfachheit steuern zusammen den ganzen Verlauf.</p>
   </div>
 </section>
 

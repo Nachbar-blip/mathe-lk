@@ -297,20 +297,26 @@
   <div class="variante aktiv">
     <div class="problemkasten">In Block 04 blieb eine Frage offen: Nach wie vielen Jahren hat sich ein Kapital bei 6 % Verzinsung verdoppelt? Antwortet <b>exakt</b>, nicht durch Probieren.</div>
     <p class="pfrage">Stellt die Gleichung auf.</p>
-    <p class="pantwort"><span class="formel">200 · 1,06^t = 400</span>, also nach Kürzen <span class="formel">1,06^t = 2</span>. Der Startwert spielt keine Rolle.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1"><span class="formel">200 · 1,06^t = 400</span>, also nach Kürzen <span class="formel">1,06^t = 2</span>. Der Startwert spielt keine Rolle.</p>
     <p class="pfrage">Warum hilft Umformen nicht weiter?</p>
-    <p class="pantwort">Die Unbekannte steht im <b>Exponenten</b>. Weder Umstellen noch Wurzelziehen holt sie herunter — Probieren liefert nur „zwischen 11 und 12“.</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2">Die Unbekannte steht im <b>Exponenten</b>. Weder Umstellen noch Wurzelziehen holt sie herunter — Probieren liefert nur „zwischen 11 und 12“.</p>
     <p class="pfrage">Was bräuchte man?</p>
-    <p class="pantwort">Eine Rechenart, die das Potenzieren rückgängig macht und den Exponenten herausholt. Genau das ist der <b>Logarithmus</b>: <span class="formel">t = log₁,₀₆(2) = ln 2 / ln 1,06 ≈ 11,90</span>.</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3">Eine Rechenart, die das Potenzieren rückgängig macht und den Exponenten herausholt. Genau das ist der <b>Logarithmus</b>: <span class="formel">t = log₁,₀₆(2) = ln 2 / ln 1,06 ≈ 11,90</span>.</p>
   </div>
   <div class="variante">
     <div class="problemkasten">Was ist <span class="formel">log₂(8)</span>, <span class="formel">log₂(1)</span>, <span class="formel">log₂(0,5)</span> — und was ist <span class="formel">log₂(0)</span>?</div>
     <p class="pfrage">Die ersten drei.</p>
-    <p class="pantwort"><span class="formel">2³ = 8 ⟹ log₂(8) = 3</span> · <span class="formel">2⁰ = 1 ⟹ log₂(1) = 0</span> · <span class="formel">2^(−1) = 0,5 ⟹ log₂(0,5) = −1</span>. Der Logarithmus ist der gesuchte Exponent.</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4"><span class="formel">2³ = 8 ⟹ log₂(8) = 3</span> · <span class="formel">2⁰ = 1 ⟹ log₂(1) = 0</span> · <span class="formel">2^(−1) = 0,5 ⟹ log₂(0,5) = −1</span>. Der Logarithmus ist der gesuchte Exponent.</p>
     <p class="pfrage">Und <span class="formel">log₂(0)</span>?</p>
-    <p class="pantwort">Es gibt <b>kein</b> x mit <span class="formel">2^x = 0</span>, denn Potenzen von 2 sind stets positiv. <span class="formel">log₂(0)</span> existiert nicht — ebenso wenig der Logarithmus einer negativen Zahl.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5">Es gibt <b>kein</b> x mit <span class="formel">2^x = 0</span>, denn Potenzen von 2 sind stets positiv. <span class="formel">log₂(0)</span> existiert nicht — ebenso wenig der Logarithmus einer negativen Zahl.</p>
     <p class="pfrage">Was heißt das für den Definitionsbereich?</p>
-    <p class="pantwort"><span class="formel">D = (0; ∞)</span>. Das ist kein Zufall: der Logarithmus ist die <b>Umkehrfunktion</b> der Exponentialfunktion, und aus deren Wertebereich <span class="formel">(0; ∞)</span> wird der Definitionsbereich der Umkehrung.</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6"><span class="formel">D = (0; ∞)</span>. Das ist kein Zufall: der Logarithmus ist die <b>Umkehrfunktion</b> der Exponentialfunktion, und aus deren Wertebereich <span class="formel">(0; ∞)</span> wird der Definitionsbereich der Umkehrung.</p>
   </div>
 </section>
 

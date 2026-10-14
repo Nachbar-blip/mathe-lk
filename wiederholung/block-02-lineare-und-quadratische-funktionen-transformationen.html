@@ -297,20 +297,26 @@
   <div class="variante aktiv">
     <div class="problemkasten">Der Graph von <span class="formel">f(x) = x²</span> wird um 3 nach rechts und um 2 nach unten verschoben. Gebt den Term der neuen Funktion an.</div>
     <p class="pfrage">Schreibt ihn hin.</p>
-    <p class="pantwort"><span class="formel">g(x) = (x − 3)² − 2</span>. Der Scheitel wandert von <span class="formel">(0 | 0)</span> nach <span class="formel">(3 | −2)</span>.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1"><span class="formel">g(x) = (x − 3)² − 2</span>. Der Scheitel wandert von <span class="formel">(0 | 0)</span> nach <span class="formel">(3 | −2)</span>.</p>
     <p class="pfrage">Warum steht bei einer Verschiebung nach <b>rechts</b> ein <b>Minus</b>?</p>
-    <p class="pantwort">Weil <span class="formel">x − 3</span> erst bei <span class="formel">x = 3</span> den Wert 0 annimmt. Die Stelle, an der vorher der Scheitel lag, wandert dorthin. Alles, was <b>innen</b> am x steht, wirkt <b>gegenläufig</b>.</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2">Weil <span class="formel">x − 3</span> erst bei <span class="formel">x = 3</span> den Wert 0 annimmt. Die Stelle, an der vorher der Scheitel lag, wandert dorthin. Alles, was <b>innen</b> am x steht, wirkt <b>gegenläufig</b>.</p>
     <p class="pfrage">Und wenn man zusätzlich streckt — spielt die Reihenfolge eine Rolle?</p>
-    <p class="pantwort">Ja, und zwar genau dann, wenn beide Schritte dieselbe Richtung betreffen. Erst <span class="formel">+1</span>, dann mal 2 ergibt <span class="formel">2x² + 2</span>; umgekehrt <span class="formel">2x² + 1</span>. Diese Grammatik klären wir jetzt vollständig.</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3">Ja, und zwar genau dann, wenn beide Schritte dieselbe Richtung betreffen. Erst <span class="formel">+1</span>, dann mal 2 ergibt <span class="formel">2x² + 2</span>; umgekehrt <span class="formel">2x² + 1</span>. Diese Grammatik klären wir jetzt vollständig.</p>
   </div>
   <div class="variante">
     <div class="problemkasten">„<span class="formel">g(x) = (2x − 6)²</span> entsteht aus <span class="formel">f(x) = x²</span>, indem man um 6 nach rechts verschiebt und dann in x-Richtung halbiert.“</div>
     <p class="pfrage">Prüft am Scheitel nach.</p>
-    <p class="pantwort"><span class="formel">g(x) = 0</span> gilt für <span class="formel">2x − 6 = 0</span>, also <span class="formel">x = 3</span>. Der Scheitel liegt bei 3, nicht bei 6 — die Behauptung stimmt nicht.</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4"><span class="formel">g(x) = 0</span> gilt für <span class="formel">2x − 6 = 0</span>, also <span class="formel">x = 3</span>. Der Scheitel liegt bei 3, nicht bei 6 — die Behauptung stimmt nicht.</p>
     <p class="pfrage">Wo steckt der Fehler?</p>
-    <p class="pantwort">Der Faktor vor dem x wurde nicht ausgeklammert: <span class="formel">2x − 6 = 2(x − 3)</span>, also <span class="formel">g(x) = 4(x − 3)²</span>. Verschoben wird um <b>3</b>, und in y-Richtung mit dem Faktor <b>4</b> gestreckt.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5">Der Faktor vor dem x wurde nicht ausgeklammert: <span class="formel">2x − 6 = 2(x − 3)</span>, also <span class="formel">g(x) = 4(x − 3)²</span>. Verschoben wird um <b>3</b>, und in y-Richtung mit dem Faktor <b>4</b> gestreckt.</p>
     <p class="pfrage">Was folgt daraus als Arbeitsregel?</p>
-    <p class="pantwort">Vor jedem Ablesen muss der Faktor vor dem x ausgeklammert sein. Erst in der Form <span class="formel">a·(x − c)² + d</span> stimmen die abgelesenen Zahlen.</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6">Vor jedem Ablesen muss der Faktor vor dem x ausgeklammert sein. Erst in der Form <span class="formel">a·(x − c)² + d</span> stimmen die abgelesenen Zahlen.</p>
   </div>
 </section>
 

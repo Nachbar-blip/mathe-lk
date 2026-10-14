@@ -297,20 +297,26 @@
   <div class="variante aktiv">
     <div class="problemkasten">Eine Bakterienkultur verdoppelt sich jede Stunde; zu Beginn sind es 500. Nach wie vielen vollen Stunden sind es erstmals mehr als eine Million?</div>
     <p class="pfrage">Stellt zuerst den Term auf.</p>
-    <p class="pantwort"><span class="formel">N(t) = 500 · 2^t</span> — der Startwert steht vorn, der Faktor pro Stunde in der Basis.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1"><span class="formel">N(t) = 500 · 2^t</span> — der Startwert steht vorn, der Faktor pro Stunde in der Basis.</p>
     <p class="pfrage">Jetzt probiert.</p>
-    <p class="pantwort"><span class="formel">N(10) = 500 · 1024 = 512 000</span> · <span class="formel">N(11) = 500 · 2048 = 1 024 000</span>. Nach <b>11</b> Stunden ist die Million überschritten.</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2"><span class="formel">N(10) = 500 · 1024 = 512 000</span> · <span class="formel">N(11) = 500 · 2048 = 1 024 000</span>. Nach <b>11</b> Stunden ist die Million überschritten.</p>
     <p class="pfrage">Und wenn der Faktor nicht 2, sondern 1,5 wäre?</p>
-    <p class="pantwort">Dann wird Probieren mühsam — man müsste t aus dem Exponenten holen. Dafür gibt es ein eigenes Werkzeug (Block 05). Heute klären wir erst, wie Exponentialfunktionen gebaut sind.</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3">Dann wird Probieren mühsam — man müsste t aus dem Exponenten holen. Dafür gibt es ein eigenes Werkzeug (Block 05). Heute klären wir erst, wie Exponentialfunktionen gebaut sind.</p>
   </div>
   <div class="variante">
     <div class="problemkasten">„<span class="formel">x²</span> wächst schneller als <span class="formel">2^x</span> — bei <span class="formel">x = 3</span> ist <span class="formel">9 &gt; 8</span>.“</div>
     <p class="pfrage">Prüft die Rechnung.</p>
-    <p class="pantwort">Sie stimmt: <span class="formel">3² = 9</span> und <span class="formel">2³ = 8</span>. Die Behauptung ist an dieser Stelle richtig.</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4">Sie stimmt: <span class="formel">3² = 9</span> und <span class="formel">2³ = 8</span>. Die Behauptung ist an dieser Stelle richtig.</p>
     <p class="pfrage">Prüft weiter: <span class="formel">x = 5</span> und <span class="formel">x = 10</span>.</p>
-    <p class="pantwort"><span class="formel">25 &lt; 32</span> und <span class="formel">100 &lt; 1024</span>. Die Behauptung gilt nur in einem kleinen Fenster — sie ist als allgemeine Aussage falsch.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5"><span class="formel">25 &lt; 32</span> und <span class="formel">100 &lt; 1024</span>. Die Behauptung gilt nur in einem kleinen Fenster — sie ist als allgemeine Aussage falsch.</p>
     <p class="pfrage">Woran liegt das strukturell?</p>
-    <p class="pantwort">Bei <span class="formel">2^x</span> wird pro Schritt mit <b>2</b> multipliziert — immer. Bei <span class="formel">x²</span> nur mit <span class="formel">(<span class="bruch"><span class="z">x + 1</span><span class="n">x</span></span>)²</span>, und dieser Faktor rückt gegen 1. Der konstante Faktor pro Schritt ist genau das Kennzeichen exponentiellen Wachstums.</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6">Bei <span class="formel">2^x</span> wird pro Schritt mit <b>2</b> multipliziert — immer. Bei <span class="formel">x²</span> nur mit <span class="formel">(<span class="bruch"><span class="z">x + 1</span><span class="n">x</span></span>)²</span>, und dieser Faktor rückt gegen 1. Der konstante Faktor pro Schritt ist genau das Kennzeichen exponentiellen Wachstums.</p>
   </div>
 </section>
 

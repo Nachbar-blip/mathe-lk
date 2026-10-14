@@ -304,20 +304,26 @@
   <div class="variante aktiv">
     <div class="problemkasten">Berechnet <span class="formel">h(1)</span> für <span class="formel">h(x) = (3x − 2)⁴</span> — ohne auszumultiplizieren.</div>
     <p class="pfrage">Was rechnet man zuerst?</p>
-    <p class="pantwort">Erst die Klammer: <span class="formel">3·1 − 2 = 1</span>. Dann hoch vier: <span class="formel">1⁴ = 1</span>.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1">Erst die Klammer: <span class="formel">3·1 − 2 = 1</span>. Dann hoch vier: <span class="formel">1⁴ = 1</span>.</p>
     <p class="pfrage">Wie viele Funktionen stecken in h?</p>
-    <p class="pantwort">Zwei. Eine <b>innere</b> <span class="formel">v(x) = 3x − 2</span> und eine <b>äußere</b> <span class="formel">u(x) = x⁴</span>. h ist keine neue Funktion, sondern eine Hintereinanderschaltung.</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2">Zwei. Eine <b>innere</b> <span class="formel">v(x) = 3x − 2</span> und eine <b>äußere</b> <span class="formel">u(x) = x⁴</span>. h ist keine neue Funktion, sondern eine Hintereinanderschaltung.</p>
     <p class="pfrage">Warum lohnt sich diese Sicht?</p>
-    <p class="pantwort">Weil man ausmultiplizieren spart — und weil das Ableiten solcher Terme später genau dieser Zerlegung folgt (Kettenregel). Zerlegen ist Vorarbeit.</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3">Weil man ausmultiplizieren spart — und weil das Ableiten solcher Terme später genau dieser Zerlegung folgt (Kettenregel). Zerlegen ist Vorarbeit.</p>
   </div>
   <div class="variante">
     <div class="problemkasten">„Bei <span class="formel">(u ∘ v)(x)</span> ersetzt man im Term von u jedes <span class="formel">v(x)</span> durch x.“</div>
     <p class="pfrage">Testet die Behauptung an <span class="formel">u(x) = x²</span> und <span class="formel">v(x) = x + 3</span> bei <span class="formel">x = 1</span>.</p>
-    <p class="pantwort">Nach der Behauptung käme etwas mit x heraus, obwohl gar kein <span class="formel">v(x)</span> im Term von u steht. Die Regel ist genau <b>umgekehrt</b>.</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4">Nach der Behauptung käme etwas mit x heraus, obwohl gar kein <span class="formel">v(x)</span> im Term von u steht. Die Regel ist genau <b>umgekehrt</b>.</p>
     <p class="pfrage">Wie heißt sie richtig?</p>
-    <p class="pantwort">In u wird jedes <b>x</b> durch <span class="formel">v(x)</span> ersetzt: <span class="formel">(u ∘ v)(x) = (x + 3)²</span>, also <span class="formel">(1 + 3)² = 16</span>.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5">In u wird jedes <b>x</b> durch <span class="formel">v(x)</span> ersetzt: <span class="formel">(u ∘ v)(x) = (x + 3)²</span>, also <span class="formel">(1 + 3)² = 16</span>.</p>
     <p class="pfrage">Und wenn man die Reihenfolge tauscht?</p>
-    <p class="pantwort"><span class="formel">(v ∘ u)(x) = x² + 3</span>, also <span class="formel">1 + 3 = 4</span>. <span class="formel">16 ≠ 4</span> — die Reihenfolge ist <b>nicht</b> vertauschbar.</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6"><span class="formel">(v ∘ u)(x) = x² + 3</span>, also <span class="formel">1 + 3 = 4</span>. <span class="formel">16 ≠ 4</span> — die Reihenfolge ist <b>nicht</b> vertauschbar.</p>
   </div>
 </section>
 

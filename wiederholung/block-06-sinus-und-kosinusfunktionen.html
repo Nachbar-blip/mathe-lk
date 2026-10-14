@@ -296,20 +296,26 @@
   <div class="variante aktiv">
     <div class="problemkasten">Welche Werte nimmt <span class="formel">g(x) = 2·sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) + 1</span> an — und wann zum ersten Mal den größten?</div>
     <p class="pfrage">Wie groß ist der größte Wert überhaupt?</p>
-    <p class="pantwort"><span class="formel">sin</span> liefert höchstens 1. Also <span class="formel">2·1 + 1 = 3</span> — und mindestens <span class="formel">2·(−1) + 1 = −1</span>. Der Wertebereich ist <span class="formel">[−1; 3]</span>.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1"><span class="formel">sin</span> liefert höchstens 1. Also <span class="formel">2·1 + 1 = 3</span> — und mindestens <span class="formel">2·(−1) + 1 = −1</span>. Der Wertebereich ist <span class="formel">[−1; 3]</span>.</p>
     <p class="pfrage">An welcher Stelle wird die 3 erreicht?</p>
-    <p class="pantwort">Wenn <span class="formel">sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = 1</span> ist, also <span class="formel">x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span> = <span class="bruch"><span class="z">π</span><span class="n">2</span></span></span> — bei <span class="formel">x = π</span>. Der Rechner nennt nur diese eine von unendlich vielen Lösungen.</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2">Wenn <span class="formel">sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = 1</span> ist, also <span class="formel">x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span> = <span class="bruch"><span class="z">π</span><span class="n">2</span></span></span> — bei <span class="formel">x = π</span>. Der Rechner nennt nur diese eine von unendlich vielen Lösungen.</p>
     <p class="pfrage">Woher kommen die Zahlen 2, 1 und <span class="bruch"><span class="z">π</span><span class="n">2</span></span> im Term?</p>
-    <p class="pantwort">Sie sind keine Rechenschritte, sondern <b>Bauteile</b>: Amplitude, Mittellinie, Verschiebung. Genau diese Grammatik klären wir jetzt.</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3">Sie sind keine Rechenschritte, sondern <b>Bauteile</b>: Amplitude, Mittellinie, Verschiebung. Genau diese Grammatik klären wir jetzt.</p>
   </div>
   <div class="variante">
     <div class="problemkasten">Bei Parabeln hieß es <span class="formel">a·f(b(x − c)) + d</span>. Gilt dieselbe Grammatik auch für <span class="formel">sin</span>?</div>
     <p class="pfrage">Was bewirkte jeder Parameter bei der Parabel?</p>
-    <p class="pantwort"><span class="formel">a</span> streckt in y-Richtung, <span class="formel">b</span> staucht in x-Richtung, <span class="formel">c</span> verschiebt waagerecht, <span class="formel">d</span> senkrecht — und <span class="formel">b</span> wirkte <b>gegenläufig</b>.</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4"><span class="formel">a</span> streckt in y-Richtung, <span class="formel">b</span> staucht in x-Richtung, <span class="formel">c</span> verschiebt waagerecht, <span class="formel">d</span> senkrecht — und <span class="formel">b</span> wirkte <b>gegenläufig</b>.</p>
     <p class="pfrage">Prüft das an <span class="formel">sin(2x)</span>.</p>
-    <p class="pantwort">Die Periode wird nicht doppelt so lang, sondern <b>halb</b> so lang: <span class="formel">π</span> statt <span class="formel">2π</span>. Die Gegenläufigkeit gilt genauso.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5">Die Periode wird nicht doppelt so lang, sondern <b>halb</b> so lang: <span class="formel">π</span> statt <span class="formel">2π</span>. Die Gegenläufigkeit gilt genauso.</p>
     <p class="pfrage">Was ist bei <span class="formel">sin</span> dann überhaupt neu?</p>
-    <p class="pantwort">Nur die Namen: <span class="formel">|a|</span> heißt Amplitude, <span class="formel">d</span> Mittellinie, und aus <span class="formel">b</span> wird die Periode <span class="formel"><span class="bruch"><span class="z">2π</span><span class="n">b</span></span></span>. Die Transformations-Grammatik trägt vollständig.</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6">Nur die Namen: <span class="formel">|a|</span> heißt Amplitude, <span class="formel">d</span> Mittellinie, und aus <span class="formel">b</span> wird die Periode <span class="formel"><span class="bruch"><span class="z">2π</span><span class="n">b</span></span></span>. Die Transformations-Grammatik trägt vollständig.</p>
   </div>
 </section>
 

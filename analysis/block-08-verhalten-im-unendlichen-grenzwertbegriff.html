@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block 08 · Verhalten im Unendlichen, Grenzwertbegriff</title>
+<!--
+  analysis-lk Block 08 (Mathematik LK, eA). MasterMind-Aufbau, neutrales Design.
+  Single-File, keine externen Abhaengigkeiten, ASCII-only JS-Bezeichner, kein Browser-Storage.
+  Tasten: B Beamer, Pfeile Abschnitt (Beamer), L alle Loesungen.
+  Erzeugt aus _skelett.py - Aenderungen am Rahmen dort vornehmen, Inhalt in _inhalt_bXX.py.
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --accent-soft:#eaf1f7; --ok:#2e7d5a; --warn:#b06a2e;
+    --maxw:920px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  main{max-width:var(--maxw);margin:0 auto;padding:28px 18px 64px;}
+  h1{font-size:1.5rem;margin:.2em 0 .1em}
+  h2{font-size:1.2rem;margin:1.5em 0 .4em;border-bottom:2px solid var(--line);padding-bottom:.2em}
+  p{margin:.5em 0}
+  .lead{color:var(--muted)}
+  .formel{white-space:nowrap}
+  sub,sup{font-size:.72em;line-height:0}
+  .spvek{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.08;font-size:.94em;padding:0 .12em;margin:0 .1em;position:relative}
+  .spvek::before,.spvek::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;
+    border:1.5px solid currentColor}
+  .spvek::before{left:-.22em;border-right:none;border-radius:.5em 0 0 .5em}
+  .spvek::after{right:-.22em;border-left:none;border-radius:0 .5em .5em 0}
+  .spvek span{display:block;padding:0 .18em}
+  .phase{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:.18em .6em;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid #cfe0ee;margin:.2em .3em .2em 0;}
+  .badge-kern{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .badge-vert{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .bluete{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;overflow:hidden;background:#fff;}
+  .bluete>summary{cursor:pointer;padding:.7em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;}
+  .bluete>summary::-webkit-details-marker{display:none}
+  .lvl{font-size:.74rem;font-weight:600;padding:.1em .5em;border-radius:6px}
+  .lvl.l1{background:#eef6f0;color:var(--ok)}
+  .lvl.l2{background:#eef2f8;color:var(--accent)}
+  .lvl.l3{background:#f7efe6;color:var(--warn)}
+  .bluete[open]>summary{border-bottom:1px solid var(--line)}
+  .bluete .body{padding:.3em .9em .9em}
+  .iqb{margin:.45em 0 0;font-size:.82rem}
+  .iqb>summary{cursor:pointer;color:var(--muted);list-style:none;display:inline-flex;
+    align-items:center;gap:.4em;padding:.12em .6em;border:1px solid var(--line);
+    border-radius:999px;background:#fbfbf9}
+  .iqb>summary::-webkit-details-marker{display:none}
+  .iqb>summary::before{content:"IQB";font-weight:700;font-size:.72rem;letter-spacing:.03em;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:.05em .35em}
+  .iqb>summary:hover{border-color:var(--accent);color:var(--accent)}
+  .iqb .iqb-text{margin:.4em 0 0;padding:.5em .7em;background:#fbfbf9;border-left:3px solid var(--line);
+    border-radius:0 6px 6px 0;color:var(--muted);line-height:1.5}
+  .iqb .iqb-text .iqb-fund{display:block;margin-top:.3em;font-size:.95em;opacity:.85}
+  .hinfuehrung{border:1px solid #ecd9c2;border-left:4px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;
+    background:#fffdf5;padding:.85em 1em;margin:.4em 0 1em}
+  .hinfuehrung h3{margin:0 0 .4em;font-size:1rem;color:var(--warn)}
+  .hinfuehrung p{margin:.35em 0}
+  .hinfuehrung .frage{font-weight:600;font-size:1.02rem}
+  .hinfuehrung .aufloesung{margin-top:.6em;padding-top:.5em;border-top:1px dashed #ecd9c2;
+    font-size:.94rem;color:var(--muted)}
+  table.wertereihe{border-collapse:collapse;margin:.3em 0 .4em;font-size:.9rem;background:#fff}
+  table.wertereihe th,table.wertereihe td{border:1px solid var(--line);padding:.25em .6em;text-align:center}
+  table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .hinfuehrung table.wertereihe{border-collapse:collapse;margin:.5em 0;font-size:.92rem;background:#fff}
+  .hinfuehrung table.wertereihe th,.hinfuehrung table.wertereihe td{border:1px solid var(--line);
+    padding:.3em .7em;text-align:center}
+  .hinfuehrung table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .tafel{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;margin:.8em 0;overflow:hidden}
+  .tafel>h3{margin:0;padding:.6em .9em;background:var(--accent);color:#fff;font-size:1rem}
+  .tafel .tafel-koerper{padding:.85em .9em}
+  .tafel-form{text-align:center;font-size:1.15rem;margin:.2em 0 .9em;padding:.5em;
+    background:var(--accent-soft);border-radius:6px;color:var(--accent);font-weight:600}
+  .tafel-form .zeiger{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:.25em}
+  table.param{border-collapse:collapse;width:100%;margin:.3em 0}
+  table.param th,table.param td{border:1px solid var(--line);padding:.5em .65em;text-align:left;vertical-align:top}
+  table.param thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  table.param .pz{font-weight:700;color:var(--accent);font-size:1.05rem;text-align:center;width:2.4em}
+  table.param .pbsp{font-size:.9rem;color:var(--muted)}
+  table.param .pbsp code{background:#fbfbf9;padding:.05em .3em;border-radius:3px;color:var(--fg)}
+  .tafel-merk{margin:.5em 0 0;padding:.45em .7em;background:#fffdf5;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.93rem}
+  .tafel-merk::before{content:"Merke: ";font-weight:700;color:var(--warn)}
+  ol.schritte{counter-reset:s;list-style:none;padding:0;margin:.4em 0 0}
+  ol.schritte li{counter-increment:s;position:relative;padding:.5em .7em .5em 2.6em;margin:.4em 0;
+    background:#fafaf7;border-radius:6px}
+  ol.schritte li::before{content:counter(s);position:absolute;left:.7em;top:.5em;width:1.5em;height:1.5em;
+    background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:.82rem;font-weight:700}
+  ol.schritte .frage{font-weight:600;display:block}
+  ol.schritte .ergebnis{display:block;margin-top:.25em;font-size:.9rem;color:var(--ok);font-weight:600}
+  table.reihen{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.93rem}
+  table.reihen th,table.reihen td{border:1px solid var(--line);padding:.45em .65em;text-align:left}
+  table.reihen thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .stufe{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;background:#fff;overflow:hidden}
+  .stufe>summary{cursor:pointer;padding:.6em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em;background:#fbfbf9}
+  .stufe>summary::-webkit-details-marker{display:none}
+  .stufe>summary::before{content:"\25b8";color:var(--accent);font-weight:400}
+  .stufe[open]>summary::before{content:"\25be"}
+  .stufe .stufe-koerper{padding:.7em .9em}
+  .tauf{margin:0 0 .9em;padding-bottom:.7em;border-bottom:1px dashed var(--line)}
+  .tauf:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+  .tauf .tfrage{margin:0 0 .4em}
+  .tauf .tfrage strong.nr{color:var(--accent);margin-right:.3em}
+  .ueberblick{border:1px solid #cfe0ee;border-radius:var(--radius);background:#fff;margin:.2em 0 1.1em}
+  .ueberblick>summary{cursor:pointer;padding:.7em .9em;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);list-style:none;border-radius:var(--radius);
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .ueberblick>summary::-webkit-details-marker{display:none}
+  .ueberblick>summary::before{content:"\25b8";font-weight:400;margin-right:.15em}
+  .ueberblick[open]>summary::before{content:"\25be"}
+  .ueberblick[open]>summary{border-radius:var(--radius) var(--radius) 0 0}
+  .ueberblick .ub-zusatz{font-weight:400;font-size:.85rem;color:var(--muted)}
+  .ueberblick .ub-koerper{padding:.8em .9em}
+  .ub-huelle{overflow-x:auto}
+  table.ub{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+  table.ub th,table.ub td{border:1px solid var(--line);padding:.42em .6em;text-align:left;vertical-align:top}
+  table.ub thead th{background:#fbfbf9;font-size:.82rem;color:var(--muted);font-weight:600}
+  table.ub tbody th{white-space:nowrap;font-weight:600}
+  table.ub .ub-bsp{white-space:nowrap;color:var(--accent);font-size:.88rem}
+  .ub-detail{margin:.9em 0 0;padding:.6em .8em;border-left:3px solid var(--line);background:#fafaf7;border-radius:0 6px 6px 0}
+  .ub-detail h4{margin:0 0 .25em;font-size:.93rem;color:var(--accent)}
+  .ub-detail p{margin:.2em 0;font-size:.93rem}
+  .ub-detail .ub-fehler{color:var(--warn)}
+  .ub-detail ol{margin:.3em 0 0;padding-left:1.4em;font-size:.93rem}
+  .ub-detail ol li{margin:.25em 0}
+  .ub-link{margin:.9em 0 0;font-size:.92rem}
+  .ub-link a{color:var(--accent);font-weight:600}
+  .grundtafel table.regeln{border-collapse:collapse;width:100%;margin:.3em 0}
+  .grundtafel table.regeln th,.grundtafel table.regeln td{border:1px solid var(--line);
+    padding:.5em .65em;text-align:left;vertical-align:top}
+  .grundtafel table.regeln thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .grundtafel table.regeln td.rname{font-weight:600;white-space:nowrap;width:11em}
+  .grundtafel table.regeln td.rform{color:var(--accent);font-weight:600;white-space:nowrap}
+  .grundtafel table.regeln td.rtext{font-size:.93rem}
+  .aufgabe{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+    background:#fff;padding:.8em 1em;margin:1em 0}
+  .aufgabe .kopf{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-bottom:.3em}
+  .loesung{display:none;margin-top:.7em;padding:.7em .9em;background:#f2f7f3;border:1px solid #cbe4d4;border-radius:8px}
+  .loesung.offen{display:block}
+  .lknopf{font:inherit;font-size:.85rem;padding:.3em .7em;border:1px solid var(--line);
+    border-radius:6px;background:#fff;cursor:pointer;color:var(--accent)}
+  .check{margin:.8em 0;padding:.8em .9em;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .check input,.check select{font:inherit;padding:.35em .5em;border:1px solid var(--line);border-radius:6px}
+  .check button,.gen button{font:inherit;padding:.4em .8em;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-left:.4em}
+  .feedback{margin-top:.5em;font-size:.95rem;min-height:1.4em}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--warn)}
+  textarea{width:100%;min-height:4.5em;font:inherit;padding:.5em;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .gen{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.8em 1em;margin:1em 0}
+  .gen .genaufgabe{margin:.6em 0;padding:.6em .8em;background:#fafaf7;border-radius:8px}
+  table.sortier{border-collapse:collapse;margin:.6em 0}
+  table.sortier td,table.sortier th{border:1px solid var(--line);padding:.35em .7em}
+  #toolbar{position:fixed;top:0;left:0;right:0;background:#20242b;color:#f3f4f6;
+    display:flex;gap:1em;align-items:center;justify-content:flex-end;padding:.35em 1em;font-size:.95rem;z-index:50}
+  #toolbar button{font:inherit;font-size:.8rem;background:#3a4150;color:#fff;border:0;border-radius:5px;padding:.15em .6em;cursor:pointer}
+  body{padding-top:2.4em}
+  body.beamer{font-size:26px;background:#fff}
+  body.beamer main{max-width:1180px}
+  body.beamer .nur-arbeit{display:none}
+  body.beamer section.slide{display:none;min-height:60vh}
+  body.beamer section.slide.aktiv{display:block}
+  body.beamer h2{font-size:1.5em}
+  /* ---- neue Bausteinfolge: Problem, Klaerung, Beispiel, Merksatz, Aufgaben ---- */
+  .vwahl{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .vknopf{font:inherit;font-size:.88rem;padding:.25em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .vknopf.aktiv{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .variante{display:none}
+  .variante.aktiv{display:block}
+  .problemkasten{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;
+    padding:.9em 1em;margin:.3em 0 1em;text-align:center;font-size:1.2rem;line-height:1.5}
+  .pfrage{font-weight:600;margin:.9em 0 .15em}
+  .pantwort{color:var(--ok);margin:.1em 0 .8em}
+  .bsp{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.5em .95em;margin:.7em 0}
+  .bsp h3{margin:.25em 0 .45em;color:var(--accent);font-size:1rem}
+  ol.bzeilen{list-style:none;margin:.2em 0;padding:0}
+  ol.bzeilen li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:.2em 1.2em;
+    align-items:baseline;padding:.3em 0;border-top:1px solid var(--line)}
+  ol.bzeilen li:first-child{border-top:0}
+  .brechnung{font-size:1.05em}
+  .bhinweis{color:var(--muted);font-size:.93em}
+  @media (max-width:800px){ol.bzeilen li{grid-template-columns:1fr}}
+  .merk{border:2px solid var(--accent);border-left-width:5px;border-radius:var(--radius);
+    background:#fff;padding:.6em 1em .7em;margin:.5em 0}
+  .merk ul{margin:.2em 0;padding-left:1.1em}
+  .merk li{margin:.5em 0}
+  .merk .regel{font-weight:600;display:block}
+  .merk .kurz{display:block;margin-top:.2em;color:var(--accent)}
+  .fehler{border:1px solid #e9cfcf;border-left:4px solid #b04a4a;border-radius:0 6px 6px 0;
+    background:#fdf6f6;padding:.55em .85em;margin:.5em 0}
+  .fehler p{margin:.2em 0;font-size:.95rem}
+  .typ,.afb{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;
+    padding:.14em .55em;border-radius:6px;margin:.2em .3em .2em 0;border:1px solid transparent}
+  .t-vor{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .t-rueck{background:#eef2f8;color:var(--accent);border-color:#cfe0ee}
+  .t-par{background:#f4eef8;color:#6b4a95;border-color:#ddd0ea}
+  .t-beur{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .afb1{background:#fbfbf9;color:var(--muted);border-color:var(--line)}
+  .afb2{background:#fbfbf9;color:var(--accent);border-color:#cfe0ee}
+  .afb3{background:#fbfbf9;color:var(--warn);border-color:#ecd9c2}
+  .spiegel{border:1px dashed var(--line);border-radius:var(--radius);background:#fbfbf9;margin:.5em 0 1em}
+  .spiegel>summary{cursor:pointer;padding:.5em .9em;font-size:.9rem;color:var(--muted);list-style:none}
+  .spiegel>summary::-webkit-details-marker{display:none}
+  .spiegel>summary::before{content:"\25b8 ";color:var(--accent)}
+  .spiegel[open]>summary::before{content:"\25be "}
+  .spiegel table.param,.spiegel p{margin:.2em .9em .7em}
+  .spiegel table.param th,.spiegel table.param td{text-align:center;padding:.35em .6em}
+  .bruch{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.15;margin:0 .12em;font-size:.92em;text-align:center}
+  .bruch .z{padding:0 .25em .05em;border-bottom:1.5px solid currentColor}
+  .bruch .n{padding:.05em .25em 0}
+  ol.bzeilen details.klapp{display:inline-block;margin:0}
+  ol.bzeilen details.klapp>summary{cursor:pointer;list-style:none;display:inline-block;font-size:.85rem;
+    padding:.1em .6em;border:1px solid var(--line);border-radius:999px;color:var(--accent);background:#fff}
+  ol.bzeilen details.klapp>summary::-webkit-details-marker{display:none}
+  ol.bzeilen details.klapp[open]>summary{background:var(--accent-soft)}
+  ol.bzeilen details.klapp .erg{margin-left:.6em;color:var(--ok);font-weight:600}
+  ol.bzeilen details.klapp:not([open]) .erg{display:none}
+  svg.plot{display:block;max-width:100%;height:auto;margin:.4em 0;background:#fff;border:1px solid var(--line);border-radius:6px}
+  svg.plot .gitter{stroke:#eceae4;stroke-width:1}
+  svg.plot .achse{stroke:#555;stroke-width:1.3}
+  svg.plot .tick{font-size:10px;fill:var(--muted)}
+  svg.plot .beschriftung{font-size:11px}
+  ol.bzeilen li:has(svg.plot){grid-template-columns:1fr}
+  .doppelbild .loesung{background:transparent;border:0;padding:0;margin-top:.3em}
+  .doppelbild .lknopf{margin:.2em 0}
+  .plots{display:flex;flex-wrap:wrap;gap:.6em;align-items:flex-start}
+  .plots svg.plot{margin:0}
+  body.beamer svg.plot{width:auto;height:auto}
+  .wurzel{display:inline-block;white-space:nowrap;vertical-align:baseline;line-height:1.15}
+  .wurzel .rad{display:inline-block;border-top:1.5px solid currentColor;padding:.04em .12em 0 .08em;
+    vertical-align:baseline;line-height:1.15}
+  ol.teile{margin:.4em 0 .2em;padding-left:1.6em}
+  ol.teile li{margin:.3em 0}
+  ol.teile li::marker{color:var(--accent);font-weight:700}
+  .limes{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.05;margin:0 .25em 0 .1em}
+  .limes .unter{font-size:.68em;color:var(--muted);white-space:nowrap}
+  body.beamer .problemkasten{font-size:1.15em}
+  .beamer-hinweis{position:fixed;bottom:.5em;right:1em;color:var(--muted);font-size:.75rem}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <a href="./" style="margin-right:auto;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:4px 6px">← Übersicht</a>
+  <button id="beamerKnopf">Beamer (B)</button>
+  <button id="alleLoesungenKnopf">Lösungen (L)</button>
+</div>
+
+<main>
+
+<section class="slide aktiv">
+  <h1>Block 08 · Verhalten im Unendlichen, Grenzwertbegriff</h1>
+  <p class="lead">Mathematik LK (eA) · <strong>Ziel:</strong> Grenzverhalten qualitativ erschließen und begründen, lim-Schreibweise nutzen, Dominanz-Hierarchie kennen.</p>
+  <p class="nur-arbeit"><em>Tasten: B Beamer · Pfeile Abschnitt · L Lösungen</em></p>
+</section>
+
+<section class="slide">
+  <span class="phase">1 · Problem</span>
+  <h2>Wohin läuft das? <span class="phase badge-kern">Einstieg</span></h2>
+  <div class="vwahl" role="group" aria-label="Einstieg wählen"><button type="button" class="vknopf aktiv" data-ziel="0">Problemorientiert</button><button type="button" class="vknopf" data-ziel="1">Zur Definition hin</button></div>
+  <div class="variante aktiv">
+    <div class="problemkasten">Wohin läuft <span class="formel">f(x) = 4 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span>, wenn x immer größer wird?</div>
+    <p class="pfrage">Rechnet drei Werte aus: x = 10, x = 100, x = 1000.</p>
+    <p class="pantwort"><span class="formel">3,9</span> · <span class="formel">3,99</span> · <span class="formel">3,999</span> — die Werte rücken an die 4 heran.</p>
+    <p class="pfrage">Wird die 4 irgendwann erreicht?</p>
+    <p class="pantwort">Nein. <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span></span> wird beliebig klein, aber nie null — für jedes x bleibt ein Rest. Die Werte <b>stabilisieren</b> sich bei 4, ohne sie anzunehmen.</p>
+    <p class="pfrage">Von welcher Seite nähern sie sich?</p>
+    <p class="pantwort">Für <span class="formel">x &gt; 0</span> ist <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span> &gt; 0</span>, also <span class="formel">f(x) = 4 − (etwas Positives) &lt; 4</span> — <b>von unten</b>. Für diese Art von Aussage brauchen wir eine eigene Schreibweise.</p>
+  </div>
+  <div class="variante">
+    <div class="problemkasten">Was ist <span class="formel">f(∞)</span> für <span class="formel">f(x) = 4 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span>?</div>
+    <p class="pfrage">Setzt ein.</p>
+    <p class="pantwort">Das geht nicht. <span class="formel">∞</span> ist keine Zahl und keine Stelle — man kann sie nicht einsetzen.</p>
+    <p class="pfrage">Trotzdem sieht man am Graphen, dass sich etwas einpendelt. Was fehlt also?</p>
+    <p class="pantwort">Ein Begriff für „wohin die Werte laufen“, ohne dass man irgendwo einsetzt. Genau das leistet der <b>Grenzwert</b>.</p>
+    <p class="pfrage">Wie schreibt man ihn?</p>
+    <p class="pantwort"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = 4</span>, gesprochen „Limes von f(x) für x gegen unendlich gleich 4“. Die Definition beantwortet damit eine Frage, die das Einsetzen offenlässt.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">2 · Klärung</span>
+  <h2>Klärung — Definition und Schreibweise</h2>
+  <p class="lead">Aus der Beobachtung wird ein Begriff — und eine Schreibweise, die ohne Einsetzen auskommt.</p>
+  <ol class="schritte">
+    <li><span class="frage">Definition: Grenzwert für x → ∞</span><span class="ergebnis">Nähern sich die Funktionswerte <span class="formel">f(x)</span> für unbegrenzt wachsendes x beliebig genau <b>einer festen Zahl g</b>, so heißt g der <b>Grenzwert</b> von f für x gegen unendlich. Man sagt: f <b>konvergiert</b> gegen g.</span></li>
+    <li><span class="frage">Schreibweise</span><span class="ergebnis"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = g</span> — gesprochen „Limes von f(x) für x gegen unendlich gleich g“. Beispiel: <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> (4 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span>) = 4</span>.</span></li>
+    <li><span class="frage">Der linke Rand: x → −∞</span><span class="ergebnis">Dieselbe Frage für beliebig kleine (negative) x — eigenes Symbol, eigene Rechnung: <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x)</span>. Beispiel: <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> (4 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span>) = 4</span>, diesmal <b>von oben</b>, denn für <span class="formel">x &lt; 0</span> ist <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span> &lt; 0</span>.</span></li>
+    <li><span class="frage">Wenn es keine Zahl gibt</span><span class="ergebnis">Wachsen die Werte über jede Schranke, schreibt man <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = ∞</span> (oder <span class="formel">−∞</span>). Das ist <b>kein</b> Grenzwert im Sinn der Definition — <span class="formel">∞</span> ist keine Zahl —, sondern eine Kurzschrift für „unbeschränkt“. Man sagt: f <b>divergiert</b>.</span></li>
+  </ol>
+  <p class="tafel-merk">Ein Grenzwert ist eine Zahl, die man nicht einsetzt, sondern der man sich nähert. Beide Ränder, <span class="formel">x → ∞</span> und <span class="formel">x → −∞</span>, werden getrennt untersucht.</p>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Beispiel — ganzrationale Funktionen mit lim-Ansatz</h2>
+  <div class="bsp"><h3>Ganzrational, rechter Rand: <span class="formel">f(x) = −3x⁵ + 20x³</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> (−3x⁵ + 20x³)</span></span><span class="bhinweis">Ansatz: lim davor, Term dahinter</span></li><li><span class="brechnung"><span class="formel">= <span class="limes">lim<span class="unter">x → ∞</span></span> x⁵·(−3 + <span class="bruch"><span class="z">20</span><span class="n">x²</span></span>)</span></span><span class="bhinweis">höchste Potenz ausklammern</span></li><li><span class="brechnung"><span class="formel"><span class="bruch"><span class="z">20</span><span class="n">x²</span></span> → 0</span>, Klammer <span class="formel">→ −3</span></span><span class="bhinweis">der Rest verschwindet</span></li><li><span class="brechnung"><span class="formel">x⁵ → ∞</span>, also <span class="formel">x⁵·(−3) → −∞</span></span><span class="bhinweis">Ergebnis: <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = −∞</span></span></li></ol>
+  </div>
+  <div class="bsp"><h3>…und getrennt davon der linke Rand: <span class="formel">x → −∞</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x) = <span class="limes">lim<span class="unter">x → −∞</span></span> x⁵·(−3 + <span class="bruch"><span class="z">20</span><span class="n">x²</span></span>)</span></span><span class="bhinweis">gleicher Ansatz, anderer Rand</span></li><li><span class="brechnung">Klammer <span class="formel">→ −3</span></span><span class="bhinweis">der Rest verschwindet auch hier</span></li><li><span class="brechnung"><span class="formel">x⁵ → −∞</span> (ungerader Exponent), also <span class="formel">(−∞)·(−3) → +∞</span></span><span class="bhinweis">Ergebnis: <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x) = +∞</span></span></li></ol>
+  </div>
+  <div class="bsp"><h3>Gerader Grad: <span class="formel">g(x) = 2x⁴ − 5x + 1</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> g(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> x⁴·(2 − <span class="bruch"><span class="z">5</span><span class="n">x³</span></span> + <span class="bruch"><span class="z">1</span><span class="n">x⁴</span></span>) = +∞</span></span><span class="bhinweis">Klammer → 2, x⁴ → ∞</span></li><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> g(x) = <span class="limes">lim<span class="unter">x → −∞</span></span> x⁴·(2 − <span class="bruch"><span class="z">5</span><span class="n">x³</span></span> + <span class="bruch"><span class="z">1</span><span class="n">x⁴</span></span>) = +∞</span></span><span class="bhinweis"><span class="formel">x⁴</span> ist an beiden Rändern positiv — beide Ränder gleich</span></li></ol>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Jetzt ihr — zwei ganzrationale Funktionen</h2>
+  <p class="lead">Beide Ränder, jeweils mit lim-Ansatz und ausgeklammerter höchster Potenz.</p>
+  <div class="aufgabe" id="b08u1">
+    <div class="kopf"><strong>Übung 1</strong><span class="typ t-vor">Vorwärts</span></div>
+    <p>Bestimmt <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x)</span> und <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x)</span> für <span class="formel">f(x) = 4x³ − x² + 7</span>.</p>
+    <button class="lknopf" data-loesung="b08u1l">Lösung ein/aus</button>
+    <div class="loesung" id="b08u1l"><p><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> x³·(4 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span> + <span class="bruch"><span class="z">7</span><span class="n">x³</span></span>) = +∞</span> (Klammer → 4, <span class="formel">x³ → ∞</span>). <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x) = <span class="limes">lim<span class="unter">x → −∞</span></span> x³·(4 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span> + <span class="bruch"><span class="z">7</span><span class="n">x³</span></span>) = −∞</span> (Klammer → 4, <span class="formel">x³ → −∞</span>).</p></div>
+  </div>
+  <div class="aufgabe" id="b08u2">
+    <div class="kopf"><strong>Übung 2</strong><span class="typ t-vor">Vorwärts</span></div>
+    <p>Bestimmt <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> g(x)</span> und <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> g(x)</span> für <span class="formel">g(x) = −x⁴ + 10x² − 3</span>. Warum sind beide Ergebnisse gleich?</p>
+    <button class="lknopf" data-loesung="b08u2l">Lösung ein/aus</button>
+    <div class="loesung" id="b08u2l"><p><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> g(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> x⁴·(−1 + <span class="bruch"><span class="z">10</span><span class="n">x²</span></span> − <span class="bruch"><span class="z">3</span><span class="n">x⁴</span></span>) = −∞</span> und ebenso <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> g(x) = −∞</span>. Der Exponent 4 ist gerade, <span class="formel">x⁴</span> ist also an beiden Rändern positiv; das Minus des Leitkoeffizienten dreht beides nach unten.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">4 · Merksatz</span>
+  <h2>Merksatz — Grenzwert und ganzrationale Funktionen</h2>
+  <div class="merk"><ul><li><span class="regel">Ein Grenzwert ist die Zahl, der sich f(x) für x → ∞ beliebig nähert — man setzt nicht ein, man nähert sich.</span><span class="kurz"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = g</span></span></li><li><span class="regel">Beide Ränder sind zwei Rechnungen: x → +∞ und x → −∞ getrennt ansetzen.</span><span class="kurz"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x)</span> und <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x)</span></span></li><li><span class="regel">Ganzrational: höchste Potenz ausklammern — allein sie entscheidet. Das Ergebnis ist immer +∞ oder −∞.</span><span class="kurz"><span class="formel">f(x) = −3x⁵ + 20x³</span>: <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> x⁵·(−3 + <span class="bruch"><span class="z">20</span><span class="n">x²</span></span>) = −∞</span></span></li><li><span class="regel">Vorzeichen: Leitkoeffizient a mal Verhalten von xⁿ. Gerader Grad: beide Ränder gleich. Ungerader Grad: entgegengesetzt.</span><span class="kurz">gerader Grad, a &gt; 0: links und rechts +∞<br>gerader Grad, a &lt; 0: links und rechts −∞<br>ungerader Grad, a &gt; 0: links −∞, rechts +∞<br>ungerader Grad, a &lt; 0: links +∞, rechts −∞</span></li></ul></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> <span class="formel">∞ − ∞ = 0</span></p><p><strong>Richtig:</strong> <span class="formel">∞ − ∞</span> ist keine Zahl, sondern ein Wettrennen: <span class="formel">x² − x → ∞</span>, aber <span class="formel">(x + 1) − x → 1</span>.</p></div>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Gebrochenrational — Zählergrad gegen Nennergrad</h2>
+  <div class="bsp"><h3>Erst wie gehabt — ausklammern: <span class="formel">g(x) = <span class="bruch"><span class="z">2x + 5</span><span class="n">x − 1</span></span></span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> g(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> <span class="bruch"><span class="z">x·(2 + <span class="bruch"><span class="z">5</span><span class="n">x</span></span>)</span><span class="n">x·(1 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span>)</span></span></span></span><span class="bhinweis">höchste Potenz in Zähler <b>und</b> Nenner ausklammern</span></li><li><span class="brechnung"><span class="formel">= <span class="limes">lim<span class="unter">x → ∞</span></span> <span class="bruch"><span class="z">2 + <span class="bruch"><span class="z">5</span><span class="n">x</span></span></span><span class="n">1 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span></span></span></span><span class="bhinweis">x kürzen</span></li><li><span class="brechnung"><span class="formel">= <span class="bruch"><span class="z">2</span><span class="n">1</span></span> = 2</span></span><span class="bhinweis">die Reste verschwinden; waagerechte Asymptote <span class="formel">y = 2</span></span></li><li><span class="brechnung">Beobachtung: nur die höchsten Potenzen und ihre Koeffizienten überleben.</span><span class="bhinweis">Darum genügt ab jetzt der Vergleich von <b>Zählergrad (ZG)</b> und <b>Nennergrad (NG)</b>.</span></li></ol>
+  </div>
+  <div class="bsp"><h3>Fall 1 · ZG &lt; NG: <span class="formel">h(x) = <span class="bruch"><span class="z">5x − 2</span><span class="n">x² + 1</span></span></span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> h(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> <span class="bruch"><span class="z">x·(5 − <span class="bruch"><span class="z">2</span><span class="n">x</span></span>)</span><span class="n">x²·(1 + <span class="bruch"><span class="z">1</span><span class="n">x²</span></span>)</span></span></span></span><span class="bhinweis">ausklammern</span></li><li><span class="brechnung"><span class="formel">= <span class="limes">lim<span class="unter">x → ∞</span></span> <span class="bruch"><span class="z">1</span><span class="n">x</span></span>·<span class="bruch"><span class="z">5 − <span class="bruch"><span class="z">2</span><span class="n">x</span></span></span><span class="n">1 + <span class="bruch"><span class="z">1</span><span class="n">x²</span></span></span></span></span></span><span class="bhinweis">kürzen — ein <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span></span> bleibt übrig</span></li><li><span class="brechnung"><span class="formel">= 0 · <span class="bruch"><span class="z">5</span><span class="n">1</span></span> = 0</span></span><span class="bhinweis">der Nenner gewinnt; waagerechte Asymptote <span class="formel">y = 0</span> (x-Achse)</span></li><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> h(x) = 0</span></span><span class="bhinweis">auch links: <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span> → 0</span></span></li></ol>
+  </div>
+  <div class="bsp"><h3>Fall 2 · ZG = NG: <span class="formel">k(x) = <span class="bruch"><span class="z">3x² − 4</span><span class="n">x² + 1</span></span></span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> k(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> <span class="bruch"><span class="z">x²·(3 − <span class="bruch"><span class="z">4</span><span class="n">x²</span></span>)</span><span class="n">x²·(1 + <span class="bruch"><span class="z">1</span><span class="n">x²</span></span>)</span></span></span></span><span class="bhinweis">ausklammern</span></li><li><span class="brechnung"><span class="formel">= <span class="limes">lim<span class="unter">x → ∞</span></span> <span class="bruch"><span class="z">3 − <span class="bruch"><span class="z">4</span><span class="n">x²</span></span></span><span class="n">1 + <span class="bruch"><span class="z">1</span><span class="n">x²</span></span></span></span> = <span class="bruch"><span class="z">3</span><span class="n">1</span></span> = 3</span></span><span class="bhinweis">kürzen; Quotient der Leitkoeffizienten</span></li><li><span class="brechnung">waagerechte Asymptote <span class="formel">y = 3</span>, ebenso für <span class="formel">x → −∞</span></span><span class="bhinweis">Probe: <span class="formel">k(100) = <span class="bruch"><span class="z">29 996</span><span class="n">10 001</span></span> ≈ 2,9997</span></span></li></ol>
+  </div>
+  <div class="bsp"><h3>Fall 3 · ZG &gt; NG: <span class="formel">m(x) = <span class="bruch"><span class="z">x² + 1</span><span class="n">x</span></span></span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> m(x) = <span class="limes">lim<span class="unter">x → ∞</span></span> <span class="bruch"><span class="z">x²·(1 + <span class="bruch"><span class="z">1</span><span class="n">x²</span></span>)</span><span class="n">x</span></span> = <span class="limes">lim<span class="unter">x → ∞</span></span> x·(1 + <span class="bruch"><span class="z">1</span><span class="n">x²</span></span>) = +∞</span></span><span class="bhinweis">der Zähler gewinnt — kein Grenzwert, keine waagerechte Asymptote</span></li><li><span class="brechnung"><span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> m(x) = −∞</span></span><span class="bhinweis">links kippt das Vorzeichen mit x</span></li><li><span class="brechnung"><span class="formel">m(x) = x + <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span></span><span class="bhinweis">Zähler durch Nenner teilen: Abstand zur Geraden <span class="formel">y = x</span> ist <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">x</span></span> → 0</span> — <b>schräge Asymptote</b> <span class="formel">y = x</span></span></li></ol>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">4 · Merksatz</span>
+  <h2>Merksatz — gebrochenrationale Funktionen und Asymptoten</h2>
+  <div class="merk"><ul><li><span class="regel">Rezept für jede gebrochenrationale Funktion: höchste Potenz in Zähler und Nenner ausklammern, kürzen — alle Terme der Form <span class="bruch"><span class="z">c</span><span class="n">xⁿ</span></span> gehen gegen 0. Übrig bleibt einer von drei Fällen.</span><span class="kurz"><span class="formel"><span class="bruch"><span class="z">c</span><span class="n">xⁿ</span></span> → 0</span> für <span class="formel">x → ±∞</span></span></li><li><span class="regel">Zählergrad &lt; Nennergrad: der Nenner wächst schneller, die Werte gehen gegen 0. Die x-Achse ist waagerechte Asymptote.</span><span class="kurz"><span class="formel">f(x) = <span class="bruch"><span class="z">5x − 2</span><span class="n">x² + 1</span></span></span>: <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = 0</span> und <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x) = 0</span> → Asymptote <span class="formel">y = 0</span></span></li><li><span class="regel">Zählergrad = Nennergrad: nach dem Kürzen bleibt der Quotient der Leitkoeffizienten. Waagerechte Asymptote y = <span class="bruch"><span class="z">a</span><span class="n">b</span></span>, an beiden Rändern dieselbe.</span><span class="kurz"><span class="formel">f(x) = <span class="bruch"><span class="z">3x² − 4</span><span class="n">x² + 1</span></span></span>: <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = <span class="bruch"><span class="z">3</span><span class="n">1</span></span> = 3</span> und <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x) = 3</span> → Asymptote <span class="formel">y = 3</span></span></li><li><span class="regel">Zählergrad &gt; Nennergrad: der Zähler gewinnt, es gibt keinen Grenzwert — die Werte laufen gegen +∞ oder −∞, das Vorzeichen wie bei ganzrationalen Funktionen. Keine waagerechte Asymptote; ist der Zählergrad genau um 1 größer, gibt es eine schräge (Zähler durch Nenner teilen).</span><span class="kurz"><span class="formel">f(x) = <span class="bruch"><span class="z">x² + 1</span><span class="n">x</span></span> = x + <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span>: <span class="formel"><span class="limes">lim<span class="unter">x → ∞</span></span> f(x) = +∞</span>, <span class="formel"><span class="limes">lim<span class="unter">x → −∞</span></span> f(x) = −∞</span> → schräge Asymptote <span class="formel">y = x</span></span></li><li><span class="regel">Asymptote heißt: eine Gerade, an die sich der Graph für x → ∞ oder x → −∞ immer enger anschmiegt. Es gibt drei Sorten.</span><span class="kurz">waagerecht, z. B. <span class="formel">y = 3</span><br>schräg, z. B. <span class="formel">y = x</span><br>senkrecht, z. B. <span class="formel">x = 1</span> an einer Nullstelle des Nenners (das ist Block 09)</span></li></ul></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „x = 0 einsetzen liefert den Grenzwert.“</p><p><strong>Richtig:</strong> <span class="formel">f(0)</span> ist der y-Achsenabschnitt. Der Grenzwert fragt nach riesigen x — dort zählen nur die höchsten Potenzen.</p></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „Eine Asymptote darf der Graph nie berühren.“</p><p><strong>Richtig:</strong> Doch — eine Asymptote beschreibt das Verhalten <b>am Ende</b>, sie ist keine Schranke für einzelne Stellen. Ob ein Graph seine waagerechte Asymptote trifft, ist eine Frage an den konkreten Term (Aufgabe 12).</p></div>
+</section>
+
+
+
+<section class="slide">
+  <h2 class="nur-arbeit">Aufgabengenerator: Grenzverhalten gebrochenrationaler Funktionen</h2>
+  <div class="gen nur-arbeit">
+    <p>Stufe:
+      <select id="genStufe">
+        <option value="1">1 · Grenzwert ablesen</option>
+        <option value="2">2 · mit y-Achsenabschnitt</option>
+        <option value="3">3 · + Annäherung von oben/unten</option>
+        <option value="4">4 · rückwärts (Term aus Asymptote)</option>
+      </select>
+      <button id="genNeu">Neue Aufgabe</button>
+      <button id="genLoesung">Lösungsweg ein/aus</button>
+    </p>
+    <div class="genaufgabe" id="genAusgabe"><em>Noch keine Aufgabe erzeugt.</em></div>
+    <div class="loesung" id="genLoesungFeld"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">5 · Aufgaben</span>
+  <h2>Aufgaben</h2>
+  <details class="spiegel nur-arbeit"><summary>Aufgabenspiegel: Typ × Anforderungsbereich</summary>
+    <table class="param"><thead><tr><th></th><th>AFB I</th><th>AFB II</th><th>AFB III</th></tr></thead><tbody><tr><th>Vorwärts</th><td>2</td><td>2</td><td>1</td></tr><tr><th>Rückwärts</th><td>2</td><td>1</td><td>—</td></tr><tr><th>Parameter</th><td>—</td><td>2</td><td>—</td></tr><tr><th>Beurteilen</th><td>—</td><td>1</td><td>1</td></tr></tbody></table>
+    <p class="lead">Verteilung der Bewertungseinheiten: AFB I 32 %; AFB II 47 %; AFB III 21 % (Richtwert 30 / 50 / 20).</p>
+  </details>
+  <details class="stufe" open><summary>Anforderungsbereich I — Reproduzieren <span class="lead">· angeben, berechnen, ablesen</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b08a1">
+    <div class="kopf"><strong>Aufgabe 1</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt das Verhalten von <span class="formel">f(x) = 3 − <span class="bruch"><span class="z">2</span><span class="n">x</span></span></span> für <span class="formel">x → +∞</span> an und begründet ohne Rechner, warum sich der Graph der Geraden <span class="formel">y = 3</span> <b>von unten</b> nähert.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Grenzwert für x → +∞?</p>
+      <input id="b08a1antwort" inputmode="text" placeholder="z. B. 5" aria-label="Antwort Aufgabe 1">
+      <button id="b08a1pruefen">Prüfen</button>
+      <div class="feedback" id="b08a1feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b08a1l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a1l"><p><span class="formel"><span class="bruch"><span class="z">2</span><span class="n">x</span></span> → 0</span>, also <span class="formel">f(x) → 3</span>. Zur Richtung: für <span class="formel">x &gt; 0</span> ist <span class="formel"><span class="bruch"><span class="z">2</span><span class="n">x</span></span> &gt; 0</span>, von 3 wird also stets etwas Positives abgezogen — damit ist <span class="formel">f(x) &lt; 3</span> für alle <span class="formel">x &gt; 0</span>, der Graph bleibt unterhalb der Geraden und nähert sich ihr von unten. (Für <span class="formel">x &lt; 0</span> wäre es umgekehrt: dort läge der Graph oberhalb.)</p></div>
+  </div>
+  <div class="aufgabe" id="b08a2">
+    <div class="kopf"><strong>Aufgabe 2</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Bestimmt das Verhalten von <span class="formel">p(x) = −2x³ + 50x</span> für <span class="formel">x → +∞</span> und <span class="formel">x → −∞</span>. Erklärt, warum der Summand <span class="formel">50x</span> am Ende keine Rolle spielt.</p>
+    <button class="lknopf" data-loesung="b08a2l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a2l"><p><span class="formel">x → +∞: p(x) → −∞</span> · <span class="formel">x → −∞: p(x) → +∞</span>. Ausklammern: <span class="formel">x³·(−2 + <span class="bruch"><span class="z">50</span><span class="n">x²</span></span>)</span> — die Klammer stabilisiert sich bei <span class="formel">−2</span>, das Vorzeichen macht <span class="formel">x³</span>. Der lineare Summand wächst nur linear und geht im Vergleich unter.</p></div>
+  </div>
+  <div class="aufgabe" id="b08a3">
+    <div class="kopf"><strong>Aufgabe 3</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt je eine Funktion an, deren Werte für <span class="formel">x → +∞</span> gegen 5 streben — einmal mit Annäherung <b>von unten</b>, einmal <b>von oben</b>.</p>
+    <button class="lknopf" data-loesung="b08a3l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a3l"><p>Von unten z. B. <span class="formel">f(x) = 5 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span>, von oben z. B. <span class="formel">g(x) = 5 + <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span>. Entscheidend ist das Vorzeichen des Restterms; jede Funktion der Bauart <span class="formel">5 ± <span class="bruch"><span class="z">c</span><span class="n">xⁿ</span></span></span> mit <span class="formel">c &gt; 0</span> leistet dasselbe.</p></div>
+  </div>
+  <div class="aufgabe" id="b08a4">
+    <div class="kopf"><strong>Aufgabe 4</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine ganzrationale Funktion an, die für <span class="formel">x → +∞</span> <b>und</b> für <span class="formel">x → −∞</span> gegen <span class="formel">−∞</span> läuft. Begründet eure Wahl.</p>
+    <button class="lknopf" data-loesung="b08a4l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a4l"><p>Zum Beispiel <span class="formel">f(x) = −x²</span> oder <span class="formel">f(x) = −x⁴ + 3</span>. Nötig ist ein <b>gerader</b> Grad mit <b>negativem</b> Leitkoeffizienten: Bei geradem Exponenten liefern beide Richtungen dasselbe Vorzeichen, das Minus dreht es nach unten.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich II — Zusammenhänge herstellen <span class="lead">· bestimmen, untersuchen, erläutern</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b08a5">
+    <div class="kopf"><strong>Aufgabe 5</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Untersucht <span class="formel">g(x) = <span class="bruch"><span class="z">3x − 1</span><span class="n">x + 2</span></span></span> für <span class="formel">x → ±∞</span> und gebt die Gleichung der waagerechten Asymptote an.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Grenzwert von g für x → ∞?</p>
+      <input id="b08a5antwort" inputmode="text" placeholder="z. B. 1,5" aria-label="Antwort Aufgabe 5">
+      <button id="b08a5pruefen">Prüfen</button>
+      <div class="feedback" id="b08a5feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b08a5l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a5l"><p>Durch x kürzen: <span class="formel"><span class="bruch"><span class="z">3 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span><span class="n">1 + <span class="bruch"><span class="z">2</span><span class="n">x</span></span></span></span> → <span class="bruch"><span class="z">3</span><span class="n">1</span></span> = 3</span>. Waagerechte Asymptote <span class="formel">y = 3</span> für beide Richtungen. Probe: <span class="formel">g(100) = <span class="bruch"><span class="z">299</span><span class="n">102</span></span> ≈ 2,93</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b08a6">
+    <div class="kopf"><strong>Aufgabe 6</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">h(x) = <span class="bruch"><span class="z">4x² − 1</span><span class="n">x² + 1</span></span></span>. Ermittelt das Verhalten für <span class="formel">x → ±∞</span> sowie den y-Achsenabschnitt und begründet, dass der Graph achsensymmetrisch ist.</p>
+    <button class="lknopf" data-loesung="b08a6l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a6l"><p>Mit <span class="formel">x²</span> kürzen: <span class="formel"><span class="bruch"><span class="z">4 − <span class="bruch"><span class="z">1</span><span class="n">x²</span></span></span><span class="n">1 + <span class="bruch"><span class="z">1</span><span class="n">x²</span></span></span></span> → 4</span> — Asymptote <span class="formel">y = 4</span>. <span class="formel">h(0) = <span class="bruch"><span class="z">−1</span><span class="n">1</span></span> = −1</span>. Symmetrie: x kommt nur in geraden Potenzen vor, also <span class="formel">h(−x) = h(x)</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b08a7">
+    <div class="kopf"><strong>Aufgabe 7</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine gebrochenrationale Funktion an, deren Graph die waagerechte Asymptote <span class="formel">y = −3</span> besitzt und die an der Stelle 1 nicht definiert ist.</p>
+    <button class="lknopf" data-loesung="b08a7l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a7l"><p>Zum Beispiel <span class="formel">f(x) = <span class="bruch"><span class="z">−3x</span><span class="n">x − 1</span></span></span>. Für <span class="formel">x → ±∞</span> kürzt sich x heraus: <span class="formel"><span class="bruch"><span class="z">−3</span><span class="n">1 − <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span></span> → −3</span>. Der Nenner wird bei <span class="formel">x = 1</span> null — dort ist f nicht definiert. Ebenso möglich: <span class="formel">f(x) = −3 + <span class="bruch"><span class="z">2</span><span class="n">x − 1</span></span></span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b08a8">
+    <div class="kopf"><strong>Aufgabe 8</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Für welchen Wert von a besitzt <span class="formel">f<sub>a</sub>(x) = <span class="bruch"><span class="z">a·x − 1</span><span class="n">x + 2</span></span></span> die waagerechte Asymptote <span class="formel">y = 3</span>? Begründet.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert von a?</p>
+      <input id="b08a8antwort" inputmode="text" placeholder="z. B. 2" aria-label="Antwort Aufgabe 8">
+      <button id="b08a8pruefen">Prüfen</button>
+      <div class="feedback" id="b08a8feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b08a8l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a8l"><p>Zähler- und Nennergrad sind gleich, also ist der Grenzwert der Quotient der Leitkoeffizienten: <span class="formel"><span class="bruch"><span class="z">a</span><span class="n">1</span></span> = a</span>. Aus <span class="formel">a = 3</span> folgt die Asymptote <span class="formel">y = 3</span>. Die Konstanten <span class="formel">−1</span> und <span class="formel">+2</span> beeinflussen den Grenzwert nicht.</p></div>
+  </div>
+  <div class="aufgabe" id="b08a9">
+    <div class="kopf"><strong>Aufgabe 9</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist die Schar <span class="formel">f<sub>a</sub>(x) = <span class="bruch"><span class="z">x² + a</span><span class="n">x² + 1</span></span></span>. Zeigt, dass für jedes a die Gerade <span class="formel">y = 1</span> waagerechte Asymptote ist, und bestimmt, für welche a der Graph vollständig oberhalb dieser Asymptote verläuft.</p>
+    <button class="lknopf" data-loesung="b08a9l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a9l"><p>Kürzen mit <span class="formel">x²</span>: <span class="formel"><span class="bruch"><span class="z">1 + <span class="bruch"><span class="z">a</span><span class="n">x²</span></span></span><span class="n">1 + <span class="bruch"><span class="z">1</span><span class="n">x²</span></span></span></span> → 1</span> für jedes a. Umformen: <span class="formel">f<sub>a</sub>(x) = 1 + <span class="bruch"><span class="z">a − 1</span><span class="n">x² + 1</span></span></span>. Da <span class="formel">x² + 1 &gt; 0</span> ist, liegt der Graph genau dann oberhalb, wenn <span class="formel">a − 1 &gt; 0</span>, also für <span class="formel">a &gt; 1</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b08a10">
+    <div class="kopf"><strong>Aufgabe 10</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Beurteilt: „Eine ganzrationale Funktion dritten Grades kann keine waagerechte Asymptote besitzen.“</p>
+    <button class="lknopf" data-loesung="b08a10l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a10l"><p><b>Wahr.</b> Klammert man <span class="formel">x³</span> aus, bleibt <span class="formel">x³·(a + <span class="bruch"><span class="z">b</span><span class="n">x</span></span> + <span class="bruch"><span class="z">c</span><span class="n">x²</span></span> + <span class="bruch"><span class="z">d</span><span class="n">x³</span></span>)</span>; die Klammer stabilisiert sich beim Leitkoeffizienten <span class="formel">a ≠ 0</span>, und <span class="formel">x³</span> wächst unbeschränkt. Das Produkt läuft also gegen <span class="formel">±∞</span> und kann sich keiner Zahl nähern. Allgemein gilt das für <b>jede</b> ganzrationale Funktion vom Grad <span class="formel">≥ 1</span> — nur konstante Funktionen haben eine waagerechte Asymptote, nämlich sich selbst.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich III — Verallgemeinern und beurteilen <span class="lead">· begründen, beurteilen, entwickeln</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b08a11">
+    <div class="kopf"><strong>Aufgabe 11</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Begründet ohne Grenzwertkalkül, dass <span class="formel">q(x) = <span class="bruch"><span class="z">x²</span><span class="n">2<sup>x</sup></span></span></span> für <span class="formel">x → +∞</span> gegen 0 strebt, obwohl der Zähler unbeschränkt wächst.</p>
+    <button class="lknopf" data-loesung="b08a11l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a11l"><p>Wertevergleich: bei <span class="formel">x = 10</span> steht <span class="formel">100</span> gegen <span class="formel">1024</span>, bei <span class="formel">x = 20</span> schon <span class="formel">400</span> gegen <span class="formel">1 048 576</span>. Der Nenner <b>verdoppelt</b> sich bei jedem Schritt um 1, der Zähler wächst nur polynomial — der Vorsprung wird beliebig groß, der Bruch also beliebig klein. Das ist die Dominanz-Hierarchie.</p></div>
+  </div>
+  <div class="aufgabe" id="b08a12">
+    <div class="kopf"><strong>Aufgabe 12</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Beurteilt die folgenden Aussagen (jeweils für <span class="formel">x → ∞</span>); begründet wahre allgemein und widerlegt falsche durch ein Gegenbeispiel. <ol class="teile"><li>Gilt <span class="formel">f(x) → ∞</span> und <span class="formel">g(x) → ∞</span>, so folgt <span class="formel">f(x) − g(x) → 0</span>.</li><li>Eine Funktion mit waagerechter Asymptote <span class="formel">y = 2</span> nimmt den Wert 2 nirgends an.</li><li>Gilt <span class="formel">f(x) → 3</span>, so folgt <span class="formel">f(x)² → 9</span>.</li></ol></p>
+    <button class="lknopf" data-loesung="b08a12l">Lösung ein/aus</button>
+    <div class="loesung" id="b08a12l"><p><ol class="teile"><li><b>falsch</b>: <span class="formel">f(x) = x²</span> und <span class="formel">g(x) = x</span> laufen beide gegen <span class="formel">∞</span>, aber <span class="formel">x² − x → ∞</span>. Mit <span class="formel">f(x) = x + 1</span> und <span class="formel">g(x) = x</span> käme 1 heraus — der Ausdruck ist unbestimmt.</li><li><b>falsch</b>: <span class="formel">f(x) = 2 + <span class="bruch"><span class="z">x</span><span class="n">x² + 1</span></span></span> hat den Grenzwert 2 und dennoch <span class="formel">f(0) = 2</span>. Eine Asymptote beschreibt das Verhalten <b>am Ende</b>; über einzelne Stellen sagt sie nichts.</li><li><b>wahr</b>: nach dem Produktsatz ist <span class="formel">f·f → 3·3 = 9</span>.</li></ol></p></div>
+  </div>
+    </div>
+  </details>
+  
+</section>
+
+<section class="slide">
+  <details class="stufe"><summary>Zum Nachschlagen: Verhalten im Unendlichen — der Grenzwertbegriff <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: Grenzwerte für x → ±∞</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">Was ein Grenzwert ist</td><td class="rform">Stabilisierung, kein Einsetzen</td><td class="rtext">Der Grenzwert beschreibt, wo sich die Funktionswerte <strong>einpendeln</strong>, wenn x immer größer wird. Er muss nicht angenommen werden — <span class="bruch"><span class="z">1</span><span class="n">x</span></span> wird nie null, der Grenzwert ist trotzdem 0.</td></tr>
+        <tr><td class="rname">Schreibweise</td><td class="rform">lim<sub>x→∞</sub> f(x) = a</td><td class="rtext">Gelesen: „Limes von f(x) für x gegen unendlich ist a." Das Pfeilsymbol meint <em>annähern</em>, nicht <em>einsetzen</em>. ∞ ist keine Zahl, man setzt sie nie ein.</td></tr>
+        <tr><td class="rname">Die Grundbausteine</td><td class="rform"><span class="bruch"><span class="z">1</span><span class="n">xⁿ</span></span> → 0</td><td class="rtext">Für jedes n ≥ 1 gilt: <span class="bruch"><span class="z">1</span><span class="n">xⁿ</span></span> geht gegen 0, wenn x gegen ±∞ läuft. Darauf lässt sich fast jeder Grenzwert zurückführen.</td></tr>
+        <tr><td class="rname">Ganzrationale Funktionen</td><td class="rform">höchste Potenz entscheidet</td><td class="rtext">Bei x³ − 100x² + 5 gewinnt auf Dauer das x³ — für x → ∞ geht der Term gegen +∞. Grad und Leitkoeffizient legen beide Enden fest, alles andere fällt nicht ins Gewicht.</td></tr>
+        <tr><td class="rname">Gebrochenrationale Funktionen</td><td class="rform">mit der höchsten Potenz kürzen</td><td class="rtext">Zähler und Nenner durch die höchste vorkommende x-Potenz teilen, dann gehen alle <span class="bruch"><span class="z">1</span><span class="n">xⁿ</span></span> gegen null. Übrig bleibt der Grenzwert.</td></tr>
+        <tr><td class="rname">Drei Fälle beim Bruch</td><td class="rform">Zählergrad gegen Nennergrad</td><td class="rtext"><strong>Zähler kleiner:</strong> Grenzwert 0. <strong>Gleich:</strong> Quotient der Leitkoeffizienten. <strong>Zähler größer:</strong> kein endlicher Grenzwert, der Betrag wächst über alle Grenzen.</td></tr>
+        <tr><td class="rname">Waagrechte Asymptote</td><td class="rform">y = a</td><td class="rtext">Existiert der Grenzwert a, nähert sich der Graph der Geraden y = a an. Sie darf durchaus geschnitten werden — „Asymptote" heißt nur: auf Dauer beliebig nah.</td></tr>
+        <tr><td class="rname">Was man nicht darf</td><td class="rform">∞ − ∞ und ∞/∞ sind keine Ergebnisse</td><td class="rtext">Solche Ausdrücke sind <strong>unbestimmt</strong> — sie sagen nichts aus. Man muss erst umformen (kürzen, ausklammern), bevor man über den Grenzwert entscheidet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+</section>
+
+</main>
+<div class="beamer-hinweis">B = Beamer · ◀ ▶ = Navigation · L = Lösungen</div>
+
+<script id="gen-lib">
+"use strict";
+function mulberry(seed){
+  var t = seed >>> 0;
+  return function(){
+    t = (t + 0x6D2B79F5) >>> 0;
+    var r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ganz(rnd, von, bis){ return von + Math.floor(rnd() * (bis - von + 1)); }
+
+function grzGgt(p, q){ p = Math.abs(p); q = Math.abs(q); while (q){ var r = p % q; p = q; q = r; } return p || 1; }
+function grzBruch(z, n){
+  var vz = (z * n < 0) ? "−" : "";
+  var az = Math.abs(z), an = Math.abs(n);
+  if (z === 0) return "0";
+  if (az % an === 0) return vz + (az / an);
+  var g = grzGgt(az, an);
+  return vz + (az / g) + "/" + (an / g);
+}
+function grzZ(w){ return w < 0 ? "−" + (-w) : "" + w; }
+function grzVz(w){ return w >= 0 ? " + " + w : " − " + (-w); }
+function grzKo(w){ return w === 1 ? "" : (w === -1 ? "−" : grzZ(w)); }
+function grzVzOpt(w){ return w === 0 ? "" : grzVz(w); }
+function grzLin(k, konst){ return grzKo(k) + "x" + grzVzOpt(konst); }
+function grzTerm(a, b, c, d){ return "(" + grzLin(a, b) + ")/(" + grzLin(c, d) + ")"; }
+function grzQuot(sym, n){ return n === 1 ? sym : sym + "/" + n; }
+function grzMalRech(k, n){
+  if (n === 1) return grzZ(k);
+  if (k === 0) return "0";
+  if (k === 1) return "" + n;
+  if (k === -1) return "−" + n;
+  return grzZ(k) + "·" + n + " = " + grzZ(k * n);
+}
+function grzNennProd(c, d){ return c === 1 ? "(" + grzLin(c, d) + ")" : "(" + c + "·(" + grzLin(c, d) + "))"; }
+function grzDiffKopf(a, c){ return a < 0 ? "f(x) + " + grzBruch(-a, c) : "f(x) − " + grzBruch(a, c); }
+function grenzMake(seed, level){
+  var rnd = mulberry(seed * 4 + level + 800);
+  var a = ganz(rnd, 1, 5) * (rnd() < 0.35 ? -1 : 1);
+  var c = ganz(rnd, 1, 4);
+  var b = ganz(rnd, -5, 5), d = ganz(rnd, 1, 5);
+  if (a * d === b * c) b = b + 1;         // ad != bc (sonst konstant)
+  var term = grzTerm(a, b, c, d);
+  var text, schritte;
+  var basis = { typ: "grenzwert", seed: seed, level: level };
+  function fertig(v, felder){
+    basis.variante = v; basis.text = text; basis.schritte = schritte;
+    basis.a = a; basis.b = b; basis.c = c; basis.d = d;
+    for (var k in felder) basis[k] = felder[k];
+    if (!basis.ergebnis) basis.ergebnis = {};
+    basis.ergebnis.gwZ = basis.a; basis.ergebnis.gwN = basis.c;
+    basis.ergebnis.y0Z = basis.b; basis.ergebnis.y0N = basis.d;
+    return basis;
+  }
+  function kuerzSchritt(aa, bb, cc, dd){
+    return "Zaehler und Nenner durch x teilen: (" + grzZ(aa) + (bb === 0 ? "" : grzVz(bb) + "/x") + ")/(" + cc + " + " + dd + "/x)";
+  }
+  if (level === 1){
+    var v1 = ganz(rnd, 0, 2);
+    if (v1 === 0){
+      text = "Gegeben ist f(x) = " + term + ". Geben Sie das Verhalten fuer x gegen +unendlich an und nennen Sie die waagerechte Asymptote.";
+      schritte = [kuerzSchritt(a, b, c, d),
+        (b === 0 ? "der Bruchterm " + d + "/x geht gegen 0" : "die Bruchterme " + grzZ(b) + "/x und " + d + "/x gehen gegen 0"),
+        "Grenzwert " + grzBruch(a, c) + ", Asymptote y = " + grzBruch(a, c)];
+      return fertig(0, {});
+    }
+    if (v1 === 1){
+      if (c === 1) c = ganz(rnd, 2, 4);   // sonst waere "a/1 = k" trivial
+      var k1 = ganz(rnd, 1, 3) * (rnd() < 0.35 ? -1 : 1);
+      var aR = k1 * c;
+      if (aR * d === b * c) b = b + 1;
+      a = aR; term = grzTerm(a, b, c, d);
+      text = "Von f(x) = (a·x" + grzVzOpt(b) + ")/(" + grzLin(c, d) + ") ist der Zaehler-Leitkoeffizient a unbekannt. " +
+        "Der Graph hat fuer x gegen +unendlich die waagerechte Asymptote y = " + grzZ(k1) + ". Bestimmen Sie a.";
+      schritte = ["fuer x gegen unendlich zaehlen nur die Leitkoeffizienten: Grenzwert = " + grzQuot("a", c),
+        grzQuot("a", c) + " = " + grzZ(k1) + " → a = " + grzMalRech(k1, c),
+        "Probe: f(x) = " + term + " hat den Grenzwert " + grzBruch(a, c)];
+      return fertig(1, { k: k1, ergebnis: { aGesucht: a, gw: k1 } });
+    }
+    var a2 = ganz(rnd, 1, 5) * (rnd() < 0.35 ? -1 : 1);
+    var c2 = ganz(rnd, 1, 4), b2 = ganz(rnd, -5, 5), d2 = ganz(rnd, 1, 5);
+    var schutz = 0;
+    while ((a2 * c === a * c2 || a2 === 0) && schutz < 12){ a2 = a2 + 1; schutz++; }
+    if (a2 * d2 === b2 * c2) b2 = b2 + 1;
+    var term2 = grzTerm(a2, b2, c2, d2);
+    text = "Vergleichen Sie f(x) = " + term + " und g(x) = " + term2 +
+      ". Bestimmen Sie beide Grenzwerte fuer x gegen +unendlich und entscheiden Sie, welcher groesser ist.";
+    schritte = ["f: Leitkoeffizienten " + grzZ(a) + " und " + c + " → Grenzwert " + grzBruch(a, c),
+      "g: Leitkoeffizienten " + grzZ(a2) + " und " + c2 + " → Grenzwert " + grzBruch(a2, c2),
+      (a / c > a2 / c2 ? "f hat den groesseren Grenzwert" : "g hat den groesseren Grenzwert")];
+    return fertig(2, { a2: a2, b2: b2, c2: c2, d2: d2,
+      ergebnis: { groesser: (a / c > a2 / c2 ? "f" : "g") } });
+  }
+  if (level === 2){
+    var v2 = ganz(rnd, 0, 2);
+    if (v2 === 0){
+      text = "Gegeben ist f(x) = " + term + ". Geben Sie den Grenzwert fuer x gegen +unendlich und den y-Achsenabschnitt an.";
+      schritte = [kuerzSchritt(a, b, c, d),
+        "Bruchterme gehen gegen 0 → Grenzwert " + grzBruch(a, c),
+        "y-Achsenabschnitt: f(0) = " + grzBruch(b, d)];
+      return fertig(0, {});
+    }
+    if (v2 === 1){
+      if (c === 1) c = ganz(rnd, 2, 4);   // sonst waere a/1 bzw. b/1 trivial
+      if (d === 1) d = ganz(rnd, 2, 5);
+      var k2 = ganz(rnd, 1, 3) * (rnd() < 0.35 ? -1 : 1);
+      var j2 = ganz(rnd, -3, 3);
+      if (j2 === k2) j2 = j2 + 1;
+      if (j2 === k2) j2 = j2 + 1;
+      a = k2 * c; b = j2 * d; term = grzTerm(a, b, c, d);
+      text = "Gesucht sind a und b in f(x) = (a·x + b)/(" + grzLin(c, d) + "). Bekannt ist: der Grenzwert fuer x gegen +unendlich betraegt " +
+        grzZ(k2) + " und es gilt f(0) = " + grzZ(j2) + ". Bestimmen Sie a und b.";
+      schritte = ["Grenzwert = " + grzQuot("a", c) + " = " + grzZ(k2) + " → a = " + grzMalRech(k2, c),
+        "f(0) = " + grzQuot("b", d) + " = " + grzZ(j2) + " → b = " + grzMalRech(j2, d),
+        "f(x) = " + term];
+      return fertig(1, { k: k2, j: j2, ergebnis: { aGesucht: a, bGesucht: b, gw: k2, y0: j2 } });
+    }
+    text = "Fehlersuche: Fuer f(x) = " + term + " setzt ein Schueler x = 0 ein und behauptet, der Grenzwert fuer x gegen +unendlich sei " +
+      grzBruch(b, d) + ". Finden Sie den Fehler und geben Sie Grenzwert und y-Achsenabschnitt korrekt an.";
+    schritte = ["Fehler: f(0) = " + grzBruch(b, d) + " ist der y-Achsenabschnitt, kein Grenzwert — Einsetzen von 0 sagt nichts ueber grosse x",
+      kuerzSchritt(a, b, c, d),
+      "Grenzwert " + grzBruch(a, c) + " (Asymptote y = " + grzBruch(a, c) + "), y-Achsenabschnitt " + grzBruch(b, d)];
+    return fertig(2, { ergebnis: { falschWertZ: b, falschWertN: d } });
+  }
+  if (level === 3){
+    var v3 = ganz(rnd, 0, 2);
+    var zae = b * c - a * d;   // f(x) - a/c = (bc-ad) / (c(cx+d))
+    var richtung = (zae > 0) ? "oben" : "unten";
+    if (v3 === 0){
+      text = "Gegeben ist f(x) = " + term + ". Bestimmen Sie den Grenzwert fuer x gegen +unendlich und entscheiden Sie, ob sich der Graph der Asymptote von oben oder von unten naehert.";
+      schritte = [kuerzSchritt(a, b, c, d) + " → Grenzwert " + grzBruch(a, c),
+        "Differenz auf einen Bruch: " + grzDiffKopf(a, c) + " = " + grzZ(zae) + "/" + grzNennProd(c, d),
+        "fuer grosse x ist der Nenner positiv, der Zaehler " + grzZ(zae) + " ist " + (zae > 0 ? "positiv" : "negativ") + " → Annaeherung von " + richtung];
+      return fertig(0, { ergebnis: { richtung: richtung } });
+    }
+    if (v3 === 1){
+      var richtungMinus = (zae > 0) ? "unten" : "oben";
+      text = "Gegeben ist f(x) = " + term + ". Untersuchen Sie beide Raender: Naehert sich der Graph der waagerechten Asymptote fuer x gegen +unendlich und fuer x gegen −unendlich jeweils von oben oder von unten? Begruenden Sie.";
+      schritte = ["Grenzwert beidseitig " + grzBruch(a, c) + "; Differenz " + grzDiffKopf(a, c) + " = " + grzZ(zae) + "/" + grzNennProd(c, d),
+        "x gegen +unendlich: " + grzLin(c, d) + " > 0 → Vorzeichen von " + grzZ(zae) + " → von " + richtung,
+        "x gegen −unendlich: " + grzLin(c, d) + " < 0 → Vorzeichen kippt → von " + richtungMinus];
+      return fertig(1, { ergebnis: { richtung: richtung, richtungMinus: richtungMinus } });
+    }
+    text = "Begriffsarbeit: Fuer f(x) = " + term + " gilt " + grzDiffKopf(a, c) + " = " + grzZ(zae) + "/" + grzNennProd(c, d) +
+      ". Erklaeren Sie damit, was der Grenzwert " + grzBruch(a, c) + " bedeutet, und begruenden Sie, dass f den Wert " + grzBruch(a, c) + " an keiner Stelle annimmt.";
+    schritte = ["Grenzwert heisst Stabilisierung: der Abstand " + grzZ(zae) + "/" + grzNennProd(c, d) + " wird fuer wachsendes x beliebig klein",
+      "Annehmen des Wertes hiesse Differenz = 0; ein Bruch ist 0 nur bei Zaehler 0",
+      "der Zaehler ist konstant " + grzZ(zae) + " ≠ 0 → der Wert " + grzBruch(a, c) + " wird nie erreicht"];
+    return fertig(2, { ergebnis: { differenzZaehler: zae } });
+  }
+  var v4 = ganz(rnd, 0, 2);
+  if (v4 === 0){
+    text = "Geben Sie eine gebrochenrationale Funktion an, deren Graph die waagerechte Asymptote y = " + grzBruch(a, c) +
+      " und den y-Achsenabschnitt " + grzBruch(b, d) + " hat, und weisen Sie beides nach.";
+    schritte = ["waagerechte Asymptote → Zaehler- und Nennergrad gleich, Leitkoeffizienten " + grzZ(a) + " und " + c,
+      "y-Achsenabschnitt f(0) = b/d: waehle b = " + grzZ(b) + " und d = " + d,
+      "f(x) = " + term + " leistet beides: Grenzwert " + grzBruch(a, c) + ", f(0) = " + grzBruch(b, d)];
+    return fertig(0, {});
+  }
+  if (v4 === 1){
+    text = "Geben Sie eine gebrochenrationale Funktion an, deren Graph die waagerechte Asymptote y = " + grzBruch(a, c) +
+      " und die senkrechte Asymptote x = " + grzBruch(-d, c) + " besitzt. Begruenden Sie beide Eigenschaften.";
+    schritte = ["senkrechte Asymptote: Nenner 0 setzen → " + grzLin(c, d) + " = 0 bei x = " + grzBruch(-d, c),
+      "waagerechte Asymptote: gleicher Grad, Leitkoeffizienten " + grzZ(a) + " und " + c + " → y = " + grzBruch(a, c),
+      "f(x) = " + term + " erfuellt beides; der Zaehler wird an der Polstelle nicht 0, die Polstelle ist also nicht hebbar"];
+    return fertig(1, { ergebnis: { polZ: -d, polN: c } });
+  }
+  var bT = (b === 0) ? 2 : b;
+  if (a * d === bT * c) bT = bT + 1;
+  b = bT; term = grzTerm(a, b, c, d);
+  var termG = grzTerm(b, a, d, c);
+  text = "Entscheiden Sie mit Begruendung: Welche der beiden Funktionen f(x) = " + term + " und g(x) = " + termG +
+    " hat die waagerechte Asymptote y = " + grzBruch(a, c) + "?";
+  schritte = ["f: Leitkoeffizienten " + grzZ(a) + " und " + c + " → Grenzwert " + grzBruch(a, c),
+    "g: Leitkoeffizienten " + grzZ(b) + " und " + d + " → Grenzwert " + grzBruch(b, d),
+    grzBruch(a, c) + " ≠ " + grzBruch(b, d) + " → nur f hat die Asymptote y = " + grzBruch(a, c)];
+  return fertig(2, { ergebnis: { richtige: "f", gGwZ: b, gGwN: d } });
+}
+function grenzVerify(t){
+  if (!t.schritte || t.schritte.length < 2) return "Loesungsweg unvollstaendig";
+  for (var i = 0; i < t.schritte.length; i++){
+    if (typeof t.schritte[i] !== "string" || /undefined|NaN|Infinity/.test(t.schritte[i])) return "Schritt defekt";
+  }
+  if (typeof t.text !== "string" || /undefined|NaN|Infinity/.test(t.text)) return "Text defekt";
+  if ([t.a, t.b, t.c, t.d].some(function(z){ return typeof z !== "number" || z !== Math.round(z); })) return "Parameter unsauber";
+  if (t.a === 0) return "a = 0 (kein echter Zaehlergrad 1)";
+  if (t.c < 1 || t.c > 8 || t.d < 1 || t.d > 8) return "Nenner-Parameter unzulaessig";
+  if (Math.abs(t.a) > 15 || Math.abs(t.b) > 25) return "Zaehler-Parameter unsauber";
+  if (t.a * t.d === t.b * t.c) return "Funktion konstant (ad = bc)";
+  if (t.ergebnis.gwZ !== t.a || t.ergebnis.gwN !== t.c) return "Grenzwert falsch";
+  if (t.ergebnis.y0Z !== t.b || t.ergebnis.y0N !== t.d) return "y-Abschnitt falsch";
+  var xg = 1e6, fw = (t.a * xg + t.b) / (t.c * xg + t.d);
+  if (Math.abs(fw - t.a / t.c) > 1e-4) return "numerische Probe verletzt";
+  if (Math.abs((t.b / t.d) - (t.a / t.c)) < 1e-12) return "Grenzwert und y-Abschnitt nicht unterscheidbar";
+  if (t.level === 1 && t.variante === 1){
+    if (t.c === 1) return "Rueckwaertsaufgabe trivial (c = 1)";
+    if (t.a !== t.k * t.c) return "rueckwaerts bestimmtes a inkonsistent";
+    if (t.ergebnis.aGesucht !== t.a || t.ergebnis.gw !== t.k) return "Rueckwaertsergebnis falsch";
+  }
+  if (t.level === 1 && t.variante === 2){
+    if (t.c2 < 1 || t.a2 === 0) return "Vergleichsfunktion unzulaessig";
+    if (t.a2 * t.d2 === t.b2 * t.c2) return "Vergleichsfunktion konstant";
+    if (Math.abs(t.a / t.c - t.a2 / t.c2) < 1e-12) return "Vergleich uneindeutig";
+    if (t.ergebnis.groesser !== (t.a / t.c > t.a2 / t.c2 ? "f" : "g")) return "Vergleich falsch";
+  }
+  if (t.level === 2 && t.variante === 1){
+    if (t.c === 1 || t.d === 1) return "Rueckwaertsaufgabe trivial";
+    if (t.a !== t.k * t.c || t.b !== t.j * t.d) return "Rueckwaertsparameter inkonsistent";
+    if (t.k === t.j) return "Grenzwert und y-Abschnitt gleich";
+    if (t.ergebnis.aGesucht !== t.a || t.ergebnis.bGesucht !== t.b) return "Rueckwaertsergebnis falsch";
+  }
+  if (t.level === 2 && t.variante === 2){
+    if (t.ergebnis.falschWertZ !== t.b || t.ergebnis.falschWertN !== t.d) return "Schuelerwert falsch";
+  }
+  if (t.level === 3){
+    var zae = t.b * t.c - t.a * t.d;
+    if (zae === 0) return "Differenz identisch 0";
+    // Punktprobe: an einer grossen Stelle liegt f auf der behaupteten Seite
+    var xp = 1000, diff = (t.a * xp + t.b) / (t.c * xp + t.d) - t.a / t.c;
+    var soll = (diff > 0) ? "oben" : "unten";
+    if (t.ergebnis.richtung !== undefined && t.ergebnis.richtung !== soll) return "Annaeherungsrichtung falsch";
+    if (t.variante === 1){
+      var xm = -1000, diffm = (t.a * xm + t.b) / (t.c * xm + t.d) - t.a / t.c;
+      var sollm = (diffm > 0) ? "oben" : "unten";
+      if (t.ergebnis.richtungMinus !== sollm) return "Richtung fuer x gegen −unendlich falsch";
+      if (t.ergebnis.richtungMinus === t.ergebnis.richtung) return "beide Raender gleich - Aufgabe stumpf";
+    }
+    if (t.variante === 2 && t.ergebnis.differenzZaehler !== zae) return "Differenzzaehler falsch";
+  }
+  if (t.level === 4 && t.variante === 1){
+    if (t.ergebnis.polZ !== -t.d || t.ergebnis.polN !== t.c) return "Polstelle falsch";
+    if (Math.abs(t.c * (t.ergebnis.polZ / t.ergebnis.polN) + t.d) > 1e-9) return "Nennernullstelle verletzt";
+    if (t.a * (-t.d) + t.b * t.c === 0) return "Polstelle hebbar";
+  }
+  if (t.level === 4 && t.variante === 2){
+    if (t.b === 0) return "Vergleichsfunktion entartet";
+    if (t.ergebnis.gGwZ !== t.b || t.ergebnis.gGwN !== t.d) return "Grenzwert von g falsch";
+    if (Math.abs(t.a / t.c - t.b / t.d) < 1e-12) return "Vergleich uneindeutig";
+    if (t.ergebnis.richtige !== "f") return "Entscheidung falsch";
+  }
+  return null;
+}
+var GENERATORS = { grenzwert: { make: grenzMake, verify: grenzVerify } };
+
+</script>
+
+<script>
+
+"use strict";
+(function(){
+  var alleOffen = false;
+  document.querySelectorAll("[data-loesung]").forEach(function(knopf){
+    knopf.addEventListener("click", function(){
+      var ziel = document.getElementById(knopf.getAttribute("data-loesung"));
+      if (ziel) ziel.classList.toggle("offen");
+    });
+  });
+  function alleLoesungen(){
+    alleOffen = !alleOffen;
+    document.querySelectorAll(".loesung").forEach(function(el){ el.classList.toggle("offen", alleOffen); });
+  }
+  document.getElementById("alleLoesungenKnopf").addEventListener("click", alleLoesungen);
+
+  var HOCH = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+               "-":"⁻","−":"⁻","+":"⁺","(":"⁽",")":"⁾",".":"˙",",":"˙",
+               "x":"ˣ","n":"ⁿ","k":"ᵏ","a":"ᵃ","b":"ᵇ","i":"ⁱ","j":"ʲ","m":"ᵐ","t":"ᵗ","u":"ᵘ",
+               "h":"ʰ","p":"ᵖ","r":"ʳ","s":"ˢ","v":"ᵛ","w":"ʷ","y":"ʸ","z":"ᶻ",
+               "c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ","l":"ˡ","o":"ᵒ"," ":" ",
+               // schon hochgestellte Zeichen bleiben, wie sie sind: e^(x²) -> eˣ²
+               "⁰":"⁰","¹":"¹","²":"²","³":"³","⁴":"⁴","⁵":"⁵","⁶":"⁶","⁷":"⁷","⁸":"⁸","⁹":"⁹",
+               "⁻":"⁻","⁺":"⁺" };
+  // Tiefgestellte Zeichen fuer Scharen und indizierte Groessen: f_a wird zu fₐ,
+  // x_1 zu x₁. Unicode kennt nur diese Buchstaben tiefgestellt - fehlt einer,
+  // bleibt der Term unveraendert stehen (lieber f_b als ein halb gesetztes fᵇ).
+  var TIEF = { "a":"ₐ","e":"ₑ","h":"ₕ","i":"ᵢ","j":"ⱼ","k":"ₖ",
+               "l":"ₗ","m":"ₘ","n":"ₙ","o":"ₒ","p":"ₚ","r":"ᵣ",
+               "s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","x":"ₓ",
+               "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄",
+               "5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" };
+  function tief(z){
+    var aus = "";
+    for (var i = 0; i < z.length; i++){
+      if (!TIEF[z[i]]) return null;
+      aus += TIEF[z[i]];
+    }
+    return aus;
+  }
+  // Vorzeichen- und Faktornormalisierung. Hier stehen nur Umformungen, die IMMER
+  // richtig sind, unabhaengig vom Kontext - "x − -4" heisst auch in einem zitierten
+  // Schuelerfehler "x + 4". Kontextabhaengiges (1x, + 0) gehoert in die Generatoren.
+  function termNormal(s){
+    var t = String(s), vorher;
+    do {
+      vorher = t;
+      t = t
+        // Vorzeichenketten: "− -4" -> "+ 4", "+ -4" -> "− 4"
+        .replace(/([−-])\s*[−-]\s*(?=[\dxa-z(])/g, "+ ")
+        .replace(/\+\s*[−-]\s*(?=[\dxa-z(])/g, "− ")
+        // nur nach Variablen/Klammern kuerzen: x^1 -> x, aber 2^1 · 2^x bleibt
+        .replace(/([a-zA-Z)])(?:\^1(?![\d,.])|\^\(1\))/g, "$1")
+        .replace(/\s*\/\s*1(?![\d,.])/g, "")
+        .replace(/(^|[^0-9a-zA-Z.,])1\s*[·*]\s*(?=[a-z(])/g, "$1")
+        .replace(/(^|[^0-9a-zA-Z.,])1(?=[a-z])/g, "$1")
+        .replace(/\s*[·*]\s*1(?![\d,.])/g, "")
+        .replace(/\(\s*([a-z])\s*[+−-]\s*0\s*\)/g, "$1")
+        // "+ 0" nur nach einem Term mit Variable streichen. Kein Wort davor
+        // ("wird + 0 −"), keine Hochzahl danach ("p − 0²" ist ein eingesetzter
+        // Wert) und kein Vorzeichen danach (Monotoniefolge "+ 0 −").
+        .replace(/(^|[^a-zA-Z])([a-z][0-9²³]*)\s*[+−-]\s*0(?![\d,.²³⁰¹⁴-⁹^])(?!\s*[+−-])/g, "$1$2");
+    } while (t !== vorher);
+    return t.replace(/[ 	]{2,}/g, " ");
+  }
+  // Setzt einen Exponenten hoch - aber nur, wenn JEDES Zeichen ein Hochzeichen hat.
+  // Sonst bliebe eine Mischung wie "2ˣ⁺?" stehen, die schlechter lesbar ist als 2^(x + ?).
+  function hoch(z){
+    // Das Malzeichen entfaellt im Exponenten: e^(a·x) wird zu eᵃˣ - so schreibt man es
+    // auch von Hand, und ein hochgestellter Malpunkt ist typografisch nicht vorgesehen.
+    // innere Exponenten zuerst aufloesen, sonst scheitert e^(x^2) am "^" im Inneren
+    var t = z.replace(/\^(-?\d+)/g, function(_, d){
+              return d.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+             .replace(/([0-9a-z])\s*[·*]\s*(?=[0-9a-z])/g, "$1");
+    var aus = "";
+    for (var i = 0; i < t.length; i++){
+      if (!HOCH[t[i]]) return null;
+      aus += HOCH[t[i]];
+    }
+    return aus;
+  }
+  function schoenMathe(s){
+    return termNormal(String(s))
+      // geklammerte Exponenten zuerst: 2^(x−1) -> 2ˣ⁻¹, e^(2x) -> e²ˣ
+      .replace(/\^\(([^()]{1,12})\)/g, function(ganz, z){
+        var h = hoch(z);
+        if (h === null) return ganz;
+        // Zusammengesetzte Exponenten bekommen hochgestellte Klammern: sonst liest sich
+        // 2^(x-1) als 2 hoch x hoch -1. Ein blosses Vorzeichen (e^(-x)) ist eindeutig.
+        return /[^-−+].*[-−+]/.test(z) ? "⁽" + h + "⁾" : h;
+      })
+      .replace(/\^(-?\d+)/g, function(_, z){ return z.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+      .replace(/\^([a-z])(?![a-zA-Z0-9])/g, function(ganz, z){ return HOCH[z] || ganz; })
+      .replace(/(\d)\.(\d)/g, "$1,$2");
+  }
+  function maskiere(s){
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  // Was schoenMathe() nicht in Unicode setzen konnte, wird hier echtes <sup>/<sub>:
+  // x^(1/2), e^(v(x)), Integralgrenzen ∫0^√a, und Indizes mit beliebigem Buchstaben.
+  // Dateinamen, Pfade und Adressen sind keine Formeln - dort bedeutet "_" nichts.
+  function istKeineFormel(s){
+    return /\.(?:md|html|py|json|txt)\b|:\/\//.test(s);
+  }
+  function markup(s){
+    if (istKeineFormel(s)) { return maskiere(s); }
+    return maskiere(s)
+      // Exponent mit eigener Klammer zuerst: e^(v(x)), 2^(f(x) + 1)
+      .replace(/\^\(((?:[^()]|\([^()]*\)){1,28})\)/g, "<sup>$1</sup>")
+      .replace(/\^([A-Za-z0-9,.√−α-ωΑ-Ω+-]+)/g, "<sup>$1</sup>")
+      .replace(/([A-Za-z])_\(([^()]{1,24})\)/g, "$1<sub>$2</sub>")
+      .replace(/([A-Za-z])_([A-Za-z0-9]+)/g, "$1<sub>$2</sub>");
+  }
+  // Notation vereinheitlichen: Hochzahlen auch im statischen Folientext (x^2 -> x2 hoch)
+  (function hochAlles(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var knoten = [];
+    while (walker.nextNode()){
+      var t = walker.currentNode, el = t.parentNode;
+      if (el && el.tagName !== "SCRIPT" && el.tagName !== "STYLE" &&
+          (t.nodeValue.indexOf("^") >= 0 || t.nodeValue.indexOf("_") >= 0)) knoten.push(t);
+    }
+    knoten.forEach(function(t){
+      var neu = schoenMathe(t.nodeValue);
+      var mk = markup(neu);
+      if (mk === maskiere(neu)) { t.nodeValue = neu; return; }
+      // Echtes Markup noetig: den Textknoten durch ein <span> ersetzen.
+      var sp = document.createElement("span");
+      sp.innerHTML = mk;
+      if (t.parentNode) { t.parentNode.replaceChild(sp, t); }
+    });
+  })();
+
+  function bindeCheck(feldId, knopfId, ausgabeId, pruefer){
+    var feld = document.getElementById(feldId), knopf = document.getElementById(knopfId),
+        ausgabe = document.getElementById(ausgabeId);
+    if (!feld || !knopf || !ausgabe) return;
+    function lauf(){
+      var r = pruefer((feld.value || "").trim().replace(",", "."));
+      ausgabe.textContent = schoenMathe(r.text); ausgabe.className = "feedback " + (r.ok ? "ok" : "no");
+    }
+    knopf.addEventListener("click", lauf);
+    feld.addEventListener("keydown", function(ev){ if (ev.key === "Enter") lauf(); });
+  }
+
+  // ---- Umschalten zwischen Einstiegs-Varianten ----
+  document.querySelectorAll(".vwahl").forEach(function(w){
+    w.addEventListener("click", function(ev){
+      var k = ev.target.closest(".vknopf"); if (!k) { return; }
+      var sec = w.closest("section") || document;
+      w.querySelectorAll(".vknopf").forEach(function(b){ b.classList.toggle("aktiv", b === k); });
+      var ziel = parseInt(k.getAttribute("data-ziel"), 10);
+      sec.querySelectorAll(".variante").forEach(function(v, j){ v.classList.toggle("aktiv", j === ziel); });
+    });
+  });
+
+  bindeCheck("b08a1antwort", "b08a1pruefen", "b08a1feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 3) return { ok: true, text: "Stimmt: 2/x verschwindet, die 3 bleibt. Jetzt begruenden, warum von unten." };
+    return { ok: false, text: "Noch nicht — was passiert mit 2/x, wenn x riesig wird?" };
+  });
+  bindeCheck("b08a5antwort", "b08a5pruefen", "b08a5feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 3) return { ok: true, text: "Stimmt: Quotient der Leitkoeffizienten 3/1. Schreibe es einmal mit lim-Symbol auf." };
+    return { ok: false, text: "Noch nicht — teile Zaehler und Nenner durch x." };
+  });
+  bindeCheck("b08a8antwort", "b08a8pruefen", "b08a8feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 3) return { ok: true, text: "Stimmt: der Grenzwert ist a/1, also a = 3." };
+    return { ok: false, text: "Noch nicht — welchen Grenzwert hat (a*x - 1)/(x + 2) allgemein?" };
+  });
+
+
+  var genZaehler = 1, letzteAufgabe = null;
+  var genWahl = document.getElementById("genStufe");
+  var genTypWahl = document.getElementById("genTyp");
+  // Trainingsbloecke buendeln mehrere Generatoren und bieten eine Typenwahl an.
+  // Fehlt das Auswahlfeld (alle Lernbloecke), bleibt es beim einzigen Generator.
+  function genName(){
+    if (genTypWahl && genTypWahl.value && GENERATORS[genTypWahl.value]) return genTypWahl.value;
+    return Object.keys(GENERATORS)[0];
+  }
+  function genNeu(){
+    var stufe = Number(genWahl.value);
+    var g = GENERATORS[genName()];
+    // verify ist der Qualitaetswaechter: eine beanstandete Aufgabe wird verworfen
+    // und neu gewuerfelt (Gate A fuzzt dieselbe Pruefung offline).
+    var versuch = 0;
+    do {
+      letzteAufgabe = g.make(Date.now() % 100000 + genZaehler++, stufe);
+      versuch++;
+    } while (versuch < 20 && g.verify(letzteAufgabe));
+    document.getElementById("genAusgabe").textContent = schoenMathe(letzteAufgabe.text);
+    var feld = document.getElementById("genLoesungFeld");
+    feld.classList.remove("offen");
+    feld.innerHTML = "<ol><li>" + letzteAufgabe.schritte.map(schoenMathe).join("</li><li>") + "</li></ol>";
+  }
+  if (document.getElementById("genNeu")){
+    document.getElementById("genNeu").addEventListener("click", genNeu);
+    document.getElementById("genLoesung").addEventListener("click", function(){
+      if (letzteAufgabe) document.getElementById("genLoesungFeld").classList.toggle("offen");
+    });
+  }
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll("section.slide"));
+  var slideIdx = 0;
+  function zeigeSlide(i){
+    slideIdx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, j){ s.classList.toggle("aktiv", j === slideIdx); });
+  }
+  function beamerUmschalten(){
+    document.body.classList.toggle("beamer");
+    if (document.body.classList.contains("beamer")) zeigeSlide(slideIdx);
+    else slides.forEach(function(s){ s.classList.add("aktiv"); });
+  }
+  document.getElementById("beamerKnopf").addEventListener("click", beamerUmschalten);
+  document.addEventListener("keydown", function(ev){
+    if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA" || ev.target.tagName === "SELECT")) return;
+    var k = ev.key.toLowerCase();
+    if (k === "b") beamerUmschalten();
+    else if (k === "l") alleLoesungen();
+    else if (document.body.classList.contains("beamer")){
+      if (ev.key === "ArrowRight" || ev.key === "PageDown") zeigeSlide(slideIdx + 1);
+      if (ev.key === "ArrowLeft" || ev.key === "PageUp") zeigeSlide(slideIdx - 1);
+    }
+  });
+  slides.forEach(function(s){ s.classList.add("aktiv"); });
+})();
+
+</script>
+</body>
+</html>

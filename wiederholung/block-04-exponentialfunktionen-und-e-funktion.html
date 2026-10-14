@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block 04 · Exponentialfunktionen und e-Funktion</title>
+<!--
+  analysis-lk Block 04 (Mathematik LK, eA). MasterMind-Aufbau, neutrales Design.
+  Single-File, keine externen Abhaengigkeiten, ASCII-only JS-Bezeichner, kein Browser-Storage.
+  Tasten: B Beamer, Pfeile Abschnitt (Beamer), L alle Loesungen.
+  Erzeugt aus _skelett.py - Aenderungen am Rahmen dort vornehmen, Inhalt in _inhalt_bXX.py.
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --accent-soft:#eaf1f7; --ok:#2e7d5a; --warn:#b06a2e;
+    --maxw:920px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  main{max-width:var(--maxw);margin:0 auto;padding:28px 18px 64px;}
+  h1{font-size:1.5rem;margin:.2em 0 .1em}
+  h2{font-size:1.2rem;margin:1.5em 0 .4em;border-bottom:2px solid var(--line);padding-bottom:.2em}
+  p{margin:.5em 0}
+  .lead{color:var(--muted)}
+  .formel{white-space:nowrap}
+  sub,sup{font-size:.72em;line-height:0}
+  .spvek{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.08;font-size:.94em;padding:0 .12em;margin:0 .1em;position:relative}
+  .spvek::before,.spvek::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;
+    border:1.5px solid currentColor}
+  .spvek::before{left:-.22em;border-right:none;border-radius:.5em 0 0 .5em}
+  .spvek::after{right:-.22em;border-left:none;border-radius:0 .5em .5em 0}
+  .spvek span{display:block;padding:0 .18em}
+  .phase{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:.18em .6em;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid #cfe0ee;margin:.2em .3em .2em 0;}
+  .badge-kern{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .badge-vert{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .bluete{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;overflow:hidden;background:#fff;}
+  .bluete>summary{cursor:pointer;padding:.7em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;}
+  .bluete>summary::-webkit-details-marker{display:none}
+  .lvl{font-size:.74rem;font-weight:600;padding:.1em .5em;border-radius:6px}
+  .lvl.l1{background:#eef6f0;color:var(--ok)}
+  .lvl.l2{background:#eef2f8;color:var(--accent)}
+  .lvl.l3{background:#f7efe6;color:var(--warn)}
+  .bluete[open]>summary{border-bottom:1px solid var(--line)}
+  .bluete .body{padding:.3em .9em .9em}
+  .iqb{margin:.45em 0 0;font-size:.82rem}
+  .iqb>summary{cursor:pointer;color:var(--muted);list-style:none;display:inline-flex;
+    align-items:center;gap:.4em;padding:.12em .6em;border:1px solid var(--line);
+    border-radius:999px;background:#fbfbf9}
+  .iqb>summary::-webkit-details-marker{display:none}
+  .iqb>summary::before{content:"IQB";font-weight:700;font-size:.72rem;letter-spacing:.03em;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:.05em .35em}
+  .iqb>summary:hover{border-color:var(--accent);color:var(--accent)}
+  .iqb .iqb-text{margin:.4em 0 0;padding:.5em .7em;background:#fbfbf9;border-left:3px solid var(--line);
+    border-radius:0 6px 6px 0;color:var(--muted);line-height:1.5}
+  .iqb .iqb-text .iqb-fund{display:block;margin-top:.3em;font-size:.95em;opacity:.85}
+  .hinfuehrung{border:1px solid #ecd9c2;border-left:4px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;
+    background:#fffdf5;padding:.85em 1em;margin:.4em 0 1em}
+  .hinfuehrung h3{margin:0 0 .4em;font-size:1rem;color:var(--warn)}
+  .hinfuehrung p{margin:.35em 0}
+  .hinfuehrung .frage{font-weight:600;font-size:1.02rem}
+  .hinfuehrung .aufloesung{margin-top:.6em;padding-top:.5em;border-top:1px dashed #ecd9c2;
+    font-size:.94rem;color:var(--muted)}
+  table.wertereihe{border-collapse:collapse;margin:.3em 0 .4em;font-size:.9rem;background:#fff}
+  table.wertereihe th,table.wertereihe td{border:1px solid var(--line);padding:.25em .6em;text-align:center}
+  table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .hinfuehrung table.wertereihe{border-collapse:collapse;margin:.5em 0;font-size:.92rem;background:#fff}
+  .hinfuehrung table.wertereihe th,.hinfuehrung table.wertereihe td{border:1px solid var(--line);
+    padding:.3em .7em;text-align:center}
+  .hinfuehrung table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .tafel{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;margin:.8em 0;overflow:hidden}
+  .tafel>h3{margin:0;padding:.6em .9em;background:var(--accent);color:#fff;font-size:1rem}
+  .tafel .tafel-koerper{padding:.85em .9em}
+  .tafel-form{text-align:center;font-size:1.15rem;margin:.2em 0 .9em;padding:.5em;
+    background:var(--accent-soft);border-radius:6px;color:var(--accent);font-weight:600}
+  .tafel-form .zeiger{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:.25em}
+  table.param{border-collapse:collapse;width:100%;margin:.3em 0}
+  table.param th,table.param td{border:1px solid var(--line);padding:.5em .65em;text-align:left;vertical-align:top}
+  table.param thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  table.param .pz{font-weight:700;color:var(--accent);font-size:1.05rem;text-align:center;width:2.4em}
+  table.param .pbsp{font-size:.9rem;color:var(--muted)}
+  table.param .pbsp code{background:#fbfbf9;padding:.05em .3em;border-radius:3px;color:var(--fg)}
+  .tafel-merk{margin:.5em 0 0;padding:.45em .7em;background:#fffdf5;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.93rem}
+  .tafel-merk::before{content:"Merke: ";font-weight:700;color:var(--warn)}
+  ol.schritte{counter-reset:s;list-style:none;padding:0;margin:.4em 0 0}
+  ol.schritte li{counter-increment:s;position:relative;padding:.5em .7em .5em 2.6em;margin:.4em 0;
+    background:#fafaf7;border-radius:6px}
+  ol.schritte li::before{content:counter(s);position:absolute;left:.7em;top:.5em;width:1.5em;height:1.5em;
+    background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:.82rem;font-weight:700}
+  ol.schritte .frage{font-weight:600;display:block}
+  ol.schritte .ergebnis{display:block;margin-top:.25em;font-size:.9rem;color:var(--ok);font-weight:600}
+  table.reihen{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.93rem}
+  table.reihen th,table.reihen td{border:1px solid var(--line);padding:.45em .65em;text-align:left}
+  table.reihen thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .stufe{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;background:#fff;overflow:hidden}
+  .stufe>summary{cursor:pointer;padding:.6em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em;background:#fbfbf9}
+  .stufe>summary::-webkit-details-marker{display:none}
+  .stufe>summary::before{content:"\25b8";color:var(--accent);font-weight:400}
+  .stufe[open]>summary::before{content:"\25be"}
+  .stufe .stufe-koerper{padding:.7em .9em}
+  .tauf{margin:0 0 .9em;padding-bottom:.7em;border-bottom:1px dashed var(--line)}
+  .tauf:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+  .tauf .tfrage{margin:0 0 .4em}
+  .tauf .tfrage strong.nr{color:var(--accent);margin-right:.3em}
+  .ueberblick{border:1px solid #cfe0ee;border-radius:var(--radius);background:#fff;margin:.2em 0 1.1em}
+  .ueberblick>summary{cursor:pointer;padding:.7em .9em;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);list-style:none;border-radius:var(--radius);
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .ueberblick>summary::-webkit-details-marker{display:none}
+  .ueberblick>summary::before{content:"\25b8";font-weight:400;margin-right:.15em}
+  .ueberblick[open]>summary::before{content:"\25be"}
+  .ueberblick[open]>summary{border-radius:var(--radius) var(--radius) 0 0}
+  .ueberblick .ub-zusatz{font-weight:400;font-size:.85rem;color:var(--muted)}
+  .ueberblick .ub-koerper{padding:.8em .9em}
+  .ub-huelle{overflow-x:auto}
+  table.ub{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+  table.ub th,table.ub td{border:1px solid var(--line);padding:.42em .6em;text-align:left;vertical-align:top}
+  table.ub thead th{background:#fbfbf9;font-size:.82rem;color:var(--muted);font-weight:600}
+  table.ub tbody th{white-space:nowrap;font-weight:600}
+  table.ub .ub-bsp{white-space:nowrap;color:var(--accent);font-size:.88rem}
+  .ub-detail{margin:.9em 0 0;padding:.6em .8em;border-left:3px solid var(--line);background:#fafaf7;border-radius:0 6px 6px 0}
+  .ub-detail h4{margin:0 0 .25em;font-size:.93rem;color:var(--accent)}
+  .ub-detail p{margin:.2em 0;font-size:.93rem}
+  .ub-detail .ub-fehler{color:var(--warn)}
+  .ub-detail ol{margin:.3em 0 0;padding-left:1.4em;font-size:.93rem}
+  .ub-detail ol li{margin:.25em 0}
+  .ub-link{margin:.9em 0 0;font-size:.92rem}
+  .ub-link a{color:var(--accent);font-weight:600}
+  .grundtafel table.regeln{border-collapse:collapse;width:100%;margin:.3em 0}
+  .grundtafel table.regeln th,.grundtafel table.regeln td{border:1px solid var(--line);
+    padding:.5em .65em;text-align:left;vertical-align:top}
+  .grundtafel table.regeln thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .grundtafel table.regeln td.rname{font-weight:600;white-space:nowrap;width:11em}
+  .grundtafel table.regeln td.rform{color:var(--accent);font-weight:600;white-space:nowrap}
+  .grundtafel table.regeln td.rtext{font-size:.93rem}
+  .aufgabe{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+    background:#fff;padding:.8em 1em;margin:1em 0}
+  .aufgabe .kopf{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-bottom:.3em}
+  .loesung{display:none;margin-top:.7em;padding:.7em .9em;background:#f2f7f3;border:1px solid #cbe4d4;border-radius:8px}
+  .loesung.offen{display:block}
+  .lknopf{font:inherit;font-size:.85rem;padding:.3em .7em;border:1px solid var(--line);
+    border-radius:6px;background:#fff;cursor:pointer;color:var(--accent)}
+  .check{margin:.8em 0;padding:.8em .9em;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .check input,.check select{font:inherit;padding:.35em .5em;border:1px solid var(--line);border-radius:6px}
+  .check button,.gen button{font:inherit;padding:.4em .8em;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-left:.4em}
+  .feedback{margin-top:.5em;font-size:.95rem;min-height:1.4em}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--warn)}
+  textarea{width:100%;min-height:4.5em;font:inherit;padding:.5em;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .gen{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.8em 1em;margin:1em 0}
+  .gen .genaufgabe{margin:.6em 0;padding:.6em .8em;background:#fafaf7;border-radius:8px}
+  table.sortier{border-collapse:collapse;margin:.6em 0}
+  table.sortier td,table.sortier th{border:1px solid var(--line);padding:.35em .7em}
+  #toolbar{position:fixed;top:0;left:0;right:0;background:#20242b;color:#f3f4f6;
+    display:flex;gap:1em;align-items:center;justify-content:flex-end;padding:.35em 1em;font-size:.95rem;z-index:50}
+  #toolbar button{font:inherit;font-size:.8rem;background:#3a4150;color:#fff;border:0;border-radius:5px;padding:.15em .6em;cursor:pointer}
+  body{padding-top:2.4em}
+  body.beamer{font-size:26px;background:#fff}
+  body.beamer main{max-width:1180px}
+  body.beamer .nur-arbeit{display:none}
+  body.beamer section.slide{display:none;min-height:60vh}
+  body.beamer section.slide.aktiv{display:block}
+  body.beamer h2{font-size:1.5em}
+  /* ---- neue Bausteinfolge: Problem, Klaerung, Beispiel, Merksatz, Aufgaben ---- */
+  .vwahl{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .vknopf{font:inherit;font-size:.88rem;padding:.25em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .vknopf.aktiv{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .variante{display:none}
+  .variante.aktiv{display:block}
+  .problemkasten{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;
+    padding:.9em 1em;margin:.3em 0 1em;text-align:center;font-size:1.2rem;line-height:1.5}
+  .pfrage{font-weight:600;margin:.9em 0 .15em}
+  .pantwort{color:var(--ok);margin:.1em 0 .8em}
+  .bsp{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.5em .95em;margin:.7em 0}
+  .bsp h3{margin:.25em 0 .45em;color:var(--accent);font-size:1rem}
+  ol.bzeilen{list-style:none;margin:.2em 0;padding:0}
+  ol.bzeilen li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:.2em 1.2em;
+    align-items:baseline;padding:.3em 0;border-top:1px solid var(--line)}
+  ol.bzeilen li:first-child{border-top:0}
+  .brechnung{font-size:1.05em}
+  .bhinweis{color:var(--muted);font-size:.93em}
+  @media (max-width:800px){ol.bzeilen li{grid-template-columns:1fr}}
+  .merk{border:2px solid var(--accent);border-left-width:5px;border-radius:var(--radius);
+    background:#fff;padding:.6em 1em .7em;margin:.5em 0}
+  .merk ul{margin:.2em 0;padding-left:1.1em}
+  .merk li{margin:.5em 0}
+  .merk .regel{font-weight:600;display:block}
+  .merk .kurz{display:block;margin-top:.2em;color:var(--accent)}
+  .fehler{border:1px solid #e9cfcf;border-left:4px solid #b04a4a;border-radius:0 6px 6px 0;
+    background:#fdf6f6;padding:.55em .85em;margin:.5em 0}
+  .fehler p{margin:.2em 0;font-size:.95rem}
+  .typ,.afb{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;
+    padding:.14em .55em;border-radius:6px;margin:.2em .3em .2em 0;border:1px solid transparent}
+  .t-vor{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .t-rueck{background:#eef2f8;color:var(--accent);border-color:#cfe0ee}
+  .t-par{background:#f4eef8;color:#6b4a95;border-color:#ddd0ea}
+  .t-beur{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .afb1{background:#fbfbf9;color:var(--muted);border-color:var(--line)}
+  .afb2{background:#fbfbf9;color:var(--accent);border-color:#cfe0ee}
+  .afb3{background:#fbfbf9;color:var(--warn);border-color:#ecd9c2}
+  .spiegel{border:1px dashed var(--line);border-radius:var(--radius);background:#fbfbf9;margin:.5em 0 1em}
+  .spiegel>summary{cursor:pointer;padding:.5em .9em;font-size:.9rem;color:var(--muted);list-style:none}
+  .spiegel>summary::-webkit-details-marker{display:none}
+  .spiegel>summary::before{content:"\25b8 ";color:var(--accent)}
+  .spiegel[open]>summary::before{content:"\25be "}
+  .spiegel table.param,.spiegel p{margin:.2em .9em .7em}
+  .spiegel table.param th,.spiegel table.param td{text-align:center;padding:.35em .6em}
+  .bruch{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.15;margin:0 .12em;font-size:.92em;text-align:center}
+  .bruch .z{padding:0 .25em .05em;border-bottom:1.5px solid currentColor}
+  .bruch .n{padding:.05em .25em 0}
+  ol.bzeilen details.klapp{display:inline-block;margin:0}
+  ol.bzeilen details.klapp>summary{cursor:pointer;list-style:none;display:inline-block;font-size:.85rem;
+    padding:.1em .6em;border:1px solid var(--line);border-radius:999px;color:var(--accent);background:#fff}
+  ol.bzeilen details.klapp>summary::-webkit-details-marker{display:none}
+  ol.bzeilen details.klapp[open]>summary{background:var(--accent-soft)}
+  ol.bzeilen details.klapp .erg{margin-left:.6em;color:var(--ok);font-weight:600}
+  ol.bzeilen details.klapp:not([open]) .erg{display:none}
+  svg.plot{display:block;max-width:100%;height:auto;margin:.4em 0;background:#fff;border:1px solid var(--line);border-radius:6px}
+  svg.plot .gitter{stroke:#eceae4;stroke-width:1}
+  svg.plot .achse{stroke:#555;stroke-width:1.3}
+  svg.plot .tick{font-size:10px;fill:var(--muted)}
+  svg.plot .beschriftung{font-size:11px}
+  ol.bzeilen li:has(svg.plot){grid-template-columns:1fr}
+  .doppelbild .loesung{background:transparent;border:0;padding:0;margin-top:.3em}
+  .doppelbild .lknopf{margin:.2em 0}
+  .plots{display:flex;flex-wrap:wrap;gap:.6em;align-items:flex-start}
+  .plots svg.plot{margin:0}
+  body.beamer svg.plot{width:auto;height:auto}
+  .wurzel{display:inline-block;white-space:nowrap;vertical-align:baseline;line-height:1.15}
+  .wurzel .rad{display:inline-block;border-top:1.5px solid currentColor;padding:.04em .12em 0 .08em;
+    vertical-align:baseline;line-height:1.15}
+  ol.teile{margin:.4em 0 .2em;padding-left:1.6em}
+  ol.teile li{margin:.3em 0}
+  ol.teile li::marker{color:var(--accent);font-weight:700}
+  .limes{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.05;margin:0 .25em 0 .1em}
+  .limes .unter{font-size:.68em;color:var(--muted);white-space:nowrap}
+  body.beamer .problemkasten{font-size:1.15em}
+  .beamer-hinweis{position:fixed;bottom:.5em;right:1em;color:var(--muted);font-size:.75rem}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <a href="./" style="margin-right:auto;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:4px 6px">← Übersicht</a>
+  <button id="beamerKnopf">Beamer (B)</button>
+  <button id="alleLoesungenKnopf">Lösungen (L)</button>
+</div>
+
+<main>
+
+<section class="slide aktiv">
+  <h1>Block 04 · Exponentialfunktionen und e-Funktion</h1>
+  <p class="lead">Mathematik LK (eA) · <strong>Ziel:</strong> Eigenschaften von b^x begründen (Positivität, Monotonie, Asymptote), Transformationen anwenden, Wachstum deuten.</p>
+  <p class="nur-arbeit"><em>Tasten: B Beamer · Pfeile Abschnitt · L Lösungen</em></p>
+</section>
+
+<section class="slide">
+  <h2>Überblick <span class="phase">vor dem Einstieg</span></h2>
+  <p class="lead">Wachstum und Zerfall: die Klasse, die nie null wird.</p>
+  <details class="ueberblick" open>
+    <summary><span>Das musst du über diese Funktionsklassen wissen</span>
+             <span class="ub-zusatz">2 Funktionsklassen</span></summary>
+    <div class="ub-koerper">
+      <div class="ub-huelle">
+      <table class="ub">
+        <thead>
+          <tr><th>Funktionsklasse</th><th>Beispiel</th><th>Was einsetzen?</th><th>Was kommt heraus?</th>
+              <th>Steigt oder fällt?</th><th>Symmetrie</th><th>Nullstellen</th></tr>
+        </thead>
+        <tbody>
+        <tr><th>Exponentialfunktionen</th><td class="ub-bsp">f(x) = 2ˣ</td><td>alle Zahlen</td><td>immer y &gt; 0</td><td>immer steigend</td><td>keine</td><td>keine</td></tr>
+        <tr><th>Die e-Funktion</th><td class="ub-bsp">f(x) = eˣ</td><td>alle Zahlen</td><td>immer y &gt; 0</td><td>immer steigend</td><td>keine</td><td>keine</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="ub-detail"><h4>Exponentialfunktionen</h4><p>Multiplikatives Wachstum: pro Schritt nach rechts wird mit b multipliziert, nicht addiert.</p><p class="ub-fehler"><strong>Typischer Fehler:</strong> Die x-Achse ist Asymptote, nicht Nullstelle: der Graph nähert sich beliebig an, berührt sie aber nie.</p><p><strong>Exponentialgleichung: Logarithmieren</strong></p><ol><li>Die Potenz allein stellen: 3 · 2ˣ = 48 → 2ˣ = 16.</li><li>Beide Seiten logarithmieren: x · ln 2 = ln 16.</li><li>Nach x auflösen: x = ln 16 / ln 2 = 4.</li><li>Im hilfsmittelfreien Teil exakt stehen lassen — ln <span class="bruch"><span class="z">16</span><span class="n">ln</span></span> 2 ist eine Lösung, kein Dezimalwert nötig.</li><li>Gleiche Basis erkennen ist schneller: 2ˣ = 2⁴ → x = 4.</li></ol></div>      <div class="ub-detail"><h4>Die e-Funktion</h4><p>Die e-Funktion ist ihre eigene Ableitung: f′(x) = eˣ. Deshalb ist sie die Basis der Analysis.</p><p class="ub-fehler"><strong>Typischer Fehler:</strong> e ist eine feste Zahl (≈ 2,718), keine Variable — eˣ wird nicht wie eine Potenzfunktion abgeleitet.</p><p><strong>Gleichungen mit eˣ lösen</strong></p><ol><li>e-Potenz allein stellen: 5·eˣ − 10 = 0 → eˣ = 2.</li><li>Beide Seiten mit ln: x = ln 2. Exakt stehen lassen, nicht runden.</li><li><strong>Produkt:</strong> bei x·eˣ = 0 nutzt man eˣ ≠ 0 — nur x = 0 bleibt übrig.</li><li>Das ist der häufigste Fall in Klausuren: eˣ wird nie null, also liefert nur der andere Faktor Nullstellen.</li></ol></div>
+      <p class="ub-link">Alle neun Funktionsklassen mit Graph, Wertetabelle und Rechenwegen:
+         <a href="funktionsklassen-uebersicht.html" target="_blank" rel="noopener">Funktionsklassen im Überblick</a></p>
+    </div>
+  </details>
+</section>
+
+<section class="slide">
+  <span class="phase">1 · Problem</span>
+  <h2>Wie schnell wächst das wirklich? <span class="phase badge-kern">Einstieg</span></h2>
+  <div class="vwahl" role="group" aria-label="Einstieg wählen"><button type="button" class="vknopf aktiv" data-ziel="0">Handlungsorientiert</button><button type="button" class="vknopf" data-ziel="1">Streitgespräch</button></div>
+  <div class="variante aktiv">
+    <div class="problemkasten">Eine Bakterienkultur verdoppelt sich jede Stunde; zu Beginn sind es 500. Nach wie vielen vollen Stunden sind es erstmals mehr als eine Million?</div>
+    <p class="pfrage">Stellt zuerst den Term auf.</p>
+    <p class="pantwort"><span class="formel">N(t) = 500 · 2^t</span> — der Startwert steht vorn, der Faktor pro Stunde in der Basis.</p>
+    <p class="pfrage">Jetzt probiert.</p>
+    <p class="pantwort"><span class="formel">N(10) = 500 · 1024 = 512 000</span> · <span class="formel">N(11) = 500 · 2048 = 1 024 000</span>. Nach <b>11</b> Stunden ist die Million überschritten.</p>
+    <p class="pfrage">Und wenn der Faktor nicht 2, sondern 1,5 wäre?</p>
+    <p class="pantwort">Dann wird Probieren mühsam — man müsste t aus dem Exponenten holen. Dafür gibt es ein eigenes Werkzeug (Block 05). Heute klären wir erst, wie Exponentialfunktionen gebaut sind.</p>
+  </div>
+  <div class="variante">
+    <div class="problemkasten">„<span class="formel">x²</span> wächst schneller als <span class="formel">2^x</span> — bei <span class="formel">x = 3</span> ist <span class="formel">9 &gt; 8</span>.“</div>
+    <p class="pfrage">Prüft die Rechnung.</p>
+    <p class="pantwort">Sie stimmt: <span class="formel">3² = 9</span> und <span class="formel">2³ = 8</span>. Die Behauptung ist an dieser Stelle richtig.</p>
+    <p class="pfrage">Prüft weiter: <span class="formel">x = 5</span> und <span class="formel">x = 10</span>.</p>
+    <p class="pantwort"><span class="formel">25 &lt; 32</span> und <span class="formel">100 &lt; 1024</span>. Die Behauptung gilt nur in einem kleinen Fenster — sie ist als allgemeine Aussage falsch.</p>
+    <p class="pfrage">Woran liegt das strukturell?</p>
+    <p class="pantwort">Bei <span class="formel">2^x</span> wird pro Schritt mit <b>2</b> multipliziert — immer. Bei <span class="formel">x²</span> nur mit <span class="formel">(<span class="bruch"><span class="z">x + 1</span><span class="n">x</span></span>)²</span>, und dieser Faktor rückt gegen 1. Der konstante Faktor pro Schritt ist genau das Kennzeichen exponentiellen Wachstums.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">2 · Klärung</span>
+  <h2>Klärung — Exponentialfunktionen lesen und aufstellen</h2>
+  <p class="lead">Exponentielles Wachstum erkennt man nicht an großen Zahlen, sondern am <b>konstanten Faktor pro Schritt</b>.</p>
+  <ol class="schritte">
+    <li><span class="frage">Bauart lesen: <span class="formel">f(x) = a · b^x</span></span><span class="ergebnis"><span class="formel">a = f(0)</span> ist der Startwert, <span class="formel">b</span> der Faktor pro Einheitsschritt. <span class="formel">b &gt; 1</span> Wachstum, <span class="formel">0 &lt; b &lt; 1</span> Zerfall.</span></li>
+    <li><span class="frage">Faktor aus einem Prozentsatz</span><span class="ergebnis">Zunahme um p % → <span class="formel">b = 1 + <span class="bruch"><span class="z">p</span><span class="n">100</span></span></span>, Abnahme um p % → <span class="formel">b = 1 − <span class="bruch"><span class="z">p</span><span class="n">100</span></span></span>. Der Faktor enthält immer den Bestand <b>plus</b> die Änderung.</span></li>
+    <li><span class="frage">Faktor aus zwei Werten</span><span class="ergebnis">Aus <span class="formel">f(x₁)</span> und <span class="formel">f(x₂)</span> folgt <span class="formel">bⁿ = <span class="bruch"><span class="z">f(x₂)</span><span class="n">f(x₁)</span></span></span> mit <span class="formel">n = x₂ − x₁</span> — der Quotient sagt, wie oft multipliziert wurde; daraus b.</span></li>
+    <li><span class="frage">Asymptote und e-Schreibweise</span><span class="ergebnis"><span class="formel">a·b^x</span> wird nie null, <span class="formel">y = 0</span> ist waagerechte Asymptote; ein Summand d hebt sie auf <span class="formel">y = d</span>. Jede Basis lässt sich als <span class="formel">b = e^k</span> schreiben, also <span class="formel">a·b^x = a·e^(kx)</span>.</span></li>
+  </ol>
+  <p class="tafel-merk">Exponentielles Wachstum überholt jedes polynomiale — und holt danach nie wieder zurück.</p>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Beispiel — vollständig vorgerechnet</h2>
+  <div class="bsp"><h3>Wachstum: 200 € zu 6 % jährlich</h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">b = 1 + <span class="bruch"><span class="z">6</span><span class="n">100</span></span> = 1,06</span></span><span class="bhinweis">Prozentsatz in den Faktor umrechnen</span></li><li><span class="brechnung"><span class="formel">K(t) = 200 · 1,06^t</span></span><span class="bhinweis">Startwert vorn, Faktor in der Basis</span></li><li><span class="brechnung"><span class="formel">K(10) = 200 · 1,06¹⁰ ≈ 200 · 1,7908 ≈ 358,17 €</span></span><span class="bhinweis">Bestand nach 10 Jahren</span></li><li><span class="brechnung"><span class="formel">1,06¹¹ ≈ 1,898 &lt; 2</span> · <span class="formel">1,06¹² ≈ 2,012 &gt; 2</span></span><span class="bhinweis">erst nach 12 Jahren ist der Bestand verdoppelt</span></li></ol>
+  </div>
+  <div class="bsp"><h3>Zerfall: von 80 mg sind nach 5 Tagen noch 20 mg übrig</h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">80 · b⁵ = 20 ⟹ b⁵ = 0,25</span></span><span class="bhinweis">durch den Startwert teilen</span></li><li><span class="brechnung"><span class="formel">b = 0,25<sup><span class="bruch"><span class="z">1</span><span class="n">5</span></span></sup> ≈ 0,758</span></span><span class="bhinweis">rund 24 % Abnahme pro Tag</span></li><li><span class="brechnung"><span class="formel">b⁵ = <span class="bruch"><span class="z">1</span><span class="n">4</span></span> = (<span class="bruch"><span class="z">1</span><span class="n">2</span></span>)² ⟹ b^2,5 = <span class="bruch"><span class="z">1</span><span class="n">2</span></span></span></span><span class="bhinweis">die Halbwertszeit lässt sich exakt ablesen</span></li><li><span class="brechnung"><span class="formel">T = 2,5 Tage</span></span><span class="bhinweis">Probe: <span class="formel">80 · 0,25^0,5 = 80 · 0,5 = 40 mg</span> ✓</span></li></ol>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">4 · Merksatz</span>
+  <h2>Merksatz — Exponentialfunktionen und e-Funktion</h2>
+  <div class="merk"><ul><li><span class="regel"><span class="formel">f(x) = a · b^x</span>: a ist der Startwert, b der Faktor pro Schritt.</span><span class="kurz"><span class="formel">b &gt; 1</span> Wachstum · <span class="formel">0 &lt; b &lt; 1</span> Zerfall</span></li><li><span class="regel">p % Änderung pro Schritt bedeutet <span class="formel">b = 1 ± <span class="bruch"><span class="z">p</span><span class="n">100</span></span></span>.</span><span class="kurz">+6 % → <span class="formel">b = 1,06</span> · −6 % → <span class="formel">b = 0,94</span></span></li><li><span class="regel"><span class="formel">a·b^x</span> wird nie null — <span class="formel">y = 0</span> ist waagerechte Asymptote.</span><span class="kurz">das Vorzeichen von f ist überall das Vorzeichen von a</span></li><li><span class="regel">Exponentielles Wachstum schlägt polynomiales.</span><span class="kurz"><span class="formel">2^x</span> überholt <span class="formel">x²</span> bei <span class="formel">x = 4</span> endgültig</span></li></ul></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „6 % Zunahme heißt <span class="formel">b = 0,06</span>.“</p><p><strong>Richtig:</strong> Dann bliebe nur der Zuwachs übrig. Richtig ist <span class="formel">b = 1,06</span>: der alte Bestand (die 1) <b>plus</b> 6 %.</p></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „Zweimal 50 % Abnahme sind zusammen 100 % — es bleibt nichts.“</p><p><strong>Richtig:</strong> Faktoren werden multipliziert, nicht Prozentsätze addiert: <span class="formel">0,5 · 0,5 = 0,25</span>. Es bleibt ein <b>Viertel</b>, die Abnahme beträgt 75 %.</p></div>
+</section>
+
+<section class="slide">
+  <h2 class="nur-arbeit">Aufgabengenerator: Transformierte Exponentialfunktionen</h2>
+  <div class="gen nur-arbeit">
+    <p>Stufe:
+      <select id="genStufe">
+        <option value="1">1 · Verschiebung: Asymptote, Werte, Kette</option>
+        <option value="2">2 · Streckfaktor: rechnen und Fehler finden</option>
+        <option value="3">3 · Wertebereich, Monotonie, Potenzgesetz</option>
+        <option value="4">4 · rückwärts: Parameter aus Asymptote und Punkt</option>
+      </select>
+      <button id="genNeu">Neue Aufgabe</button>
+      <button id="genLoesung">Lösungsweg ein/aus</button>
+    </p>
+    <div class="genaufgabe" id="genAusgabe"><em>Noch keine Aufgabe erzeugt.</em></div>
+    <div class="loesung" id="genLoesungFeld"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">5 · Aufgaben</span>
+  <h2>Aufgaben</h2>
+  <details class="spiegel nur-arbeit"><summary>Aufgabenspiegel: Typ × Anforderungsbereich</summary>
+    <table class="param"><thead><tr><th></th><th>AFB I</th><th>AFB II</th><th>AFB III</th></tr></thead><tbody><tr><th>Vorwärts</th><td>2</td><td>2</td><td>1</td></tr><tr><th>Rückwärts</th><td>2</td><td>1</td><td>—</td></tr><tr><th>Parameter</th><td>—</td><td>2</td><td>—</td></tr><tr><th>Beurteilen</th><td>—</td><td>1</td><td>1</td></tr></tbody></table>
+    <p class="lead">Verteilung der Bewertungseinheiten: AFB I 32 %; AFB II 47 %; AFB III 21 % (Richtwert 30 / 50 / 20).</p>
+  </details>
+  <details class="stufe" open><summary>Anforderungsbereich I — Reproduzieren <span class="lead">· angeben, berechnen, ablesen</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b04a1">
+    <div class="kopf"><strong>Aufgabe 1</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">g(x) = 2^(x−1) + 3</span>. Beschreibt, wie der Graph von g aus dem Graphen von <span class="formel">y = 2^x</span> hervorgeht, und gebt die Gleichung der waagerechten Asymptote an.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> y-Wert der waagerechten Asymptote?</p>
+      <input id="b04a1antwort" inputmode="text" placeholder="z. B. 1" aria-label="Antwort Aufgabe 1">
+      <button id="b04a1pruefen">Prüfen</button>
+      <div class="feedback" id="b04a1feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b04a1l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a1l"><p>Zwei Schritte: Verschiebung um <b>1 nach rechts</b> (innen wirkt gegenläufig: <span class="formel">x − 1</span>) und um <b>3 nach oben</b>.<br>Für <span class="formel">x → −∞</span> geht <span class="formel">2^(x−1) → 0</span>, also <span class="formel">g(x) → 3</span>: die Asymptote ist <span class="formel">y = 3</span>. Exakter y-Achsenabschnitt: <span class="formel">g(0) = 2^(−1) + 3 = <span class="bruch"><span class="z">7</span><span class="n">2</span></span></span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b04a2">
+    <div class="kopf"><strong>Aufgabe 2</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt für <span class="formel">f(x) = 3 · 1,25^x</span> Startwert, Wachstumsfaktor und die prozentuale Änderung pro Schritt an und berechnet <span class="formel">f(4)</span>.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Prozentuale Zunahme pro Schritt?</p>
+      <input id="b04a2antwort" inputmode="text" placeholder="z. B. 12" aria-label="Antwort Aufgabe 2">
+      <button id="b04a2pruefen">Prüfen</button>
+      <div class="feedback" id="b04a2feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b04a2l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a2l"><p>Startwert <span class="formel">f(0) = 3</span>, Faktor <span class="formel">b = 1,25</span>, also <b>+25 %</b> pro Schritt. <span class="formel">f(4) = 3 · 1,25⁴ = 3 · 2,4414… ≈ 7,32</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b04a3">
+    <div class="kopf"><strong>Aufgabe 3</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt den Term einer Exponentialfunktion an, die bei 12 startet und pro Schritt um 20 % abnimmt — und den Term einer, die bei 0,5 startet und sich pro Schritt verdreifacht.</p>
+    <button class="lknopf" data-loesung="b04a3l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a3l"><p><span class="formel">f(x) = 12 · 0,8^x</span> (Abnahme: <span class="formel">b = 1 − 0,2 = 0,8</span>) und <span class="formel">g(x) = 0,5 · 3^x</span> (Verdreifachung: <span class="formel">b = 3</span>). Der Startwert steht jeweils vorn, der Faktor in der Basis.</p></div>
+  </div>
+  <div class="aufgabe" id="b04a4">
+    <div class="kopf"><strong>Aufgabe 4</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine Exponentialfunktion an, deren Graph die waagerechte Asymptote <span class="formel">y = 4</span> besitzt und durch <span class="formel">(0 | 7)</span> verläuft.</p>
+    <button class="lknopf" data-loesung="b04a4l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a4l"><p>Zum Beispiel <span class="formel">f(x) = 3 · 0,5^x + 4</span>: für <span class="formel">x → +∞</span> geht <span class="formel">3·0,5^x → 0</span>, also <span class="formel">f(x) → 4</span>; und <span class="formel">f(0) = 3 + 4 = 7</span>. Allgemein <span class="formel">a·b^x + 4</span> mit <span class="formel">a = 3</span> und <span class="formel">0 &lt; b &lt; 1</span> (bei <span class="formel">b &gt; 1</span> wäre die Asymptote nur für <span class="formel">x → −∞</span> erreicht).</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich II — Zusammenhänge herstellen <span class="lead">· bestimmen, untersuchen, erläutern</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b04a5">
+    <div class="kopf"><strong>Aufgabe 5</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Begründet, dass <span class="formel">f(x) = 2^x + 3</span> keine Nullstelle hat, und gebt die Gleichung der waagerechten Asymptote des Graphen an.</p>
+    <button class="lknopf" data-loesung="b04a5l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a5l"><p>Für jedes reelle x gilt <span class="formel">2^x &gt; 0</span>, also <span class="formel">f(x) &gt; 3</span> — der Funktionswert ist stets größer als 3 und damit nie null. Der Graph verläuft vollständig oberhalb der Geraden <span class="formel">y = 3</span>.<br>Für <span class="formel">x → −∞</span> geht <span class="formel">2^x → 0</span>, also <span class="formel">f(x) → 3</span>: waagerechte Asymptote <span class="formel">y = 3</span>. Für <span class="formel">x → +∞</span> wächst f unbeschränkt.</p></div>
+  </div>
+  <div class="aufgabe" id="b04a6">
+    <div class="kopf"><strong>Aufgabe 6</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Eine Bakterienkultur verdoppelt sich alle 3 Stunden; der Startwert beträgt 500. Sie wird durch <span class="formel">B(t) = 500 · 2<sup><span class="bruch"><span class="z">t</span><span class="n">3</span></span></sup></span> beschrieben (t in Stunden). Berechnet den Bestand nach 6 Stunden und ermittelt, nach welcher Zeit der Bestand 4000 beträgt.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Zeit in Stunden für 4000?</p>
+      <input id="b04a6antwort" inputmode="text" placeholder="z. B. 6" aria-label="Antwort Aufgabe 6">
+      <button id="b04a6pruefen">Prüfen</button>
+      <div class="feedback" id="b04a6feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b04a6l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a6l"><p><span class="formel">B(6) = 500 · 2<sup><span class="bruch"><span class="z">6</span><span class="n">3</span></span></sup> = 500 · 2² = 2000</span>.<br><span class="formel">500 · 2<sup><span class="bruch"><span class="z">t</span><span class="n">3</span></span></sup> = 4000</span> ergibt <span class="formel">2<sup><span class="bruch"><span class="z">t</span><span class="n">3</span></span></sup> = 8 = 2³</span>, also <span class="formel"><span class="bruch"><span class="z">t</span><span class="n">3</span></span> = 3</span> und damit <span class="formel">t = 9</span> Stunden. Kontrolle: nach 9 Stunden hat sich der Bestand dreimal verdoppelt — <span class="formel">500 · 8 = 4000</span> ✓.</p></div>
+  </div>
+  <div class="aufgabe" id="b04a7">
+    <div class="kopf"><strong>Aufgabe 7</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Der Graph von <span class="formel">f(x) = a · b^x</span> verläuft durch <span class="formel">(1 | 6)</span> und <span class="formel">(3 | 54)</span>. Bestimmt a und b.</p>
+    <button class="lknopf" data-loesung="b04a7l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a7l"><p>Die beiden Gleichungen dividieren: <span class="formel"><span class="bruch"><span class="z">54</span><span class="n">6</span></span> = b² = 9</span>, also <span class="formel">b = 3</span> (nur positive Basen sind zugelassen). Einsetzen: <span class="formel">a · 3 = 6</span>, also <span class="formel">a = 2</span> und <span class="formel">f(x) = 2 · 3^x</span>. Probe: <span class="formel">f(3) = 2 · 27 = 54</span> ✓.</p></div>
+  </div>
+  <div class="aufgabe" id="b04a8">
+    <div class="kopf"><strong>Aufgabe 8</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">f_a(x) = a · 2^x + 3</span>. Bestimmt a so, dass der Graph durch <span class="formel">(2 | 11)</span> verläuft, und gebt den Wertebereich in Abhängigkeit vom Vorzeichen von a an.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert von a?</p>
+      <input id="b04a8antwort" inputmode="text" placeholder="z. B. 4" aria-label="Antwort Aufgabe 8">
+      <button id="b04a8pruefen">Prüfen</button>
+      <div class="feedback" id="b04a8feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b04a8l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a8l"><p><span class="formel">a · 2² + 3 = 11</span> ergibt <span class="formel">4a = 8</span>, also <span class="formel">a = 2</span>.<br><span class="formel">2^x</span> durchläuft genau das Intervall <span class="formel">(0; ∞)</span>. Für <span class="formel">a &gt; 0</span> ist daher <span class="formel">W = (3; ∞)</span>, für <span class="formel">a &lt; 0</span> ist <span class="formel">W = (−∞; 3)</span>, für <span class="formel">a = 0</span> ist f konstant 3. In jedem Fall ist <span class="formel">y = 3</span> die Asymptote (für <span class="formel">x → −∞</span>).</p></div>
+  </div>
+  <div class="aufgabe" id="b04a9">
+    <div class="kopf"><strong>Aufgabe 9</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist die Schar <span class="formel">f_k(x) = e^(k·x)</span> mit <span class="formel">k ≠ 0</span>. Begründet, dass alle Graphen durch <span class="formel">(0 | 1)</span> verlaufen, und gebt an, für welche k die Funktion fällt.</p>
+    <button class="lknopf" data-loesung="b04a9l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a9l"><p><span class="formel">f_k(0) = e^0 = 1</span> für jedes k — alle Graphen treffen sich in <span class="formel">(0 | 1)</span>. Mit <span class="formel">b = e^k</span> ist <span class="formel">f_k(x) = b^x</span>; die Funktion fällt genau dann, wenn <span class="formel">0 &lt; b &lt; 1</span> ist, also <span class="formel">e^k &lt; e^0</span> und damit <span class="formel">k &lt; 0</span>. Für <span class="formel">k &gt; 0</span> wächst sie.</p></div>
+  </div>
+  <div class="aufgabe" id="b04a10">
+    <div class="kopf"><strong>Aufgabe 10</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Beurteilt: „Nimmt ein Bestand zweimal hintereinander um 50 % ab, so ist er vollständig verschwunden.“</p>
+    <button class="lknopf" data-loesung="b04a10l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a10l"><p><b>Falsch.</b> Faktoren werden multipliziert: <span class="formel">0,5 · 0,5 = 0,25</span> — es bleibt ein Viertel, die Gesamtabnahme beträgt 75 %. Konkret: von 80 mg bleiben 20 mg. Allgemein wird <span class="formel">a·b^x</span> mit <span class="formel">a ≠ 0</span> und <span class="formel">b &gt; 0</span> überhaupt nie null — der Bestand verschwindet in diesem Modell nie vollständig.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich III — Verallgemeinern und beurteilen <span class="lead">· begründen, beurteilen, entwickeln</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b04a11">
+    <div class="kopf"><strong>Aufgabe 11</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Schreibt <span class="formel">4 · 2^x</span> in der Form <span class="formel">2^(x+k)</span> und deutet das Ergebnis als Transformation. Begründet anschließend allgemein, dass sich bei Exponentialfunktionen <b>jede</b> senkrechte Streckung als waagerechte Verschiebung schreiben lässt — und zeigt an einem Beispiel, dass das bei Parabeln nicht gilt.</p>
+    <button class="lknopf" data-loesung="b04a11l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a11l"><p><span class="formel">4 · 2^x = 2² · 2^x = 2^(x+2)</span>. Deutung: die Streckung mit dem Faktor 4 in y-Richtung wirkt genau wie eine Verschiebung um <b>2 nach links</b>.<br>Allgemein: für <span class="formel">c &gt; 0</span> ist <span class="formel">c · b^x = b<sup>log_b(c)</sup> · b^x = b<sup>x + log_b(c)</sup></span> — jede Streckung mit positivem Faktor ist eine waagerechte Verschiebung um <span class="formel">log_b(c)</span>. Der Grund ist das Potenzgesetz <span class="formel">b^(u+v) = b^u · b^v</span>, das den Faktor in den Exponenten überführt.<br>Bei Parabeln gilt das nicht: <span class="formel">4x²</span> hat den Scheitel bei 0, jede Verschiebung von <span class="formel">x²</span> verschiebt aber den Scheitel; <span class="formel">(x + k)² = x² + 2kx + k²</span> ist für <span class="formel">k ≠ 0</span> nie ein Vielfaches von <span class="formel">x²</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b04a12">
+    <div class="kopf"><strong>Aufgabe 12</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Beurteilt; begründet wahre Aussagen allgemein und widerlegt falsche durch ein konkretes Gegenbeispiel oder eine allgemeine Begründung. <ol class="teile"><li>„Der Graph von <span class="formel">y = (<span class="bruch"><span class="z">1</span><span class="n">2</span></span>)^x</span> entsteht aus dem Graphen von <span class="formel">y = 2^x</span> durch Spiegelung an der y-Achse.“</li><li>„Die Graphen von <span class="formel">y = 2^x</span> und <span class="formel">y = x²</span> schneiden sich in genau zwei Punkten.“</li><li>„Jede Funktion <span class="formel">f(x) = b^x</span> mit <span class="formel">b &gt; 1</span> ist streng monoton wachsend.“</li></ol></p>
+    <button class="lknopf" data-loesung="b04a12l">Lösung ein/aus</button>
+    <div class="loesung" id="b04a12l"><p><ol class="teile"><li><b>wahr</b>: <span class="formel">(<span class="bruch"><span class="z">1</span><span class="n">2</span></span>)^x = 2^(−x)</span>. Das Ersetzen von x durch <span class="formel">−x</span> ist genau die Spiegelung an der y-Achse.</li><li><b>falsch</b>: neben <span class="formel">x = 2</span> (<span class="formel">4 = 4</span>) und <span class="formel">x = 4</span> (<span class="formel">16 = 16</span>) gibt es einen <b>dritten</b> Schnittpunkt zwischen <span class="formel">−1</span> und 0: bei <span class="formel">x = −1</span> ist <span class="formel">2^(−1) = 0,5 &lt; 1 = (−1)²</span>, bei <span class="formel">x = 0</span> ist <span class="formel">1 &gt; 0</span> — die Differenz wechselt dort das Vorzeichen.</li><li><b>wahr</b>: für <span class="formel">x₂ &gt; x₁</span> ist <span class="formel">b<sup>x₂</sup> = b<sup>x₁</sup></li></ol> b<sup>x₂ − x₁</sup></span> und der zweite Faktor ist wegen <span class="formel">b &gt; 1</span> und <span class="formel">x₂ − x₁ &gt; 0</span> größer als 1.</p></div>
+  </div>
+    </div>
+  </details>
+  
+</section>
+
+<section class="slide">
+  <details class="stufe"><summary>Zum Nachschlagen: Exponentialfunktionen und e-Funktion <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: f(x) = a · bˣ</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">Grundform</td><td class="rform">f(x) = a · bˣ</td><td class="rtext"><strong>a</strong> ist der Startwert (der y-Achsenabschnitt, denn b⁰ = 1), <strong>b</strong> der Wachstumsfaktor. Die Variable steht im <em>Exponenten</em> — das unterscheidet sie von Potenzfunktionen wie x², wo sie in der Basis steht.</td></tr>
+        <tr><td class="rname">Wachstum oder Zerfall?</td><td class="rform">b &gt; 1 wächst · 0 &lt; b &lt; 1 zerfällt</td><td class="rtext">b = 1,05 bedeutet <strong>+5 % pro Schritt</strong>, b = 0,8 bedeutet <strong>−20 % pro Schritt</strong>. Umrechnung: b = 1 + <span class="bruch"><span class="z">p</span><span class="n">100</span></span>.</td></tr>
+        <tr><td class="rname">Multiplikativ, nicht additiv</td><td class="rform">je Schritt mal b</td><td class="rtext">Bei linearem Wachstum kommt immer dasselbe dazu, bei exponentiellem wird immer mit demselben Faktor multipliziert. Deshalb wird es irgendwann rasend schnell.</td></tr>
+        <tr><td class="rname">Asymptote</td><td class="rform">y = 0 wird nie erreicht</td><td class="rtext">bˣ ist für jedes x echt positiv. Der Graph nähert sich der x-Achse beliebig an, berührt sie aber nie — <strong>es gibt keine Nullstelle</strong>. Erst eine Verschiebung wie bˣ − 2 erzeugt eine.</td></tr>
+        <tr><td class="rname">y-Achsenabschnitt</td><td class="rform">f(0) = a</td><td class="rtext">Jede Exponentialfunktion geht durch (0|a), denn b⁰ = 1 für jede Basis.</td></tr>
+        <tr><td class="rname">Die Zahl e</td><td class="rform">e ≈ 2,718</td><td class="rtext">Eine feste Zahl, keine Variable. Sie ist so gewählt, dass die Steigung der Funktion an jeder Stelle genau so groß ist wie der Funktionswert.</td></tr>
+        <tr><td class="rname">Warum die e-Funktion?</td><td class="rform">f(x) = eˣ → f′(x) = eˣ</td><td class="rtext">Die e-Funktion ist <strong>ihre eigene Ableitung</strong>. Deshalb ist sie in der Analysis die Standardform — jede andere Basis lässt sich darauf zurückführen: bˣ = e^(x·ln b).</td></tr>
+        <tr><td class="rname">Halbwertszeit / Verdopplungszeit</td><td class="rform">b^t = 0,5 bzw. b^t = 2</td><td class="rtext">Die Zeit, nach der die Hälfte übrig bzw. das Doppelte erreicht ist. Man erhält sie durch Logarithmieren: t = <span class="bruch"><span class="z">ln(0,5)</span><span class="n">ln(b)</span></span> bzw. t = <span class="bruch"><span class="z">ln(2)</span><span class="n">ln(b)</span></span>.</td></tr>
+        <tr><td class="rname">Gleichungen lösen</td><td class="rform">logarithmieren</td><td class="rtext">Die Potenz allein stellen, dann beide Seiten mit ln. Aus bˣ = c wird x · ln b = ln c, also x = ln c / ln b. Gleiche Basis erkennen geht schneller: 2ˣ = 2⁴ → x = 4.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+</section>
+
+</main>
+<div class="beamer-hinweis">B = Beamer · ◀ ▶ = Navigation · L = Lösungen</div>
+
+<script id="gen-lib">
+"use strict";
+function mulberry(seed){
+  var t = seed >>> 0;
+  return function(){
+    t = (t + 0x6D2B79F5) >>> 0;
+    var r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ganz(rnd, von, bis){ return von + Math.floor(rnd() * (bis - von + 1)); }
+
+function expBruch(z, n){
+  if (z % n === 0) return String(z / n);
+  var g = (function ggt(p, q){ return q ? ggt(q, p % q) : p; })(Math.abs(z), n);
+  return (z / g) + "/" + (n / g);
+}
+function expVz(e){ return e > 0 ? " + " + e : " − " + (-e); }
+function expFaktor(a){ return (a === 1) ? "" : (a === -1 ? "−" : a + "·"); }
+function expPot(d){ return (d === 0) ? "2^x" : "2^(x − " + d + ")"; }
+function expPotNeg(d){ return (d === 0) ? "2^0" : "2^(−" + d + ")"; }
+function expPotAn(x, d){ return (d === 0) ? "2^" + x : "2^(" + x + " − " + d + ")"; }
+function expProd(a, d){ return expFaktor(a) + expPot(d); }
+function expTerm(a, d, e){ return expProd(a, d) + expVz(e); }
+function expMake(seed, level){
+  var rnd = mulberry(seed * 4 + level + 400);
+  var d = ganz(rnd, 0, 3);
+  var e = ganz(rnd, -3, 3);
+  if (e === 0) e = ganz(rnd, 1, 3);
+  var a = 1;
+  var text, schritte;
+  var basis = { typ: "expTransform", seed: seed, level: level };
+  function fertig(v, felder){
+    basis.variante = v; basis.text = text; basis.schritte = schritte;
+    basis.a = a; basis.d = d; basis.e = e;
+    for (var k in felder) basis[k] = felder[k];
+    if (!basis.ergebnis) basis.ergebnis = {};
+    return basis;
+  }
+  if (level === 1){
+    var v1 = ganz(rnd, 0, 2);
+    if (v1 === 0){
+      var pot1 = Math.pow(2, d);
+      text = "Gegeben ist g(x) = " + expTerm(1, d, e) + ". Geben Sie die Gleichung der waagerechten Asymptote und den y-Achsenabschnitt exakt an.";
+      schritte = [
+        "fuer x gegen −unendlich geht " + expPot(d) + " gegen 0 → Asymptote y = " + e,
+        "g(0) = " + expPotNeg(d) + expVz(e) + " = " + expBruch(1, pot1) + expVz(e) + " = " + expBruch(1 + e * pot1, pot1)
+      ];
+      return fertig(0, { ergebnis: { asymptote: e, yAbZ: 1 + e * pot1, yAbN: pot1 } });
+    }
+    if (v1 === 1){
+      if (d === 0) d = 2;
+      text = "Beschreiben Sie, wie der Graph von g(x) = " + expTerm(1, d, e) + " aus dem Graphen von y = 2^x hervorgeht, und geben Sie an, auf welchen Punkt der Punkt (0 | 1) dabei abgebildet wird.";
+      schritte = [
+        "innen x − " + d + ": Verschiebung um " + d + " nach rechts",
+        "aussen " + (e > 0 ? "+ " + e : "− " + (-e)) + ": Verschiebung um " + Math.abs(e) + (e > 0 ? " nach oben" : " nach unten"),
+        "(0 | 1) → (" + d + " | " + (1 + e) + ")"
+      ];
+      return fertig(1, { ergebnis: { asymptote: e, bildpunkt: [d, 1 + e] } });
+    }
+    var k1 = ganz(rnd, 1, 3), xs = d + k1, ws = Math.pow(2, k1) + e;
+    text = "Gegeben ist g(x) = " + expTerm(1, d, e) + ". Berechnen Sie g(" + xs + ") exakt.";
+    schritte = [
+      "g(" + xs + ") = " + expPotAn(xs, d) + expVz(e) + (d === 0 ? "" : " = 2^" + k1 + expVz(e)),
+      "= " + Math.pow(2, k1) + expVz(e) + " = " + ws
+    ];
+    return fertig(2, { ergebnis: { asymptote: e, punkt: [xs, ws] } });
+  }
+  if (level === 2){
+    a = ganz(rnd, 2, 4);
+    var v2 = ganz(rnd, 0, 2);
+    var pot2 = Math.pow(2, d);
+    if (v2 === 0){
+      text = "Gegeben ist g(x) = " + expTerm(a, d, e) + ". Geben Sie die Gleichung der waagerechten Asymptote und den y-Achsenabschnitt exakt an.";
+      schritte = [
+        "der Faktor " + a + " aendert nichts am Grenzverhalten: " + expProd(a, d) + " geht fuer x gegen −unendlich gegen 0 → Asymptote y = " + e,
+        "g(0) = " + expFaktor(a) + expPotNeg(d) + expVz(e) + " = " + expBruch(a, pot2) + expVz(e) + " = " + expBruch(a + e * pot2, pot2)
+      ];
+      return fertig(0, { ergebnis: { asymptote: e, yAbZ: a + e * pot2, yAbN: pot2 } });
+    }
+    if (v2 === 1){
+      text = "Ein Schueler gibt fuer g(x) = " + expTerm(a, d, e) + " die waagerechte Asymptote y = 0 an. Pruefen Sie die Angabe, benennen Sie den Denkfehler und korrigieren Sie.";
+      schritte = [
+        expProd(a, d) + " geht fuer x gegen −unendlich gegen 0 — so weit stimmt die Ueberlegung",
+        "der Summand " + (e > 0 ? "+ " + e : "− " + (-e)) + " wurde uebersehen: g(x) naehert sich " + e + ", nicht 0",
+        "richtig: Asymptote y = " + e + " (Probe: g(−10) = " + a + "·2^(−" + (10 + d) + ")" + expVz(e) + " liegt dicht bei " + e + ")"
+      ];
+      return fertig(1, { ergebnis: { asymptote: e, falschAsymptote: 0 } });
+    }
+    var w2 = a + e;
+    text = "Der Graph von g(x) = a·" + expPot(d) + expVz(e) + " mit a > 0 geht durch den Punkt (" + d + " | " + w2 + "). Bestimmen Sie a.";
+    schritte = [
+      "g(" + d + ") = a·" + expPotAn(d, d) + expVz(e) + " = a·1" + expVz(e) + " = a" + expVz(e),
+      "a" + expVz(e) + " = " + w2 + " → a = " + w2 + " − (" + e + ") = " + a
+    ];
+    return fertig(2, { ergebnis: { asymptote: e, a: a, punkt: [d, w2] } });
+  }
+  if (level === 3){
+    var v3 = ganz(rnd, 0, 2);
+    if (v3 === 0){
+      a = ganz(rnd, 1, 3);
+      text = "Gegeben ist g(x) = " + expTerm(a, d, e) + ". Geben Sie Asymptote, Monotonieverhalten und Wertebereich an und begruenden Sie den Wertebereich.";
+      schritte = [
+        expPot(d) + " ist streng monoton wachsend" + (a === 1 ? "" : ", der Faktor " + a + " ist positiv") + " → g ist streng monoton wachsend",
+        expProd(a, d) + " > 0 fuer alle x, wird aber beliebig klein → g(x) > " + e,
+        "Asymptote y = " + e + "; Wertebereich W = (" + e + "; unendlich)"
+      ];
+      return fertig(0, { ergebnis: { asymptote: e, wertebereichUnten: e, wachsend: true } });
+    }
+    if (v3 === 1){
+      var kk = ganz(rnd, 1, 3);
+      a = Math.pow(2, kk);
+      text = "Schreiben Sie h(x) = " + a + "·2^x als Potenz mit der Basis 2 in der Form 2^(x + k) und deuten Sie das Ergebnis als Transformation des Graphen von y = 2^x.";
+      schritte = [
+        "Vorfaktor als Zweierpotenz: " + a + " = 2^" + kk,
+        "Potenzgesetz: 2^" + kk + " · 2^x = 2^(x + " + kk + ")",
+        "die Streckung in y-Richtung mit Faktor " + a + " wirkt hier wie eine Verschiebung um " + kk + " nach links"
+      ];
+      return fertig(1, { ergebnis: { k: kk, a: a } });
+    }
+    var d2 = (d + ganz(rnd, 1, 3)) % 4;
+    var e2 = e + [-2, -1, 1, 2][ganz(rnd, 0, 3)];
+    if (e2 === 0) e2 = e + 3;
+    text = "Gegeben sind f(x) = " + expTerm(1, d, e) + " und g(x) = " + expTerm(1, d2, e2) + ". Entscheiden Sie, welcher Graph die hoehere waagerechte Asymptote besitzt und welcher aus y = 2^x durch die groessere Verschiebung nach rechts entsteht.";
+    schritte = [
+      "Asymptoten ablesen: y = " + e + " bei f und y = " + e2 + " bei g → " + (e > e2 ? "f" : "g") + " liegt hoeher",
+      "Verschiebung nach rechts ablesen: " + d + " bei f und " + d2 + " bei g → " + (d > d2 ? "f" : "g") + " ist weiter verschoben"
+    ];
+    return fertig(2, { d2: d2, e2: e2, ergebnis: { asymptote: e, hoehereAsymptote: (e > e2 ? "f" : "g"), weiterRechts: (d > d2 ? "f" : "g") } });
+  }
+  var v4 = ganz(rnd, 0, 2);
+  if (v4 === 0){
+    if (d === 0) d = 1;
+    text = "Der Graph von g(x) = 2^(x − d) + e hat die waagerechte Asymptote y = " + e + " und geht durch den Punkt P(" + (d + 1) + " | " + (2 + e) + "). Bestimmen Sie d und e.";
+    schritte = [
+      "die Asymptote liefert direkt e = " + e,
+      "Punktprobe: 2^(" + (d + 1) + " − d)" + expVz(e) + " = " + (2 + e) + " → 2^(" + (d + 1) + " − d) = 2",
+      (d + 1) + " − d = 1 → d = " + d + "; also g(x) = " + expTerm(1, d, e)
+    ];
+    return fertig(0, { ergebnis: { asymptote: e, d: d, punkt: [d + 1, 2 + e] } });
+  }
+  if (v4 === 1){
+    a = ganz(rnd, 2, 4);
+    d = 0;
+    var w4 = 2 * a + e;
+    text = "Die Funktion g mit g(x) = a·2^x + e (a > 0) hat die waagerechte Asymptote y = " + e + " und es gilt g(1) = " + w4 + ". Bestimmen Sie a und berechnen Sie g(0).";
+    schritte = [
+      "die Asymptote liefert e = " + e,
+      "g(1) = a·2" + expVz(e) + " = " + w4 + " → 2a = " + (w4 - e) + " → a = " + a,
+      "g(0) = " + a + "·2^0" + expVz(e) + " = " + (a + e)
+    ];
+    return fertig(1, { ergebnis: { asymptote: e, a: a, punkt: [1, w4], g0: a + e } });
+  }
+  a = ganz(rnd, 1, 3);
+  text = "Entscheiden Sie ohne zu rechnen, ob der Graph von g(x) = " + expTerm(a, d, e) + " die x-Achse schneidet. Begruenden Sie mit dem Wertebereich.";
+  schritte = [
+    expProd(a, d) + " > 0 fuer alle x → g(x) > " + e + ", also W = (" + e + "; unendlich)",
+    e < 0 ? "0 liegt in W (denn " + e + " < 0) → der Graph schneidet die x-Achse genau einmal"
+          : "alle Funktionswerte sind groesser als " + e + " > 0 → der Graph schneidet die x-Achse nicht"
+  ];
+  return fertig(2, { ergebnis: { asymptote: e, hatNullstelle: (e < 0) } });
+}
+function expVerify(t){
+  if (!t.schritte || t.schritte.length < 2) return "Loesungsweg unvollstaendig";
+  for (var i = 0; i < t.schritte.length; i++){
+    if (typeof t.schritte[i] !== "string" || /undefined|NaN|Infinity/.test(t.schritte[i])) return "Schritt defekt";
+  }
+  if (typeof t.text !== "string" || /undefined|NaN|Infinity/.test(t.text)) return "Text defekt";
+  if ([t.a, t.d, t.e].some(function(z){ return typeof z !== "number" || z !== Math.round(z) || Math.abs(z) > 8; })) return "Parameter unsauber";
+  if (t.a < 1) return "Streckfaktor unzulaessig";
+  if (t.d < 0 || t.d > 4) return "Verschiebung ausserhalb";
+  if (t.e === 0) return "e = 0 (Asymptote nicht verschoben - zu trivial)";
+  var pot = Math.pow(2, t.d);
+  function g(x){ return t.a * Math.pow(2, x - t.d) + t.e; }
+  var E = t.ergebnis;
+  if (E.asymptote !== undefined && E.asymptote !== t.e) return "Asymptote falsch";
+  if (E.yAbZ !== undefined && (E.yAbZ !== t.a + t.e * pot || E.yAbN !== pot)) return "y-Abschnitt falsch";
+  if (E.punkt && Math.abs(g(E.punkt[0]) - E.punkt[1]) > 1e-9) return "Punktprobe verletzt";
+  if (E.bildpunkt){
+    if (E.bildpunkt[0] !== t.d) return "Bildpunkt x falsch";
+    if (Math.abs(g(t.d) - E.bildpunkt[1]) > 1e-9) return "Bildpunkt y falsch";
+  }
+  if (t.level === 1){
+    if (t.a !== 1) return "Streckfaktor auf Stufe 1 unerwuenscht";
+    if (t.variante === 1 && t.d === 0) return "triviale Verschiebung";
+    if (t.variante === 2 && (!E.punkt || E.punkt[0] <= t.d)) return "Stelle nicht rechts vom Scheitel der Verschiebung";
+  }
+  if (t.level === 2){
+    if (t.a < 2) return "Streckfaktor fehlt";
+    if (t.variante === 1 && E.falschAsymptote === t.e) return "Fehlersuche ohne Fehler";
+    if (t.variante === 2 && (E.a !== t.a || E.punkt[0] !== t.d || E.punkt[1] !== t.a + t.e)) return "Rueckwaerts-Aufgabe inkonsistent";
+  }
+  if (t.level === 3){
+    if (t.variante === 0 && (E.wertebereichUnten !== t.e || E.wachsend !== true)) return "Wertebereich oder Monotonie falsch";
+    if (t.variante === 1){
+      if (Math.pow(2, E.k) !== t.a || E.a !== t.a) return "Potenzgesetz falsch";
+      if (E.k < 1) return "trivialer Vorfaktor";
+    }
+    if (t.variante === 2){
+      if (t.d === t.d2 || t.e === t.e2) return "Vergleich uneindeutig";
+      if (typeof t.d2 !== "number" || t.d2 < 0 || t.d2 > 4) return "Vergleichsparameter unsauber";
+      if (t.e2 === 0 || Math.abs(t.e2) > 8) return "Vergleichsparameter unsauber";
+      if (E.hoehereAsymptote !== (t.e > t.e2 ? "f" : "g")) return "Asymptotenvergleich falsch";
+      if (E.weiterRechts !== (t.d > t.d2 ? "f" : "g")) return "Verschiebungsvergleich falsch";
+    }
+  }
+  if (t.level === 4){
+    if (t.variante === 0 && (E.d !== t.d || t.d === 0)) return "Rueckwaerts d falsch";
+    if (t.variante === 1){
+      if (t.d !== 0) return "Verschiebung auf dieser Variante nicht vorgesehen";
+      if (E.a !== t.a || E.g0 !== t.a + t.e) return "Rueckwaerts a falsch";
+      if (Math.abs(E.punkt[1] - (2 * t.a + t.e)) > 1e-9) return "Punktwert falsch";
+    }
+    if (t.variante === 2 && E.hatNullstelle !== (t.e < 0)) return "Nullstellen-Entscheidung falsch";
+  }
+  return null;
+}
+var GENERATORS = { expTransform: { make: expMake, verify: expVerify } };
+
+</script>
+
+<script>
+
+"use strict";
+(function(){
+  var alleOffen = false;
+  document.querySelectorAll("[data-loesung]").forEach(function(knopf){
+    knopf.addEventListener("click", function(){
+      var ziel = document.getElementById(knopf.getAttribute("data-loesung"));
+      if (ziel) ziel.classList.toggle("offen");
+    });
+  });
+  function alleLoesungen(){
+    alleOffen = !alleOffen;
+    document.querySelectorAll(".loesung").forEach(function(el){ el.classList.toggle("offen", alleOffen); });
+  }
+  document.getElementById("alleLoesungenKnopf").addEventListener("click", alleLoesungen);
+
+  var HOCH = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+               "-":"⁻","−":"⁻","+":"⁺","(":"⁽",")":"⁾",".":"˙",",":"˙",
+               "x":"ˣ","n":"ⁿ","k":"ᵏ","a":"ᵃ","b":"ᵇ","i":"ⁱ","j":"ʲ","m":"ᵐ","t":"ᵗ","u":"ᵘ",
+               "h":"ʰ","p":"ᵖ","r":"ʳ","s":"ˢ","v":"ᵛ","w":"ʷ","y":"ʸ","z":"ᶻ",
+               "c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ","l":"ˡ","o":"ᵒ"," ":" ",
+               // schon hochgestellte Zeichen bleiben, wie sie sind: e^(x²) -> eˣ²
+               "⁰":"⁰","¹":"¹","²":"²","³":"³","⁴":"⁴","⁵":"⁵","⁶":"⁶","⁷":"⁷","⁸":"⁸","⁹":"⁹",
+               "⁻":"⁻","⁺":"⁺" };
+  // Tiefgestellte Zeichen fuer Scharen und indizierte Groessen: f_a wird zu fₐ,
+  // x_1 zu x₁. Unicode kennt nur diese Buchstaben tiefgestellt - fehlt einer,
+  // bleibt der Term unveraendert stehen (lieber f_b als ein halb gesetztes fᵇ).
+  var TIEF = { "a":"ₐ","e":"ₑ","h":"ₕ","i":"ᵢ","j":"ⱼ","k":"ₖ",
+               "l":"ₗ","m":"ₘ","n":"ₙ","o":"ₒ","p":"ₚ","r":"ᵣ",
+               "s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","x":"ₓ",
+               "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄",
+               "5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" };
+  function tief(z){
+    var aus = "";
+    for (var i = 0; i < z.length; i++){
+      if (!TIEF[z[i]]) return null;
+      aus += TIEF[z[i]];
+    }
+    return aus;
+  }
+  // Vorzeichen- und Faktornormalisierung. Hier stehen nur Umformungen, die IMMER
+  // richtig sind, unabhaengig vom Kontext - "x − -4" heisst auch in einem zitierten
+  // Schuelerfehler "x + 4". Kontextabhaengiges (1x, + 0) gehoert in die Generatoren.
+  function termNormal(s){
+    var t = String(s), vorher;
+    do {
+      vorher = t;
+      t = t
+        // Vorzeichenketten: "− -4" -> "+ 4", "+ -4" -> "− 4"
+        .replace(/([−-])\s*[−-]\s*(?=[\dxa-z(])/g, "+ ")
+        .replace(/\+\s*[−-]\s*(?=[\dxa-z(])/g, "− ")
+        // nur nach Variablen/Klammern kuerzen: x^1 -> x, aber 2^1 · 2^x bleibt
+        .replace(/([a-zA-Z)])(?:\^1(?![\d,.])|\^\(1\))/g, "$1")
+        .replace(/\s*\/\s*1(?![\d,.])/g, "")
+        .replace(/(^|[^0-9a-zA-Z.,])1\s*[·*]\s*(?=[a-z(])/g, "$1")
+        .replace(/(^|[^0-9a-zA-Z.,])1(?=[a-z])/g, "$1")
+        .replace(/\s*[·*]\s*1(?![\d,.])/g, "")
+        .replace(/\(\s*([a-z])\s*[+−-]\s*0\s*\)/g, "$1")
+        // "+ 0" nur nach einem Term mit Variable streichen. Kein Wort davor
+        // ("wird + 0 −"), keine Hochzahl danach ("p − 0²" ist ein eingesetzter
+        // Wert) und kein Vorzeichen danach (Monotoniefolge "+ 0 −").
+        .replace(/(^|[^a-zA-Z])([a-z][0-9²³]*)\s*[+−-]\s*0(?![\d,.²³⁰¹⁴-⁹^])(?!\s*[+−-])/g, "$1$2");
+    } while (t !== vorher);
+    return t.replace(/[ 	]{2,}/g, " ");
+  }
+  // Setzt einen Exponenten hoch - aber nur, wenn JEDES Zeichen ein Hochzeichen hat.
+  // Sonst bliebe eine Mischung wie "2ˣ⁺?" stehen, die schlechter lesbar ist als 2^(x + ?).
+  function hoch(z){
+    // Das Malzeichen entfaellt im Exponenten: e^(a·x) wird zu eᵃˣ - so schreibt man es
+    // auch von Hand, und ein hochgestellter Malpunkt ist typografisch nicht vorgesehen.
+    // innere Exponenten zuerst aufloesen, sonst scheitert e^(x^2) am "^" im Inneren
+    var t = z.replace(/\^(-?\d+)/g, function(_, d){
+              return d.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+             .replace(/([0-9a-z])\s*[·*]\s*(?=[0-9a-z])/g, "$1");
+    var aus = "";
+    for (var i = 0; i < t.length; i++){
+      if (!HOCH[t[i]]) return null;
+      aus += HOCH[t[i]];
+    }
+    return aus;
+  }
+  function schoenMathe(s){
+    return termNormal(String(s))
+      // geklammerte Exponenten zuerst: 2^(x−1) -> 2ˣ⁻¹, e^(2x) -> e²ˣ
+      .replace(/\^\(([^()]{1,12})\)/g, function(ganz, z){
+        var h = hoch(z);
+        if (h === null) return ganz;
+        // Zusammengesetzte Exponenten bekommen hochgestellte Klammern: sonst liest sich
+        // 2^(x-1) als 2 hoch x hoch -1. Ein blosses Vorzeichen (e^(-x)) ist eindeutig.
+        return /[^-−+].*[-−+]/.test(z) ? "⁽" + h + "⁾" : h;
+      })
+      .replace(/\^(-?\d+)/g, function(_, z){ return z.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+      .replace(/\^([a-z])(?![a-zA-Z0-9])/g, function(ganz, z){ return HOCH[z] || ganz; })
+      .replace(/(\d)\.(\d)/g, "$1,$2");
+  }
+  function maskiere(s){
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  // Was schoenMathe() nicht in Unicode setzen konnte, wird hier echtes <sup>/<sub>:
+  // x^(1/2), e^(v(x)), Integralgrenzen ∫0^√a, und Indizes mit beliebigem Buchstaben.
+  // Dateinamen, Pfade und Adressen sind keine Formeln - dort bedeutet "_" nichts.
+  function istKeineFormel(s){
+    return /\.(?:md|html|py|json|txt)\b|:\/\//.test(s);
+  }
+  function markup(s){
+    if (istKeineFormel(s)) { return maskiere(s); }
+    return maskiere(s)
+      // Exponent mit eigener Klammer zuerst: e^(v(x)), 2^(f(x) + 1)
+      .replace(/\^\(((?:[^()]|\([^()]*\)){1,28})\)/g, "<sup>$1</sup>")
+      .replace(/\^([A-Za-z0-9,.√−α-ωΑ-Ω+-]+)/g, "<sup>$1</sup>")
+      .replace(/([A-Za-z])_\(([^()]{1,24})\)/g, "$1<sub>$2</sub>")
+      .replace(/([A-Za-z])_([A-Za-z0-9]+)/g, "$1<sub>$2</sub>");
+  }
+  // Notation vereinheitlichen: Hochzahlen auch im statischen Folientext (x^2 -> x2 hoch)
+  (function hochAlles(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var knoten = [];
+    while (walker.nextNode()){
+      var t = walker.currentNode, el = t.parentNode;
+      if (el && el.tagName !== "SCRIPT" && el.tagName !== "STYLE" &&
+          (t.nodeValue.indexOf("^") >= 0 || t.nodeValue.indexOf("_") >= 0)) knoten.push(t);
+    }
+    knoten.forEach(function(t){
+      var neu = schoenMathe(t.nodeValue);
+      var mk = markup(neu);
+      if (mk === maskiere(neu)) { t.nodeValue = neu; return; }
+      // Echtes Markup noetig: den Textknoten durch ein <span> ersetzen.
+      var sp = document.createElement("span");
+      sp.innerHTML = mk;
+      if (t.parentNode) { t.parentNode.replaceChild(sp, t); }
+    });
+  })();
+
+  function bindeCheck(feldId, knopfId, ausgabeId, pruefer){
+    var feld = document.getElementById(feldId), knopf = document.getElementById(knopfId),
+        ausgabe = document.getElementById(ausgabeId);
+    if (!feld || !knopf || !ausgabe) return;
+    function lauf(){
+      var r = pruefer((feld.value || "").trim().replace(",", "."));
+      ausgabe.textContent = schoenMathe(r.text); ausgabe.className = "feedback " + (r.ok ? "ok" : "no");
+    }
+    knopf.addEventListener("click", lauf);
+    feld.addEventListener("keydown", function(ev){ if (ev.key === "Enter") lauf(); });
+  }
+
+  // ---- Umschalten zwischen Einstiegs-Varianten ----
+  document.querySelectorAll(".vwahl").forEach(function(w){
+    w.addEventListener("click", function(ev){
+      var k = ev.target.closest(".vknopf"); if (!k) { return; }
+      var sec = w.closest("section") || document;
+      w.querySelectorAll(".vknopf").forEach(function(b){ b.classList.toggle("aktiv", b === k); });
+      var ziel = parseInt(k.getAttribute("data-ziel"), 10);
+      sec.querySelectorAll(".variante").forEach(function(v, j){ v.classList.toggle("aktiv", j === ziel); });
+    });
+  });
+
+  bindeCheck("b04a1antwort", "b04a1pruefen", "b04a1feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 3) return { ok: true, text: "Stimmt: der Summand 3 hebt die Asymptote auf y = 3." };
+    return { ok: false, text: "Noch nicht — wohin laeuft 2^(x-1) fuer x gegen minus unendlich?" };
+  });
+  bindeCheck("b04a2antwort", "b04a2pruefen", "b04a2feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 25) return { ok: true, text: "Stimmt: b = 1,25 bedeutet +25 %. Jetzt noch f(4)." };
+    return { ok: false, text: "Noch nicht — aus b = 1 + p/100 folgt p = (b - 1)*100." };
+  });
+  bindeCheck("b04a6antwort", "b04a6pruefen", "b04a6feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 9) return { ok: true, text: "Stimmt: 2<sup>t/3</sup> = 8 ergibt t/3 = 3, also t = 9." };
+    return { ok: false, text: "Noch nicht — teile durch 500 und schreibe 8 als Zweierpotenz." };
+  });
+  bindeCheck("b04a8antwort", "b04a8pruefen", "b04a8feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 2) return { ok: true, text: "Stimmt: 4a + 3 = 11 ergibt a = 2." };
+    return { ok: false, text: "Noch nicht — setze x = 2 und f(2) = 11 ein." };
+  });
+
+
+  var genZaehler = 1, letzteAufgabe = null;
+  var genWahl = document.getElementById("genStufe");
+  var genTypWahl = document.getElementById("genTyp");
+  // Trainingsbloecke buendeln mehrere Generatoren und bieten eine Typenwahl an.
+  // Fehlt das Auswahlfeld (alle Lernbloecke), bleibt es beim einzigen Generator.
+  function genName(){
+    if (genTypWahl && genTypWahl.value && GENERATORS[genTypWahl.value]) return genTypWahl.value;
+    return Object.keys(GENERATORS)[0];
+  }
+  function genNeu(){
+    var stufe = Number(genWahl.value);
+    var g = GENERATORS[genName()];
+    // verify ist der Qualitaetswaechter: eine beanstandete Aufgabe wird verworfen
+    // und neu gewuerfelt (Gate A fuzzt dieselbe Pruefung offline).
+    var versuch = 0;
+    do {
+      letzteAufgabe = g.make(Date.now() % 100000 + genZaehler++, stufe);
+      versuch++;
+    } while (versuch < 20 && g.verify(letzteAufgabe));
+    document.getElementById("genAusgabe").textContent = schoenMathe(letzteAufgabe.text);
+    var feld = document.getElementById("genLoesungFeld");
+    feld.classList.remove("offen");
+    feld.innerHTML = "<ol><li>" + letzteAufgabe.schritte.map(schoenMathe).join("</li><li>") + "</li></ol>";
+  }
+  if (document.getElementById("genNeu")){
+    document.getElementById("genNeu").addEventListener("click", genNeu);
+    document.getElementById("genLoesung").addEventListener("click", function(){
+      if (letzteAufgabe) document.getElementById("genLoesungFeld").classList.toggle("offen");
+    });
+  }
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll("section.slide"));
+  var slideIdx = 0;
+  function zeigeSlide(i){
+    slideIdx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, j){ s.classList.toggle("aktiv", j === slideIdx); });
+  }
+  function beamerUmschalten(){
+    document.body.classList.toggle("beamer");
+    if (document.body.classList.contains("beamer")) zeigeSlide(slideIdx);
+    else slides.forEach(function(s){ s.classList.add("aktiv"); });
+  }
+  document.getElementById("beamerKnopf").addEventListener("click", beamerUmschalten);
+  document.addEventListener("keydown", function(ev){
+    if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA" || ev.target.tagName === "SELECT")) return;
+    var k = ev.key.toLowerCase();
+    if (k === "b") beamerUmschalten();
+    else if (k === "l") alleLoesungen();
+    else if (document.body.classList.contains("beamer")){
+      if (ev.key === "ArrowRight" || ev.key === "PageDown") zeigeSlide(slideIdx + 1);
+      if (ev.key === "ArrowLeft" || ev.key === "PageUp") zeigeSlide(slideIdx - 1);
+    }
+  });
+  slides.forEach(function(s){ s.classList.add("aktiv"); });
+})();
+
+</script>
+</body>
+</html>

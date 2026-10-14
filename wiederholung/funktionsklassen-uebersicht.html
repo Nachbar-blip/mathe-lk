@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Funktionsklassen im Überblick</title>
+<!--
+  Referenzseite Analysis LK - alle Funktionsklassen auf einen Blick.
+  Erzeugt aus _uebersicht.py (Daten: _uebersicht_daten.py) - dort aendern, nicht hier.
+  Single-File, keine externen Abhaengigkeiten, kein Browser-Storage.
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --accent-soft:#eaf1f7; --ok:#2e7d5a; --warn:#b06a2e;
+    --maxw:920px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  main{max-width:var(--maxw);margin:0 auto;padding:28px 18px 64px;}
+  h1{font-size:1.5rem;margin:.2em 0 .1em}
+  h2{font-size:1.2rem;margin:1.5em 0 .4em;border-bottom:2px solid var(--line);padding-bottom:.2em}
+  p{margin:.5em 0}
+  .lead{color:var(--muted)}
+  .formel{white-space:nowrap}
+  sub,sup{font-size:.72em;line-height:0}
+  .spvek{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.08;font-size:.94em;padding:0 .12em;margin:0 .1em;position:relative}
+  .spvek::before,.spvek::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;
+    border:1.5px solid currentColor}
+  .spvek::before{left:-.22em;border-right:none;border-radius:.5em 0 0 .5em}
+  .spvek::after{right:-.22em;border-left:none;border-radius:0 .5em .5em 0}
+  .spvek span{display:block;padding:0 .18em}
+  .phase{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:.18em .6em;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid #cfe0ee;margin:.2em .3em .2em 0;}
+  .badge-kern{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .badge-vert{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .bluete{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;overflow:hidden;background:#fff;}
+  .bluete>summary{cursor:pointer;padding:.7em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;}
+  .bluete>summary::-webkit-details-marker{display:none}
+  .lvl{font-size:.74rem;font-weight:600;padding:.1em .5em;border-radius:6px}
+  .lvl.l1{background:#eef6f0;color:var(--ok)}
+  .lvl.l2{background:#eef2f8;color:var(--accent)}
+  .lvl.l3{background:#f7efe6;color:var(--warn)}
+  .bluete[open]>summary{border-bottom:1px solid var(--line)}
+  .bluete .body{padding:.3em .9em .9em}
+  .iqb{margin:.45em 0 0;font-size:.82rem}
+  .iqb>summary{cursor:pointer;color:var(--muted);list-style:none;display:inline-flex;
+    align-items:center;gap:.4em;padding:.12em .6em;border:1px solid var(--line);
+    border-radius:999px;background:#fbfbf9}
+  .iqb>summary::-webkit-details-marker{display:none}
+  .iqb>summary::before{content:"IQB";font-weight:700;font-size:.72rem;letter-spacing:.03em;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:.05em .35em}
+  .iqb>summary:hover{border-color:var(--accent);color:var(--accent)}
+  .iqb .iqb-text{margin:.4em 0 0;padding:.5em .7em;background:#fbfbf9;border-left:3px solid var(--line);
+    border-radius:0 6px 6px 0;color:var(--muted);line-height:1.5}
+  .iqb .iqb-text .iqb-fund{display:block;margin-top:.3em;font-size:.95em;opacity:.85}
+  .hinfuehrung{border:1px solid #ecd9c2;border-left:4px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;
+    background:#fffdf5;padding:.85em 1em;margin:.4em 0 1em}
+  .hinfuehrung h3{margin:0 0 .4em;font-size:1rem;color:var(--warn)}
+  .hinfuehrung p{margin:.35em 0}
+  .hinfuehrung .frage{font-weight:600;font-size:1.02rem}
+  .hinfuehrung .aufloesung{margin-top:.6em;padding-top:.5em;border-top:1px dashed #ecd9c2;
+    font-size:.94rem;color:var(--muted)}
+  .hinfuehrung table.wertereihe{border-collapse:collapse;margin:.5em 0;font-size:.92rem;background:#fff}
+  .hinfuehrung table.wertereihe th,.hinfuehrung table.wertereihe td{border:1px solid var(--line);
+    padding:.3em .7em;text-align:center}
+  .hinfuehrung table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .tafel{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;margin:.8em 0;overflow:hidden}
+  .tafel>h3{margin:0;padding:.6em .9em;background:var(--accent);color:#fff;font-size:1rem}
+  .tafel .tafel-koerper{padding:.85em .9em}
+  .tafel-form{text-align:center;font-size:1.15rem;margin:.2em 0 .9em;padding:.5em;
+    background:var(--accent-soft);border-radius:6px;color:var(--accent);font-weight:600}
+  .tafel-form .zeiger{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:.25em}
+  table.param{border-collapse:collapse;width:100%;margin:.3em 0}
+  table.param th,table.param td{border:1px solid var(--line);padding:.5em .65em;text-align:left;vertical-align:top}
+  table.param thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  table.param .pz{font-weight:700;color:var(--accent);font-size:1.05rem;text-align:center;width:2.4em}
+  table.param .pbsp{font-size:.9rem;color:var(--muted)}
+  table.param .pbsp code{background:#fbfbf9;padding:.05em .3em;border-radius:3px;color:var(--fg)}
+  .tafel-merk{margin:.5em 0 0;padding:.45em .7em;background:#fffdf5;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.93rem}
+  .tafel-merk::before{content:"Merke: ";font-weight:700;color:var(--warn)}
+  ol.schritte{counter-reset:s;list-style:none;padding:0;margin:.4em 0 0}
+  ol.schritte li{counter-increment:s;position:relative;padding:.5em .7em .5em 2.6em;margin:.4em 0;
+    background:#fafaf7;border-radius:6px}
+  ol.schritte li::before{content:counter(s);position:absolute;left:.7em;top:.5em;width:1.5em;height:1.5em;
+    background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:.82rem;font-weight:700}
+  ol.schritte .frage{font-weight:600;display:block}
+  ol.schritte .ergebnis{display:block;margin-top:.25em;font-size:.9rem;color:var(--ok);font-weight:600}
+  table.reihen{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.93rem}
+  table.reihen th,table.reihen td{border:1px solid var(--line);padding:.45em .65em;text-align:left}
+  table.reihen thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .stufe{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;background:#fff;overflow:hidden}
+  .stufe>summary{cursor:pointer;padding:.6em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em;background:#fbfbf9}
+  .stufe>summary::-webkit-details-marker{display:none}
+  .stufe>summary::before{content:"\25b8";color:var(--accent);font-weight:400}
+  .stufe[open]>summary::before{content:"\25be"}
+  .stufe .stufe-koerper{padding:.7em .9em}
+  .tauf{margin:0 0 .9em;padding-bottom:.7em;border-bottom:1px dashed var(--line)}
+  .tauf:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+  .tauf .tfrage{margin:0 0 .4em}
+  .tauf .tfrage strong.nr{color:var(--accent);margin-right:.3em}
+  .ueberblick{border:1px solid #cfe0ee;border-radius:var(--radius);background:#fff;margin:.2em 0 1.1em}
+  .ueberblick>summary{cursor:pointer;padding:.7em .9em;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);list-style:none;border-radius:var(--radius);
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .ueberblick>summary::-webkit-details-marker{display:none}
+  .ueberblick>summary::before{content:"\25b8";font-weight:400;margin-right:.15em}
+  .ueberblick[open]>summary::before{content:"\25be"}
+  .ueberblick[open]>summary{border-radius:var(--radius) var(--radius) 0 0}
+  .ueberblick .ub-zusatz{font-weight:400;font-size:.85rem;color:var(--muted)}
+  .ueberblick .ub-koerper{padding:.8em .9em}
+  .ub-huelle{overflow-x:auto}
+  table.ub{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+  table.ub th,table.ub td{border:1px solid var(--line);padding:.42em .6em;text-align:left;vertical-align:top}
+  table.ub thead th{background:#fbfbf9;font-size:.82rem;color:var(--muted);font-weight:600}
+  table.ub tbody th{white-space:nowrap;font-weight:600}
+  table.ub .ub-bsp{white-space:nowrap;color:var(--accent);font-size:.88rem}
+  .ub-detail{margin:.9em 0 0;padding:.6em .8em;border-left:3px solid var(--line);background:#fafaf7;border-radius:0 6px 6px 0}
+  .ub-detail h4{margin:0 0 .25em;font-size:.93rem;color:var(--accent)}
+  .ub-detail p{margin:.2em 0;font-size:.93rem}
+  .ub-detail .ub-fehler{color:var(--warn)}
+  .ub-detail ol{margin:.3em 0 0;padding-left:1.4em;font-size:.93rem}
+  .ub-detail ol li{margin:.25em 0}
+  .ub-link{margin:.9em 0 0;font-size:.92rem}
+  .ub-link a{color:var(--accent);font-weight:600}
+  .grundtafel table.regeln{border-collapse:collapse;width:100%;margin:.3em 0}
+  .grundtafel table.regeln th,.grundtafel table.regeln td{border:1px solid var(--line);
+    padding:.5em .65em;text-align:left;vertical-align:top}
+  .grundtafel table.regeln thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .grundtafel table.regeln td.rname{font-weight:600;white-space:nowrap;width:11em}
+  .grundtafel table.regeln td.rform{color:var(--accent);font-weight:600;white-space:nowrap}
+  .grundtafel table.regeln td.rtext{font-size:.93rem}
+  .aufgabe{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+    background:#fff;padding:.8em 1em;margin:1em 0}
+  .aufgabe .kopf{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-bottom:.3em}
+  .loesung{display:none;margin-top:.7em;padding:.7em .9em;background:#f2f7f3;border:1px solid #cbe4d4;border-radius:8px}
+  .loesung.offen{display:block}
+  .lknopf{font:inherit;font-size:.85rem;padding:.3em .7em;border:1px solid var(--line);
+    border-radius:6px;background:#fff;cursor:pointer;color:var(--accent)}
+  .check{margin:.8em 0;padding:.8em .9em;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .check input,.check select{font:inherit;padding:.35em .5em;border:1px solid var(--line);border-radius:6px}
+  .check button,.gen button{font:inherit;padding:.4em .8em;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-left:.4em}
+  .feedback{margin-top:.5em;font-size:.95rem;min-height:1.4em}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--warn)}
+  textarea{width:100%;min-height:4.5em;font:inherit;padding:.5em;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .gen{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.8em 1em;margin:1em 0}
+  .gen .genaufgabe{margin:.6em 0;padding:.6em .8em;background:#fafaf7;border-radius:8px}
+  table.sortier{border-collapse:collapse;margin:.6em 0}
+  table.sortier td,table.sortier th{border:1px solid var(--line);padding:.35em .7em}
+  #toolbar{position:fixed;top:0;left:0;right:0;background:#20242b;color:#f3f4f6;
+    display:flex;gap:1em;align-items:center;justify-content:flex-end;padding:.35em 1em;font-size:.95rem;z-index:50}
+  #toolbar button{font:inherit;font-size:.8rem;background:#3a4150;color:#fff;border:0;border-radius:5px;padding:.15em .6em;cursor:pointer}
+  body{padding-top:2.4em}
+  body.beamer{font-size:26px;background:#fff}
+  body.beamer main{max-width:1180px}
+  body.beamer .nur-arbeit{display:none}
+  body.beamer section.slide{display:none;min-height:60vh}
+  body.beamer section.slide.aktiv{display:block}
+  body.beamer h2{font-size:1.5em}
+  /* ---- neue Bausteinfolge: Problem, Klaerung, Beispiel, Merksatz, Aufgaben ---- */
+  .vwahl{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .vknopf{font:inherit;font-size:.88rem;padding:.25em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .vknopf.aktiv{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .variante{display:none}
+  .variante.aktiv{display:block}
+  .problemkasten{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;
+    padding:.9em 1em;margin:.3em 0 1em;text-align:center;font-size:1.2rem;line-height:1.5}
+  .pfrage{font-weight:600;margin:.9em 0 .15em}
+  .pantwort{color:var(--ok);margin:.1em 0 .8em}
+  .bsp{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.5em .95em;margin:.7em 0}
+  .bsp h3{margin:.25em 0 .45em;color:var(--accent);font-size:1rem}
+  ol.bzeilen{list-style:none;margin:.2em 0;padding:0}
+  ol.bzeilen li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:.2em 1.2em;
+    align-items:baseline;padding:.3em 0;border-top:1px solid var(--line)}
+  ol.bzeilen li:first-child{border-top:0}
+  .brechnung{font-size:1.05em}
+  .bhinweis{color:var(--muted);font-size:.93em}
+  @media (max-width:800px){ol.bzeilen li{grid-template-columns:1fr}}
+  .merk{border:2px solid var(--accent);border-left-width:5px;border-radius:var(--radius);
+    background:#fff;padding:.6em 1em .7em;margin:.5em 0}
+  .merk ul{margin:.2em 0;padding-left:1.1em}
+  .merk li{margin:.5em 0}
+  .merk .regel{font-weight:600;display:block}
+  .merk .kurz{display:block;margin-top:.2em;color:var(--accent)}
+  .fehler{border:1px solid #e9cfcf;border-left:4px solid #b04a4a;border-radius:0 6px 6px 0;
+    background:#fdf6f6;padding:.55em .85em;margin:.5em 0}
+  .fehler p{margin:.2em 0;font-size:.95rem}
+  .typ,.afb{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;
+    padding:.14em .55em;border-radius:6px;margin:.2em .3em .2em 0;border:1px solid transparent}
+  .t-vor{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .t-rueck{background:#eef2f8;color:var(--accent);border-color:#cfe0ee}
+  .t-par{background:#f4eef8;color:#6b4a95;border-color:#ddd0ea}
+  .t-beur{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .afb1{background:#fbfbf9;color:var(--muted);border-color:var(--line)}
+  .afb2{background:#fbfbf9;color:var(--accent);border-color:#cfe0ee}
+  .afb3{background:#fbfbf9;color:var(--warn);border-color:#ecd9c2}
+  .spiegel{border:1px dashed var(--line);border-radius:var(--radius);background:#fbfbf9;margin:.5em 0 1em}
+  .spiegel>summary{cursor:pointer;padding:.5em .9em;font-size:.9rem;color:var(--muted);list-style:none}
+  .spiegel>summary::-webkit-details-marker{display:none}
+  .spiegel>summary::before{content:"\25b8 ";color:var(--accent)}
+  .spiegel[open]>summary::before{content:"\25be "}
+  .spiegel table.param,.spiegel p{margin:.2em .9em .7em}
+  .spiegel table.param th,.spiegel table.param td{text-align:center;padding:.35em .6em}
+  body.beamer .problemkasten{font-size:1.15em}
+  .beamer-hinweis{position:fixed;bottom:.5em;right:1em;color:var(--muted);font-size:.75rem}
+
+  .matrix-huelle{overflow-x:auto;margin:1em 0}
+  table.matrix{border-collapse:collapse;width:100%;min-width:820px;background:#fff;font-size:.92rem}
+  table.matrix{table-layout:auto}
+  table.matrix th,table.matrix td{border:1px solid var(--line);padding:.5em .6em;text-align:left;
+    vertical-align:top;hyphens:auto;-webkit-hyphens:auto;overflow-wrap:break-word}
+  table.matrix tbody th{min-width:9.5em}
+  table.matrix td{min-width:7.5em}
+  table.matrix thead th{background:var(--accent-soft);color:var(--accent);font-size:.88rem;line-height:1.3}
+  table.matrix thead .feiner{font-weight:400;font-size:.78rem;color:var(--muted)}
+  table.matrix td.bsp{white-space:nowrap;color:var(--accent);font-size:.9rem}
+  table.matrix tbody th{font-weight:600;white-space:nowrap;background:#fbfbf9}
+  table.matrix tbody tr:hover td{background:#fafaf7}
+  table.matrix a{color:inherit;text-decoration:none;border-bottom:1px dotted var(--accent)}
+  .klasse{border:1px solid var(--line);border-radius:var(--radius);margin:.7em 0;background:#fff;overflow:hidden}
+  .klasse>summary{cursor:pointer;padding:.75em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .klasse>summary::-webkit-details-marker{display:none}
+  .klasse>summary::before{content:"\25b8";color:var(--accent);font-weight:400;margin-right:.1em}
+  .klasse[open]>summary::before{content:"\25be"}
+  .klasse[open]>summary{border-bottom:1px solid var(--line);background:#fbfbf9}
+  .klasse .term{font-weight:400;color:var(--muted);font-size:.93rem}
+  .klasse .inhalt{padding:.9em}
+  .ebenen{display:flex;gap:.4em;flex-wrap:wrap;margin-bottom:.7em;border-bottom:1px solid var(--line);padding-bottom:.5em}
+  .ebene-tab{font:inherit;font-size:.88rem;padding:.3em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;cursor:pointer;color:var(--muted)}
+  .ebene-tab.aktiv{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .ebene-inhalt[hidden]{display:none}
+  dl.eigen{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:.35em .9em}
+  dl.eigen dt{font-weight:600;color:var(--accent);white-space:nowrap}
+  dl.eigen dd{margin:0}
+  .merk{margin:.8em 0 0;padding:.55em .8em;background:var(--accent-soft);border-left:3px solid var(--accent);
+    border-radius:0 6px 6px 0;font-size:.95rem}
+  .fehler{margin:.5em 0 0;padding:.55em .8em;background:#f7efe6;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.95rem}
+  .fehler::before{content:"Typischer Fehler: ";font-weight:600;color:var(--warn)}
+  .weg{margin:0 0 1.1em}
+  .weg:last-child{margin-bottom:0}
+  .weg h4{margin:0 0 .4em;font-size:.96rem;color:var(--accent)}
+  .weg ol{margin:0;padding-left:1.5em}
+  .weg li{margin:.32em 0}
+  .weg li::marker{color:var(--muted)}
+  .plot-huelle{text-align:center}
+  canvas.plot{width:100%;max-width:460px;height:auto;border:1px solid var(--line);border-radius:6px;background:#fff}
+  .legende{font-size:.88rem;color:var(--muted);margin:.45em 0 0}
+  .legende .stift{display:inline-block;width:1.5em;height:0;border-top:3px solid var(--accent);
+    vertical-align:middle;margin-right:.35em;border-radius:2px}
+  .legende .stift.zweit{border-top-color:#c1442a;border-top-style:dashed}
+  table.werte{border-collapse:collapse;font-size:.93rem;margin:0 auto}
+  table.werte th,table.werte td{border:1px solid var(--line);padding:.32em .75em;text-align:center}
+  table.werte th{background:#fbfbf9;font-weight:600}
+  .zurueck{margin:1.6em 0 0;padding-top:.8em;border-top:1px solid var(--line);font-size:.93rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <a href="./" style="margin-right:auto;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:4px 6px">← Übersicht</a>
+  <button id="alleAufKnopf">Alle aufklappen</button>
+  <button id="beamerKnopf">Beamer (B)</button>
+</div>
+
+<main>
+
+<h1>Funktionsklassen im Überblick</h1>
+<p class="lead">Definitionsbereich, Wertebereich, Monotonie, Symmetrie und Nullstellen
+   aller Funktionsklassen der Oberstufe — zum Nachschlagen und Vergleichen.</p>
+
+<h2>Auf einen Blick</h2>
+<div class="matrix-huelle">
+<table class="matrix">
+  <thead>
+    <tr><th>Funktionsklasse</th><th>Beispiel</th><th>Was darf ich einsetzen?<br><span class="feiner">Definitionsbereich</span></th>
+        <th>Was kommt heraus?<br><span class="feiner">Wertebereich</span></th>
+        <th>Steigt oder fällt?<br><span class="feiner">Monotonie</span></th>
+        <th>Symmetrie</th><th>Nullstellen</th></tr>
+  </thead>
+  <tbody>
+    <tr><th><a href="#linear">Lineare Funktionen</a></th><td class="bsp">f(x) = 2x − 1</td><td>alle Zahlen</td><td>alle Zahlen</td><td>steigend (m &gt; 0)<br>fallend (m &lt; 0)</td><td>punktsymmetrisch</td><td>genau eine</td></tr>
+    <tr><th><a href="#quadratisch">Quadratische Funktionen</a></th><td class="bsp">f(x) = x²</td><td>alle Zahlen</td><td>ab Scheitel nach oben</td><td>erst fallend, dann steigend</td><td>achsensymmetrisch</td><td>keine, eine oder zwei</td></tr>
+    <tr><th><a href="#potenz">Kubische & Potenzfunktionen</a></th><td class="bsp">f(x) = x³</td><td>alle Zahlen</td><td>alle Zahlen</td><td>immer steigend</td><td>punktsymmetrisch</td><td>eine (bei x = 0)</td></tr>
+    <tr><th><a href="#wurzel">Wurzelfunktionen</a></th><td class="bsp">f(x) = √x</td><td>nur x ≥ 0</td><td>nur y ≥ 0</td><td>steigend, immer langsamer</td><td>keine</td><td>eine (bei x = 0)</td></tr>
+    <tr><th><a href="#trigo">Sinus & Kosinus</a></th><td class="bsp">f(x) = sin x</td><td>alle Zahlen</td><td>zwischen −1 und 1</td><td>immer auf und ab</td><td>sin: punktsym.<br>cos: achsensym.</td><td>unendlich viele</td></tr>
+    <tr><th><a href="#exponential">Exponentialfunktionen</a></th><td class="bsp">f(x) = 2ˣ</td><td>alle Zahlen</td><td>immer y &gt; 0</td><td>immer steigend</td><td>keine</td><td>keine</td></tr>
+    <tr><th><a href="#logarithmus">Logarithmusfunktionen</a></th><td class="bsp">f(x) = ln x</td><td>nur x &gt; 0</td><td>alle Zahlen</td><td>steigend, immer langsamer</td><td>keine</td><td>eine (bei x = 1)</td></tr>
+    <tr><th><a href="#efunktion">Die e-Funktion</a></th><td class="bsp">f(x) = eˣ</td><td>alle Zahlen</td><td>immer y &gt; 0</td><td>immer steigend</td><td>keine</td><td>keine</td></tr>
+    <tr><th><a href="#umkehr">Umkehrfunktionen</a></th><td class="bsp">√x kehrt x² um</td><td>der Wertebereich von f</td><td>der Definitionsbereich von f</td><td>genau wie f</td><td>Spiegelung an y = x</td><td>y-Achsenabschnitt von f</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="legende">Klick auf eine Funktionsklasse springt zur ausführlichen Karte.</p>
+
+<h2>Die Klassen im Einzelnen</h2>
+  <details class="klasse" id="linear">
+    <summary><span>Lineare Funktionen</span><span class="term">f(x) = m·x + n</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D = ℝ — jede reelle Zahl ist einsetzbar.</dd><dt>Wertebereich</dt><dd>W = ℝ für m ≠ 0; für m = 0 ist W = {n} (waagerechte Gerade).</dd><dt>Monotonie</dt><dd>m &gt; 0 streng monoton steigend, m &lt; 0 streng monoton fallend, m = 0 konstant.</dd><dt>Symmetrie</dt><dd>Punktsymmetrisch zum y-Achsenabschnitt (0|n). Nur für n = 0 ungerade Funktion.</dd><dt>Nullstellen</dt><dd>m ≠ 0: genau eine bei x = −n/m. m = 0, n ≠ 0: keine. m = n = 0: alle.</dd></dl>
+        <p class="merk">m ist die Steigung (Höhenunterschied je Schritt nach rechts), n der y-Achsenabschnitt.</p>
+        <p class="fehler">Steigung aus zwei Punkten: m = (y₂−y₁)/(x₂−x₁) — die Differenzen nicht vertauschen und x/y nicht verwechseln.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>Geradengleichung aus zwei Punkten</h4><ol><li>Gegeben A(1|1) und B(3|5). Steigung zuerst: m = (y₂ − y₁)/(x₂ − x₁) = (5 − 1)/(3 − 1) = 4/2 = 2.</li><li>Einen Punkt in y = mx + n einsetzen: 1 = 2·1 + n → n = −1.</li><li>Ergebnis: y = 2x − 1. Probe mit dem zweiten Punkt: 2·3 − 1 = 5 ✓.</li></ol></div>
+        <div class="weg"><h4>Nullstelle und Schnittpunkt zweier Geraden</h4><ol><li>Nullstelle: y = 0 setzen, also 2x − 1 = 0 → x = 1/2.</li><li>Schnittpunkt zweier Geraden: Terme gleichsetzen. 2x − 1 = −x + 5 → 3x = 6 → x = 2.</li><li>x in eine der beiden Gleichungen einsetzen: y = 2·2 − 1 = 3, Schnittpunkt S(2|3).</li><li>Parallel (gleiches m) → kein Schnittpunkt. Senkrecht → m₁ · m₂ = −1.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-4, 4, -6, 6], &quot;hilfslinie&quot;: false, &quot;kurven&quot;: [{&quot;term&quot;: &quot;2*x - 1&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: -4, &quot;bis&quot;: 4}], &quot;punkte&quot;: [[0.5, 0, &quot;N&quot;], [0, -1, &quot;y&quot;]]}"
+                  role="img" aria-label="Graph von Lineare Funktionen"></canvas>
+          <p class="legende">f(x) = 2x − 1 · Nullstelle bei x = 0,5, y-Achsenabschnitt −1</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>f(x) = 2x − 1</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>−2</td><td>−1</td><td>0</td><td>1</td><td>2</td><td>3</td></tr>
+          <tr><th>f(x)</th><td>−5</td><td>−3</td><td>−1</td><td>1</td><td>3</td><td>5</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+  <details class="klasse" id="quadratisch">
+    <summary><span>Quadratische Funktionen</span><span class="term">f(x) = ax² + bx + c</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D = ℝ.</dd><dt>Wertebereich</dt><dd>Mit Scheitel S(d|e): a &gt; 0 → W = [e; ∞), a &lt; 0 → W = (−∞; e].</dd><dt>Monotonie</dt><dd>Nicht global monoton. a &gt; 0: fallend bis d, danach steigend (umgekehrt für a &lt; 0).</dd><dt>Symmetrie</dt><dd>Achsensymmetrisch zur Geraden x = d. Nur für b = 0 zur y-Achse (gerade Funktion).</dd><dt>Nullstellen</dt><dd>Erst die <strong>Diskriminante</strong> prüfen — das ist der Term unter der Wurzel: D = b² − 4ac (bzw. (p/2)² − q). D &gt; 0 zwei Nullstellen, D = 0 eine (doppelte), D &lt; 0 keine. Rechenwege: siehe Reiter <em>Rechenweg</em>.</dd></dl>
+        <p class="merk">Scheitelform f(x) = a(x − d)² + e liest Scheitel und Wertebereich direkt ab.</p>
+        <p class="fehler">Erst das Vorzeichen der Diskriminante prüfen, dann die Wurzel ziehen — aus einem negativen Term unter der Wurzel wird keine Lösung, nicht etwa null. Zweiter Klassiker: in der Scheitelform ist das Vorzeichen von d gespiegelt, a(x − 3)² hat den Scheitel bei x = +3.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>pq-Formel — braucht die Normalform x² + px + q = 0</h4><ol><li>Durch a teilen, bis vor dem x² eine 1 steht. Aus 2x² − 4x − 6 = 0 wird x² − 2x − 3 = 0.</li><li>Ablesen: p = −2, q = −3.</li><li><strong>Zuerst die Diskriminante</strong>, also den Term unter der Wurzel: (p/2)² − q = (−1)² − (−3) = 1 + 3 = 4.</li><li>Vorzeichen prüfen: 4 &gt; 0, also gibt es zwei Lösungen. Erst jetzt die Wurzel ziehen: √4 = 2.</li><li>Einsetzen: x₁,₂ = −p/2 ± 2 = 1 ± 2, also x₁ = 3 und x₂ = −1.</li></ol></div>
+        <div class="weg"><h4>abc-Formel (Mitternachtsformel) — geht ohne Umformen</h4><ol><li>Direkt aus f(x) = ax² + bx + c ablesen: a = 1, b = −2, c = −3.</li><li>Diskriminante zuerst: D = b² − 4ac = (−2)² − 4·1·(−3) = 4 + 12 = 16.</li><li>D &gt; 0 → zwei Lösungen, √16 = 4.</li><li>x₁,₂ = (−b ± √D)/(2a) = (2 ± 4)/2, also x₁ = 3 und x₂ = −1.</li><li>Vorteil: kein Teilen durch a nötig. Nachteil: mehr Zahlen im Kopf.</li></ol></div>
+        <div class="weg"><h4>Quadratische Ergänzung — der Weg zur Scheitelform</h4><ol><li>Ziel: aus x² − 2x − 3 die Form (x − d)² + e machen.</li><li>Die Hälfte des x-Koeffizienten bilden und quadrieren: (−2/2)² = 1. Das ist die Ergänzung.</li><li>Diese 1 addieren <em>und</em> sofort wieder abziehen — der Term ändert sich dadurch nicht: x² − 2x <strong>+ 1 − 1</strong> − 3.</li><li>Die ersten drei Glieder sind ein Binom: (x − 1)² − 1 − 3 = (x − 1)² − 4.</li><li>Scheitel direkt ablesen: S(1|−4). Nullstellen: (x − 1)² = 4 → x − 1 = ±2 → x = 3 oder x = −1.</li><li>Bei a ≠ 1 vorher a ausklammern: 2x² − 4x = 2(x² − 2x).</li></ol></div>
+        <div class="weg"><h4>Ohne Formel: Faktorisieren</h4><ol><li>Fehlt das absolute Glied, reicht Ausklammern: x² − 3x = x(x − 3) → x = 0 oder x = 3.</li><li>Satz vom Nullprodukt: Ein Produkt ist null, wenn ein Faktor null ist.</li><li>Bei ganzzahligen Lösungen hilft der Satz von Vieta: x₁ + x₂ = −p und x₁ · x₂ = q. Für x² − 2x − 3 sucht man zwei Zahlen mit Summe 2 und Produkt −3 — das sind 3 und −1.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-3.5, 5.5, -5.5, 7], &quot;hilfslinie&quot;: false, &quot;kurven&quot;: [{&quot;term&quot;: &quot;x*x - 2*x - 3&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: -3.5, &quot;bis&quot;: 5.5}], &quot;punkte&quot;: [[-1, 0, &quot;N₁&quot;], [3, 0, &quot;N₂&quot;], [1, -4, &quot;S&quot;]]}"
+                  role="img" aria-label="Graph von Quadratische Funktionen"></canvas>
+          <p class="legende">f(x) = x² − 2x − 3 · Nullstellen −1 und 3, Scheitel (1|−4)</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>f(x) = x² − 2x − 3</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>−2</td><td>−1</td><td>0</td><td>1</td><td>2</td><td>3</td></tr>
+          <tr><th>f(x)</th><td>5</td><td>0</td><td>−3</td><td>−4</td><td>−3</td><td>0</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+  <details class="klasse" id="potenz">
+    <summary><span>Kubische & Potenzfunktionen</span><span class="term">f(x) = a·xⁿ</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D = ℝ für n ∈ ℕ. Bei negativem Exponenten (x⁻ⁿ = 1/xⁿ) ist x = 0 ausgeschlossen.</dd><dt>Wertebereich</dt><dd>n ungerade: W = ℝ. n gerade: W = [0; ∞) für a &gt; 0.</dd><dt>Monotonie</dt><dd>n ungerade, a &gt; 0: auf ganz ℝ streng monoton steigend. n gerade: erst fallend, dann steigend.</dd><dt>Symmetrie</dt><dd>Der Exponent entscheidet: gerades n → achsensymmetrisch, ungerades n → punktsymmetrisch.</dd><dt>Nullstellen</dt><dd>Nur x = 0, mit Vielfachheit n. Gerade Vielfachheit = berühren, ungerade = schneiden.</dd></dl>
+        <p class="merk">Bei ganzrationalen Funktionen bestimmen Grad und Leitkoeffizient den Globalverlauf.</p>
+        <p class="fehler">Vielfachheit übersehen: (x−2)² hat bei x = 2 eine Berührstelle, keinen Vorzeichenwechsel.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>Nullstellen ganzrationaler Funktionen — in dieser Reihenfolge</h4><ol><li><strong>Ausklammern, wenn kein absolutes Glied da ist:</strong> x³ − 4x = x(x² − 4) → x = 0 oder x² = 4.</li><li>Satz vom Nullprodukt anwenden: x = 0, x = 2, x = −2.</li><li><strong>Substitution bei nur geraden Exponenten:</strong> x⁴ − 5x² + 4 = 0 mit u = x² wird zu u² − 5u + 4 = 0 → u = 1, u = 4; zurück: x = ±1, x = ±2.</li><li><strong>Polynomdivision,</strong> wenn beides nicht geht: eine Nullstelle raten (Teiler des absoluten Glieds probieren), dann durch (x − x₀) teilen und den Rest mit der pq-Formel lösen.</li></ol></div>
+        <div class="weg"><h4>Was der Exponent über den Graphen verrät</h4><ol><li>Grad ungerade → die Enden laufen in verschiedene Richtungen, es gibt mindestens eine Nullstelle.</li><li>Grad gerade → beide Enden laufen in dieselbe Richtung, es kann gar keine Nullstelle geben.</li><li>Leitkoeffizient negativ → alles spiegelt sich an der x-Achse.</li><li>Höchstens so viele Nullstellen wie der Grad angibt.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-2.6, 2.6, -8.5, 8.5], &quot;hilfslinie&quot;: false, &quot;kurven&quot;: [{&quot;term&quot;: &quot;Math.pow(x, 3)&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: -2.6, &quot;bis&quot;: 2.6}], &quot;punkte&quot;: [[0, 0, &quot;N&quot;]]}"
+                  role="img" aria-label="Graph von Kubische & Potenzfunktionen"></canvas>
+          <p class="legende">f(x) = x³ · punktsymmetrisch, dreifache Nullstelle bei x = 0</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>f(x) = x³</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>−2</td><td>−1</td><td>0</td><td>1</td><td>2</td></tr>
+          <tr><th>f(x)</th><td>−8</td><td>−1</td><td>0</td><td>1</td><td>8</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+  <details class="klasse" id="wurzel">
+    <summary><span>Wurzelfunktionen</span><span class="term">f(x) = √x</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D = [0; ∞) — unter der Wurzel darf nichts Negatives stehen. Bei √(x−a) gilt x ≥ a.</dd><dt>Wertebereich</dt><dd>W = [0; ∞). Die Wurzel liefert nie einen negativen Wert.</dd><dt>Monotonie</dt><dd>Auf ganz D streng monoton steigend, aber immer langsamer (Rechtskrümmung).</dd><dt>Symmetrie</dt><dd>Keine — der Graph existiert nur auf einer Seite.</dd><dt>Nullstellen</dt><dd>Genau eine dort, wo der Radikand null wird; bei √x also x = 0.</dd></dl>
+        <p class="merk">√x ist die Umkehrfunktion von x² für x ≥ 0 — Spiegelung an der Winkelhalbierenden y = x.</p>
+        <p class="fehler">√(x²) = |x|, nicht x. Für negative x liefert die Wurzel den Betrag.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>Wurzelgleichung lösen — Probe ist Pflicht</h4><ol><li>Wurzel allein auf eine Seite bringen: √(x + 6) = x.</li><li>Beide Seiten quadrieren: x + 6 = x².</li><li>Umstellen und mit der pq-Formel lösen: x² − x − 6 = 0 → x₁ = 3, x₂ = −2.</li><li><strong>Probe einsetzen</strong>, denn Quadrieren ist keine Äquivalenzumformung: √(3 + 6) = 3 ✓, aber √(−2 + 6) = 2 ≠ −2 ✗.</li><li>Nur x = 3 ist Lösung. x = −2 ist eine Scheinlösung.</li></ol></div>
+        <div class="weg"><h4>Definitionsbereich vorher bestimmen</h4><ol><li>Der Radikand darf nicht negativ werden: bei √(2x − 4) also 2x − 4 ≥ 0.</li><li>Auflösen: x ≥ 2, also D = [2; ∞).</li><li>Lösungen außerhalb von D fallen weg — auch wenn die Rechnung sie liefert.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-1.5, 9.5, -1.5, 4.5], &quot;hilfslinie&quot;: false, &quot;kurven&quot;: [{&quot;term&quot;: &quot;Math.sqrt(x)&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: 0, &quot;bis&quot;: 9.5}], &quot;punkte&quot;: [[0, 0, &quot;N&quot;], [4, 2, &quot;&quot;]]}"
+                  role="img" aria-label="Graph von Wurzelfunktionen"></canvas>
+          <p class="legende">f(x) = √x · nur für x ≥ 0 definiert</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>f(x) = √x</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>0</td><td>1</td><td>4</td><td>9</td></tr>
+          <tr><th>f(x)</th><td>0</td><td>1</td><td>2</td><td>3</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+  <details class="klasse" id="trigo">
+    <summary><span>Sinus & Kosinus</span><span class="term">f(x) = a·sin(b(x − c)) + d</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D = ℝ.</dd><dt>Wertebereich</dt><dd>W = [d − |a|; d + |a|]. Ohne Parameter: [−1; 1].</dd><dt>Monotonie</dt><dd>Periodisch abwechselnd steigend und fallend — nie global monoton.</dd><dt>Symmetrie</dt><dd>sin ist punktsymmetrisch zum Ursprung (ungerade), cos achsensymmetrisch zur y-Achse (gerade).</dd><dt>Nullstellen</dt><dd>Unendlich viele im Abstand einer halben Periode: sin bei k·π, cos bei π/2 + k·π.</dd></dl>
+        <p class="merk">a Amplitude · Periode 2π/b · c Verschiebung nach rechts · d Mittellinie.</p>
+        <p class="fehler">b streckt nicht die Amplitude, sondern staucht die Periode: sin(2x) schwingt doppelt so schnell, nicht doppelt so hoch.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>Alle Lösungen von sin x = c finden</h4><ol><li>Eine Lösung mit dem Taschenrechner: sin x = 0,5 → x₁ = arcsin(0,5) = π/6.</li><li>Die zweite Lösung im Periodenfenster liegt symmetrisch: x₂ = π − π/6 = 5π/6.</li><li>Alle weiteren durch Anhängen der Periode: x = π/6 + k·2π und x = 5π/6 + k·2π, k ∈ ℤ.</li><li>Bei cos x = c ist die zweite Lösung x₂ = −x₁, ebenfalls + k·2π.</li><li>Der Rechner liefert immer nur EINE Lösung — die anderen muss man selbst ergänzen.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-6.8, 6.8, -2.2, 2.2], &quot;hilfslinie&quot;: false, &quot;kurven&quot;: [{&quot;term&quot;: &quot;Math.sin(x)&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: -6.8, &quot;bis&quot;: 6.8}, {&quot;term&quot;: &quot;Math.cos(x)&quot;, &quot;stil&quot;: &quot;zweit&quot;, &quot;von&quot;: -6.8, &quot;bis&quot;: 6.8}], &quot;punkte&quot;: [[0, 0, &quot;&quot;], [3.14159, 0, &quot;π&quot;]]}"
+                  role="img" aria-label="Graph von Sinus & Kosinus"></canvas>
+          <p class="legende">f(x) = sin x · Periode 2π, Nullstellen bei k·π &middot; <span class="stift"></span>erste Kurve, <span class="stift zweit"></span>cos(x)</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>f(x) = sin x</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>0</td><td>π/2</td><td>π</td><td>3π/2</td><td>2π</td></tr>
+          <tr><th>f(x)</th><td>0</td><td>1</td><td>0</td><td>−1</td><td>0</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+  <details class="klasse" id="exponential">
+    <summary><span>Exponentialfunktionen</span><span class="term">f(x) = a·bˣ</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D = ℝ.</dd><dt>Wertebereich</dt><dd>W = (0; ∞) für a &gt; 0 — der Graph erreicht die x-Achse nie.</dd><dt>Monotonie</dt><dd>b &gt; 1 streng monoton steigend (Wachstum), 0 &lt; b &lt; 1 streng monoton fallend (Zerfall).</dd><dt>Symmetrie</dt><dd>Keine.</dd><dt>Nullstellen</dt><dd>Keine. bˣ ist immer positiv — erst eine Verschiebung wie bˣ − 2 erzeugt eine.</dd></dl>
+        <p class="merk">Multiplikatives Wachstum: pro Schritt nach rechts wird mit b multipliziert, nicht addiert.</p>
+        <p class="fehler">Die x-Achse ist Asymptote, nicht Nullstelle: der Graph nähert sich beliebig an, berührt sie aber nie.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>Exponentialgleichung: Logarithmieren</h4><ol><li>Die Potenz allein stellen: 3 · 2ˣ = 48 → 2ˣ = 16.</li><li>Beide Seiten logarithmieren: x · ln 2 = ln 16.</li><li>Nach x auflösen: x = ln 16 / ln 2 = 4.</li><li>Im hilfsmittelfreien Teil exakt stehen lassen — ln 16/ln 2 ist eine Lösung, kein Dezimalwert nötig.</li><li>Gleiche Basis erkennen ist schneller: 2ˣ = 2⁴ → x = 4.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-3.5, 4.2, -1.5, 9], &quot;hilfslinie&quot;: false, &quot;kurven&quot;: [{&quot;term&quot;: &quot;Math.pow(2, x)&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: -3.5, &quot;bis&quot;: 4.2}], &quot;punkte&quot;: [[0, 1, &quot;y&quot;]]}"
+                  role="img" aria-label="Graph von Exponentialfunktionen"></canvas>
+          <p class="legende">f(x) = 2ˣ · Asymptote y = 0, y-Achsenabschnitt 1</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>f(x) = 2ˣ</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>−2</td><td>−1</td><td>0</td><td>1</td><td>2</td><td>3</td></tr>
+          <tr><th>f(x)</th><td>0,25</td><td>0,5</td><td>1</td><td>2</td><td>4</td><td>8</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+  <details class="klasse" id="logarithmus">
+    <summary><span>Logarithmusfunktionen</span><span class="term">f(x) = log_b(x)</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D = (0; ∞) — nur echt positive Zahlen. Bei ln(x−3) gilt x &gt; 3.</dd><dt>Wertebereich</dt><dd>W = ℝ.</dd><dt>Monotonie</dt><dd>b &gt; 1: streng monoton steigend, aber immer langsamer.</dd><dt>Symmetrie</dt><dd>Keine.</dd><dt>Nullstellen</dt><dd>Genau eine bei x = 1, denn b⁰ = 1 für jede Basis.</dd></dl>
+        <p class="merk">log_b(x) beantwortet: Mit welchem Exponenten wird b zu x? Umkehrfunktion von bˣ.</p>
+        <p class="fehler">log(a + b) ist NICHT log a + log b. Nur Produkte werden zu Summen: log(a·b) = log a + log b.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>Logarithmusgleichung: Exponenzieren</h4><ol><li>Den Logarithmus allein stellen: ln(x − 3) = 2.</li><li>Beide Seiten als Exponent zur Basis e: x − 3 = e².</li><li>Auflösen: x = e² + 3 ≈ 10,39.</li><li>Definitionsbereich prüfen: x − 3 &gt; 0, also x &gt; 3 — die Lösung liegt darin ✓.</li></ol></div>
+        <div class="weg"><h4>Die Logarithmusgesetze</h4><ol><li><strong>Produkt wird Summe:</strong> log(a · b) = log a + log b. Beispiel: ln(3x) = ln 3 + ln x.</li><li><strong>Quotient wird Differenz:</strong> log(a/b) = log a − log b. Beispiel: ln(x/5) = ln x − ln 5.</li><li><strong>Exponent wird Faktor:</strong> log(aⁿ) = n · log a. Das ist das wichtigste Gesetz — damit holt man die Unbekannte aus dem Exponenten herunter.</li><li><strong>Kehrwert:</strong> log(1/a) = −log a. Folgt aus dem Quotientengesetz mit log 1 = 0.</li><li><strong>Wurzel:</strong> log(ⁿ√a) = (1/n) · log a. Wurzel ist eine Potenz mit Bruchexponent.</li><li><strong>Feste Werte:</strong> log_b(1) = 0 und log_b(b) = 1 — für jede Basis. Also ln 1 = 0, ln e = 1.</li><li><strong>Hin und zurück:</strong> b^(log_b(x)) = x und log_b(b^x) = x — Logarithmieren und Potenzieren heben sich auf.</li><li><strong>Basiswechsel:</strong> log_b(x) = ln x / ln b. Damit rechnet jeder Taschenrechner jede Basis, auch wenn er nur ln und lg kennt.</li></ol></div>
+        <div class="weg"><h4>Die drei Schreibweisen</h4><ol><li><strong>ln x</strong> = log_e(x), der natürliche Logarithmus zur Basis e — der Standard in der Analysis.</li><li><strong>lg x</strong> = log₁₀(x), der Zehnerlogarithmus — in Sachkontexten (pH-Wert, Dezibel).</li><li><strong>log₂ x</strong>, der Zweierlogarithmus — bei Verdopplungsfragen.</li><li>Alle drei folgen denselben Gesetzen; nur die Basis unterscheidet sie.</li></ol></div>
+        <div class="weg"><h4>Was NICHT gilt — die häufigsten Fallen</h4><ol><li>log(a + b) ist <strong>nicht</strong> log a + log b. Für Summen gibt es kein Gesetz.</li><li>log(a · b) ist <strong>nicht</strong> log a · log b — aus dem Produkt wird eine <em>Summe</em>.</li><li>(log a)ⁿ ist <strong>nicht</strong> n · log a. Nur der Exponent <em>im Argument</em> darf nach vorn.</li><li>log(a/b) ist <strong>nicht</strong> log a / log b — aus dem Quotienten wird eine <em>Differenz</em>.</li><li>Logarithmen von 0 oder negativen Zahlen gibt es nicht: ln 0 und ln(−2) sind nicht definiert.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-1, 8.5, -3.2, 3.2], &quot;hilfslinie&quot;: false, &quot;kurven&quot;: [{&quot;term&quot;: &quot;Math.log(x)&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: 0.02, &quot;bis&quot;: 8.5}], &quot;punkte&quot;: [[1, 0, &quot;N&quot;]]}"
+                  role="img" aria-label="Graph von Logarithmusfunktionen"></canvas>
+          <p class="legende">f(x) = ln x · Polstelle bei x = 0, Nullstelle bei x = 1</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>f(x) = ln x</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>0,5</td><td>1</td><td>e</td><td>e²</td></tr>
+          <tr><th>f(x)</th><td>−0,69</td><td>0</td><td>1</td><td>2</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+  <details class="klasse" id="efunktion">
+    <summary><span>Die e-Funktion</span><span class="term">f(x) = eˣ</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D = ℝ.</dd><dt>Wertebereich</dt><dd>W = (0; ∞).</dd><dt>Monotonie</dt><dd>Auf ganz ℝ streng monoton steigend, weil e ≈ 2,718 &gt; 1.</dd><dt>Symmetrie</dt><dd>Keine.</dd><dt>Nullstellen</dt><dd>Keine — eˣ &gt; 0 für alle x.</dd></dl>
+        <p class="merk">Die e-Funktion ist ihre eigene Ableitung: f′(x) = eˣ. Deshalb ist sie die Basis der Analysis.</p>
+        <p class="fehler">e ist eine feste Zahl (≈ 2,718), keine Variable — eˣ wird nicht wie eine Potenzfunktion abgeleitet.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>Gleichungen mit eˣ lösen</h4><ol><li>e-Potenz allein stellen: 5·eˣ − 10 = 0 → eˣ = 2.</li><li>Beide Seiten mit ln: x = ln 2. Exakt stehen lassen, nicht runden.</li><li><strong>Produkt:</strong> bei x·eˣ = 0 nutzt man eˣ ≠ 0 — nur x = 0 bleibt übrig.</li><li>Das ist der häufigste Fall in Klausuren: eˣ wird nie null, also liefert nur der andere Faktor Nullstellen.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-3.5, 2.6, -1.5, 9], &quot;hilfslinie&quot;: false, &quot;kurven&quot;: [{&quot;term&quot;: &quot;Math.exp(x)&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: -3.5, &quot;bis&quot;: 2.6}], &quot;punkte&quot;: [[0, 1, &quot;y&quot;]]}"
+                  role="img" aria-label="Graph von Die e-Funktion"></canvas>
+          <p class="legende">f(x) = eˣ · Steigung an jeder Stelle gleich dem Funktionswert</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>f(x) = eˣ</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>−1</td><td>0</td><td>1</td><td>2</td></tr>
+          <tr><th>f(x)</th><td>0,37</td><td>1</td><td>2,72</td><td>7,39</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+  <details class="klasse" id="umkehr">
+    <summary><span>Umkehrfunktionen</span><span class="term">f⁻¹ mit f⁻¹(f(x)) = x</span></summary>
+    <div class="inhalt">
+      <div class="ebenen">
+        <button class="ebene-tab aktiv" data-ebene="term">Term</button>
+        <button class="ebene-tab" data-ebene="rechenweg">Rechenweg</button>
+        <button class="ebene-tab" data-ebene="graph">Graph</button>
+        <button class="ebene-tab" data-ebene="tabelle">Tabelle</button>
+      </div>
+      <div class="ebene-inhalt" data-ebene="term">
+        <dl class="eigen"><dt>Definitionsbereich</dt><dd>D von f⁻¹ ist der Wertebereich von f — die Bereiche tauschen die Rollen.</dd><dt>Wertebereich</dt><dd>W von f⁻¹ ist der Definitionsbereich von f.</dd><dt>Monotonie</dt><dd>f⁻¹ hat dasselbe Monotonieverhalten wie f.</dd><dt>Symmetrie</dt><dd>Der Graph von f⁻¹ entsteht durch Spiegelung von f an der Winkelhalbierenden y = x.</dd><dt>Nullstellen</dt><dd>Die Nullstelle von f⁻¹ ist der y-Achsenabschnitt von f — die Koordinaten tauschen.</dd></dl>
+        <p class="merk">Existiert nur, wenn f streng monoton (umkehrbar) ist — sonst den Definitionsbereich einschränken.</p>
+        <p class="fehler">f⁻¹ ist NICHT 1/f. Die Hochstellung meint die Umkehrung, nicht den Kehrwert.</p>
+      </div>
+      <div class="ebene-inhalt" data-ebene="rechenweg" hidden>
+        <div class="weg"><h4>Umkehrfunktion bestimmen — zwei Schritte</h4><ol><li>Funktionsgleichung mit y schreiben: f(x) = 2x + 3 wird zu <strong>y = 2x + 3</strong>.</li><li><strong>Schritt 1 — x und y tauschen:</strong> x = 2y + 3.</li><li><strong>Schritt 2 — nach y umstellen:</strong> x − 3 = 2y, also y = (x − 3)/2.</li><li>Ergebnis aufschreiben: f⁻¹(x) = (x − 3)/2.</li><li>Probe: f⁻¹(f(x)) = (2x + 3 − 3)/2 = x ✓ — kommt x heraus, stimmt die Umkehrung.</li></ol></div>
+        <div class="weg"><h4>Wenn der Definitionsbereich eingeschränkt werden muss</h4><ol><li>f(x) = x² ist auf ganz ℝ <em>nicht</em> umkehrbar: 2 und −2 haben beide den Wert 4.</li><li>Erst den Definitionsbereich einschränken, sodass f streng monoton wird: x ≥ 0.</li><li>Dann wie gehabt: y = x² → tauschen: x = y² → nach y umstellen: y = √x.</li><li>Die Einschränkung mitschreiben: f⁻¹(x) = √x für x ≥ 0.</li><li>Kontrolle am Graphen: f und f⁻¹ liegen spiegelbildlich zur Geraden y = x.</li></ol></div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="graph" hidden>
+        <div class="plot-huelle">
+          <canvas class="plot" data-plot="{&quot;fenster&quot;: [-1, 5.5, -1, 5.5], &quot;hilfslinie&quot;: true, &quot;kurven&quot;: [{&quot;term&quot;: &quot;Math.sqrt(x)&quot;, &quot;stil&quot;: &quot;kurve&quot;, &quot;von&quot;: 0, &quot;bis&quot;: 5.5}, {&quot;term&quot;: &quot;x*x&quot;, &quot;stil&quot;: &quot;zweit&quot;, &quot;von&quot;: 0, &quot;bis&quot;: 2.35}], &quot;punkte&quot;: [[1, 1, &quot;&quot;], [4, 2, &quot;&quot;], [2, 4, &quot;&quot;]]}"
+                  role="img" aria-label="Graph von Umkehrfunktionen"></canvas>
+          <p class="legende">√x und x² sind Spiegelbilder an y = x (gestrichelt) &middot; <span class="stift"></span>erste Kurve, <span class="stift zweit"></span>x²</p>
+        </div>
+      </div>
+      <div class="ebene-inhalt" data-ebene="tabelle" hidden>
+        <p><strong>x² und √x für x ≥ 0</strong></p>
+        <table class="werte">
+          <tr><th>x</th><td>0</td><td>1</td><td>2</td><td>3</td></tr>
+          <tr><th>f(x)</th><td>0 ↔ 0</td><td>1 ↔ 1</td><td>4 ↔ √4 = 2</td><td>9 ↔ √9 = 3</td></tr>
+        </table>
+      </div>
+    </div>
+  </details>
+
+<p class="zurueck">Diese Seite gehört zu den Wiederholungsblöcken 01–07 (Analysis I).
+   Sie ist zum Nachschlagen gedacht — während der Stunde, bei den Aufgaben und vor Klausuren.</p>
+
+</main>
+
+<script>
+
+"use strict";
+(function(){
+
+  // ------------------------------------------------ Funktionenplotter (Canvas)
+  var FARBE = {
+    grund:   "#ffffff",
+    raster:  "#ececec",
+    einheit: "#d6d6d6",
+    achse:   "#4a4f57",
+    zahl:    "#7b8189",
+    kurve:   "#1f6feb",
+    zweit:   "#c1442a",
+    punkt:   "#e07b39"
+  };
+
+  function schrittweite(spanne){
+    // Zielgroesse: rund 8-12 Kaestchen je Achse, aber nur "runde" Schritte.
+    var roh = spanne / 10;
+    var zehner = Math.pow(10, Math.floor(Math.log(roh) / Math.LN10));
+    var rest = roh / zehner;
+    var wahl = rest < 1.5 ? 1 : (rest < 3 ? 2 : (rest < 7 ? 5 : 10));
+    return wahl * zehner;
+  }
+
+  function zahlText(w, schritt){
+    if (Math.abs(w) < 1e-9) return "";
+    var stellen = schritt < 1 ? (schritt < 0.2 ? 2 : 1) : 0;
+    return w.toFixed(stellen).replace(".", ",");
+  }
+
+  function zeichne(flaeche){
+    var daten = JSON.parse(flaeche.getAttribute("data-plot"));
+    var f = daten.fenster, xmin = f[0], xmax = f[1], ymin = f[2], ymax = f[3];
+
+    // Aufloesung an das Geraet anpassen, sonst wirkt alles unscharf.
+    var breiteCss = flaeche.clientWidth || 440;
+    var hoeheCss = Math.round(breiteCss * (ymax - ymin) / (xmax - xmin));
+    hoeheCss = Math.max(170, Math.min(330, hoeheCss));
+    var dpr = window.devicePixelRatio || 1;
+    flaeche.width = Math.round(breiteCss * dpr);
+    flaeche.height = Math.round(hoeheCss * dpr);
+    flaeche.style.height = hoeheCss + "px";
+
+    var c = flaeche.getContext("2d");
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var B = breiteCss, H = hoeheCss;
+
+    function px(x){ return (x - xmin) / (xmax - xmin) * B; }
+    function py(y){ return H - (y - ymin) / (ymax - ymin) * H; }
+
+    c.fillStyle = FARBE.grund;
+    c.fillRect(0, 0, B, H);
+
+    var sx = schrittweite(xmax - xmin), sy = schrittweite(ymax - ymin);
+
+    // Raster
+    c.lineWidth = 1;
+    c.strokeStyle = FARBE.raster;
+    c.beginPath();
+    for (var gx = Math.ceil(xmin / sx) * sx; gx <= xmax; gx += sx){
+      var X = Math.round(px(gx)) + 0.5; c.moveTo(X, 0); c.lineTo(X, H);
+    }
+    for (var gy = Math.ceil(ymin / sy) * sy; gy <= ymax; gy += sy){
+      var Y = Math.round(py(gy)) + 0.5; c.moveTo(0, Y); c.lineTo(B, Y);
+    }
+    c.stroke();
+
+    // Achsen (auf den Rand geklemmt, falls die Null ausserhalb liegt)
+    var achseY = py(Math.min(Math.max(0, ymin), ymax));
+    var achseX = px(Math.min(Math.max(0, xmin), xmax));
+    c.strokeStyle = FARBE.achse;
+    c.fillStyle = FARBE.achse;
+    c.lineWidth = 1.4;
+    c.beginPath();
+    c.moveTo(0, Math.round(achseY) + 0.5); c.lineTo(B, Math.round(achseY) + 0.5);
+    c.moveTo(Math.round(achseX) + 0.5, H); c.lineTo(Math.round(achseX) + 0.5, 0);
+    c.stroke();
+
+    // Pfeilspitzen
+    c.beginPath();
+    c.moveTo(B, achseY); c.lineTo(B - 9, achseY - 4.5); c.lineTo(B - 9, achseY + 4.5);
+    c.closePath(); c.fill();
+    c.beginPath();
+    c.moveTo(achseX, 0); c.lineTo(achseX - 4.5, 9); c.lineTo(achseX + 4.5, 9);
+    c.closePath(); c.fill();
+
+    // Teilstriche und Zahlen
+    c.font = "11px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+    c.fillStyle = FARBE.zahl;
+    c.strokeStyle = FARBE.achse;
+    c.lineWidth = 1;
+    c.textAlign = "center"; c.textBaseline = "top";
+    for (var tx = Math.ceil(xmin / sx) * sx; tx <= xmax; tx += sx){
+      var t = zahlText(tx, sx); if (!t) continue;
+      var TX = Math.round(px(tx)) + 0.5;
+      c.beginPath(); c.moveTo(TX, achseY - 3.5); c.lineTo(TX, achseY + 3.5); c.stroke();
+      c.fillText(t, TX, Math.min(achseY + 6, H - 14));
+    }
+    c.textAlign = "right"; c.textBaseline = "middle";
+    for (var ty = Math.ceil(ymin / sy) * sy; ty <= ymax; ty += sy){
+      var u = zahlText(ty, sy); if (!u) continue;
+      var TY = Math.round(py(ty)) + 0.5;
+      c.beginPath(); c.moveTo(achseX - 3.5, TY); c.lineTo(achseX + 3.5, TY); c.stroke();
+      c.fillText(u, Math.max(achseX - 6, 20), TY);
+    }
+    c.fillStyle = FARBE.achse;
+    c.textAlign = "right"; c.textBaseline = "top";
+    c.fillText("x", B - 6, achseY + 6);
+    c.textAlign = "left";
+    c.fillText("y", achseX + 7, 3);
+
+    // Hilfslinie y = x (nur wo angefordert)
+    if (daten.hilfslinie){
+      c.save();
+      c.strokeStyle = FARBE.zahl; c.lineWidth = 1.2; c.setLineDash([5, 4]);
+      c.beginPath(); c.moveTo(px(xmin), py(xmin)); c.lineTo(px(xmax), py(xmax)); c.stroke();
+      c.restore();
+    }
+
+    // Kurven
+    c.lineJoin = "round"; c.lineCap = "round";
+    daten.kurven.forEach(function(kurve){
+      var werte = new Function("x", "return (" + kurve.term + ");");
+      var zweit = kurve.stil === "zweit";
+      c.strokeStyle = zweit ? FARBE.zweit : FARBE.kurve;
+      c.lineWidth = zweit ? 2 : 2.6;
+      if (zweit) c.setLineDash([7, 4]); else c.setLineDash([]);
+      c.beginPath();
+      var neu = true, n = 620;
+      var von = kurve.von, bis = kurve.bis;
+      for (var i = 0; i <= n; i++){
+        var x = von + (bis - von) * i / n, y;
+        try { y = werte(x); } catch (e) { y = NaN; }
+        // Ausserhalb des Fensters den Stift heben, statt quer durchs Bild zu ziehen
+        if (!isFinite(y) || y < ymin - (ymax - ymin) || y > ymax + (ymax - ymin)){ neu = true; continue; }
+        if (neu){ c.moveTo(px(x), py(y)); neu = false; } else { c.lineTo(px(x), py(y)); }
+      }
+      c.stroke();
+      c.setLineDash([]);
+    });
+
+    // Markante Punkte
+    c.font = "600 11px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+    daten.punkte.forEach(function(p){
+      var X = px(p[0]), Y = py(p[1]);
+      c.beginPath(); c.arc(X, Y, 4, 0, 2 * Math.PI);
+      c.fillStyle = FARBE.punkt; c.fill();
+      c.lineWidth = 1.6; c.strokeStyle = "#fff"; c.stroke();
+      if (p[2]){
+        c.fillStyle = FARBE.punkt;
+        c.textAlign = "left"; c.textBaseline = "bottom";
+        c.fillText(p[2], X + 6, Y - 4);
+      }
+    });
+  }
+
+  var gezeichnet = [];
+  function zeichneAlleSichtbaren(){
+    document.querySelectorAll("canvas.plot").forEach(function(fl){
+      if (fl.clientWidth > 0) zeichne(fl);
+    });
+  }
+
+  // Erst zeichnen, wenn die Karte offen ist - eine unsichtbare Flaeche hat Breite 0.
+  document.querySelectorAll("details.klasse").forEach(function(d){
+    d.addEventListener("toggle", function(){
+      if (d.open) d.querySelectorAll("canvas.plot").forEach(function(fl){ zeichne(fl); });
+    });
+  });
+  document.querySelectorAll(".ebene-tab").forEach(function(tab){
+    if (tab.getAttribute("data-ebene") === "graph"){
+      tab.addEventListener("click", function(){
+        var karte = tab.closest(".inhalt");
+        window.setTimeout(function(){
+          karte.querySelectorAll("canvas.plot").forEach(function(fl){ zeichne(fl); });
+        }, 0);
+      });
+    }
+  });
+  var warten = null;
+  window.addEventListener("resize", function(){
+    window.clearTimeout(warten);
+    warten = window.setTimeout(zeichneAlleSichtbaren, 150);
+  });
+
+  // ------------------------------------------------ Ebenenwechsler (Pattern 2)
+  document.querySelectorAll(".ebenen").forEach(function(leiste){
+    var karte = leiste.parentNode;
+    leiste.querySelectorAll(".ebene-tab").forEach(function(tab){
+      tab.addEventListener("click", function(){
+        var wahl = tab.getAttribute("data-ebene");
+        leiste.querySelectorAll(".ebene-tab").forEach(function(t){
+          t.classList.toggle("aktiv", t === tab);
+        });
+        karte.querySelectorAll(".ebene-inhalt").forEach(function(feld){
+          feld.hidden = feld.getAttribute("data-ebene") !== wahl;
+        });
+      });
+    });
+  });
+
+  var alleOffen = false;
+  var knopf = document.getElementById("alleAufKnopf");
+  knopf.addEventListener("click", function(){
+    alleOffen = !alleOffen;
+    document.querySelectorAll("details.klasse").forEach(function(d){ d.open = alleOffen; });
+    knopf.textContent = alleOffen ? "Alle zuklappen" : "Alle aufklappen";
+    if (alleOffen) window.setTimeout(zeichneAlleSichtbaren, 0);
+  });
+
+  document.querySelectorAll("table.matrix a").forEach(function(link){
+    link.addEventListener("click", function(){
+      var ziel = document.getElementById(link.getAttribute("href").slice(1));
+      if (ziel) ziel.open = true;
+    });
+  });
+
+  function beamerUmschalten(){
+    document.body.classList.toggle("beamer");
+    window.setTimeout(zeichneAlleSichtbaren, 0);
+  }
+  document.getElementById("beamerKnopf").addEventListener("click", beamerUmschalten);
+  document.addEventListener("keydown", function(ev){
+    if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA")) return;
+    if (ev.key.toLowerCase() === "b") beamerUmschalten();
+  });
+})();
+
+</script>
+</body>
+</html>

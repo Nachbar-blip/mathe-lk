@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block 07 · Verknüpfung und Verkettung</title>
+<!--
+  analysis-lk Block 07 (Mathematik LK, eA). MasterMind-Aufbau, neutrales Design.
+  Single-File, keine externen Abhaengigkeiten, ASCII-only JS-Bezeichner, kein Browser-Storage.
+  Tasten: B Beamer, Pfeile Abschnitt (Beamer), L alle Loesungen.
+  Erzeugt aus _skelett.py - Aenderungen am Rahmen dort vornehmen, Inhalt in _inhalt_bXX.py.
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --accent-soft:#eaf1f7; --ok:#2e7d5a; --warn:#b06a2e;
+    --maxw:920px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  main{max-width:var(--maxw);margin:0 auto;padding:28px 18px 64px;}
+  h1{font-size:1.5rem;margin:.2em 0 .1em}
+  h2{font-size:1.2rem;margin:1.5em 0 .4em;border-bottom:2px solid var(--line);padding-bottom:.2em}
+  p{margin:.5em 0}
+  .lead{color:var(--muted)}
+  .formel{white-space:nowrap}
+  sub,sup{font-size:.72em;line-height:0}
+  .spvek{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.08;font-size:.94em;padding:0 .12em;margin:0 .1em;position:relative}
+  .spvek::before,.spvek::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;
+    border:1.5px solid currentColor}
+  .spvek::before{left:-.22em;border-right:none;border-radius:.5em 0 0 .5em}
+  .spvek::after{right:-.22em;border-left:none;border-radius:0 .5em .5em 0}
+  .spvek span{display:block;padding:0 .18em}
+  .phase{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:.18em .6em;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid #cfe0ee;margin:.2em .3em .2em 0;}
+  .badge-kern{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .badge-vert{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .bluete{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;overflow:hidden;background:#fff;}
+  .bluete>summary{cursor:pointer;padding:.7em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;}
+  .bluete>summary::-webkit-details-marker{display:none}
+  .lvl{font-size:.74rem;font-weight:600;padding:.1em .5em;border-radius:6px}
+  .lvl.l1{background:#eef6f0;color:var(--ok)}
+  .lvl.l2{background:#eef2f8;color:var(--accent)}
+  .lvl.l3{background:#f7efe6;color:var(--warn)}
+  .bluete[open]>summary{border-bottom:1px solid var(--line)}
+  .bluete .body{padding:.3em .9em .9em}
+  .iqb{margin:.45em 0 0;font-size:.82rem}
+  .iqb>summary{cursor:pointer;color:var(--muted);list-style:none;display:inline-flex;
+    align-items:center;gap:.4em;padding:.12em .6em;border:1px solid var(--line);
+    border-radius:999px;background:#fbfbf9}
+  .iqb>summary::-webkit-details-marker{display:none}
+  .iqb>summary::before{content:"IQB";font-weight:700;font-size:.72rem;letter-spacing:.03em;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:.05em .35em}
+  .iqb>summary:hover{border-color:var(--accent);color:var(--accent)}
+  .iqb .iqb-text{margin:.4em 0 0;padding:.5em .7em;background:#fbfbf9;border-left:3px solid var(--line);
+    border-radius:0 6px 6px 0;color:var(--muted);line-height:1.5}
+  .iqb .iqb-text .iqb-fund{display:block;margin-top:.3em;font-size:.95em;opacity:.85}
+  .hinfuehrung{border:1px solid #ecd9c2;border-left:4px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;
+    background:#fffdf5;padding:.85em 1em;margin:.4em 0 1em}
+  .hinfuehrung h3{margin:0 0 .4em;font-size:1rem;color:var(--warn)}
+  .hinfuehrung p{margin:.35em 0}
+  .hinfuehrung .frage{font-weight:600;font-size:1.02rem}
+  .hinfuehrung .aufloesung{margin-top:.6em;padding-top:.5em;border-top:1px dashed #ecd9c2;
+    font-size:.94rem;color:var(--muted)}
+  table.wertereihe{border-collapse:collapse;margin:.3em 0 .4em;font-size:.9rem;background:#fff}
+  table.wertereihe th,table.wertereihe td{border:1px solid var(--line);padding:.25em .6em;text-align:center}
+  table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .hinfuehrung table.wertereihe{border-collapse:collapse;margin:.5em 0;font-size:.92rem;background:#fff}
+  .hinfuehrung table.wertereihe th,.hinfuehrung table.wertereihe td{border:1px solid var(--line);
+    padding:.3em .7em;text-align:center}
+  .hinfuehrung table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .tafel{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;margin:.8em 0;overflow:hidden}
+  .tafel>h3{margin:0;padding:.6em .9em;background:var(--accent);color:#fff;font-size:1rem}
+  .tafel .tafel-koerper{padding:.85em .9em}
+  .tafel-form{text-align:center;font-size:1.15rem;margin:.2em 0 .9em;padding:.5em;
+    background:var(--accent-soft);border-radius:6px;color:var(--accent);font-weight:600}
+  .tafel-form .zeiger{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:.25em}
+  table.param{border-collapse:collapse;width:100%;margin:.3em 0}
+  table.param th,table.param td{border:1px solid var(--line);padding:.5em .65em;text-align:left;vertical-align:top}
+  table.param thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  table.param .pz{font-weight:700;color:var(--accent);font-size:1.05rem;text-align:center;width:2.4em}
+  table.param .pbsp{font-size:.9rem;color:var(--muted)}
+  table.param .pbsp code{background:#fbfbf9;padding:.05em .3em;border-radius:3px;color:var(--fg)}
+  .tafel-merk{margin:.5em 0 0;padding:.45em .7em;background:#fffdf5;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.93rem}
+  .tafel-merk::before{content:"Merke: ";font-weight:700;color:var(--warn)}
+  ol.schritte{counter-reset:s;list-style:none;padding:0;margin:.4em 0 0}
+  ol.schritte li{counter-increment:s;position:relative;padding:.5em .7em .5em 2.6em;margin:.4em 0;
+    background:#fafaf7;border-radius:6px}
+  ol.schritte li::before{content:counter(s);position:absolute;left:.7em;top:.5em;width:1.5em;height:1.5em;
+    background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:.82rem;font-weight:700}
+  ol.schritte .frage{font-weight:600;display:block}
+  ol.schritte .ergebnis{display:block;margin-top:.25em;font-size:.9rem;color:var(--ok);font-weight:600}
+  table.reihen{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.93rem}
+  table.reihen th,table.reihen td{border:1px solid var(--line);padding:.45em .65em;text-align:left}
+  table.reihen thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .stufe{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;background:#fff;overflow:hidden}
+  .stufe>summary{cursor:pointer;padding:.6em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em;background:#fbfbf9}
+  .stufe>summary::-webkit-details-marker{display:none}
+  .stufe>summary::before{content:"\25b8";color:var(--accent);font-weight:400}
+  .stufe[open]>summary::before{content:"\25be"}
+  .stufe .stufe-koerper{padding:.7em .9em}
+  .tauf{margin:0 0 .9em;padding-bottom:.7em;border-bottom:1px dashed var(--line)}
+  .tauf:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+  .tauf .tfrage{margin:0 0 .4em}
+  .tauf .tfrage strong.nr{color:var(--accent);margin-right:.3em}
+  .ueberblick{border:1px solid #cfe0ee;border-radius:var(--radius);background:#fff;margin:.2em 0 1.1em}
+  .ueberblick>summary{cursor:pointer;padding:.7em .9em;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);list-style:none;border-radius:var(--radius);
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .ueberblick>summary::-webkit-details-marker{display:none}
+  .ueberblick>summary::before{content:"\25b8";font-weight:400;margin-right:.15em}
+  .ueberblick[open]>summary::before{content:"\25be"}
+  .ueberblick[open]>summary{border-radius:var(--radius) var(--radius) 0 0}
+  .ueberblick .ub-zusatz{font-weight:400;font-size:.85rem;color:var(--muted)}
+  .ueberblick .ub-koerper{padding:.8em .9em}
+  .ub-huelle{overflow-x:auto}
+  table.ub{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+  table.ub th,table.ub td{border:1px solid var(--line);padding:.42em .6em;text-align:left;vertical-align:top}
+  table.ub thead th{background:#fbfbf9;font-size:.82rem;color:var(--muted);font-weight:600}
+  table.ub tbody th{white-space:nowrap;font-weight:600}
+  table.ub .ub-bsp{white-space:nowrap;color:var(--accent);font-size:.88rem}
+  .ub-detail{margin:.9em 0 0;padding:.6em .8em;border-left:3px solid var(--line);background:#fafaf7;border-radius:0 6px 6px 0}
+  .ub-detail h4{margin:0 0 .25em;font-size:.93rem;color:var(--accent)}
+  .ub-detail p{margin:.2em 0;font-size:.93rem}
+  .ub-detail .ub-fehler{color:var(--warn)}
+  .ub-detail ol{margin:.3em 0 0;padding-left:1.4em;font-size:.93rem}
+  .ub-detail ol li{margin:.25em 0}
+  .ub-link{margin:.9em 0 0;font-size:.92rem}
+  .ub-link a{color:var(--accent);font-weight:600}
+  .grundtafel table.regeln{border-collapse:collapse;width:100%;margin:.3em 0}
+  .grundtafel table.regeln th,.grundtafel table.regeln td{border:1px solid var(--line);
+    padding:.5em .65em;text-align:left;vertical-align:top}
+  .grundtafel table.regeln thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .grundtafel table.regeln td.rname{font-weight:600;white-space:nowrap;width:11em}
+  .grundtafel table.regeln td.rform{color:var(--accent);font-weight:600;white-space:nowrap}
+  .grundtafel table.regeln td.rtext{font-size:.93rem}
+  .aufgabe{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+    background:#fff;padding:.8em 1em;margin:1em 0}
+  .aufgabe .kopf{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-bottom:.3em}
+  .loesung{display:none;margin-top:.7em;padding:.7em .9em;background:#f2f7f3;border:1px solid #cbe4d4;border-radius:8px}
+  .loesung.offen{display:block}
+  .lknopf{font:inherit;font-size:.85rem;padding:.3em .7em;border:1px solid var(--line);
+    border-radius:6px;background:#fff;cursor:pointer;color:var(--accent)}
+  .check{margin:.8em 0;padding:.8em .9em;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .check input,.check select{font:inherit;padding:.35em .5em;border:1px solid var(--line);border-radius:6px}
+  .check button,.gen button{font:inherit;padding:.4em .8em;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-left:.4em}
+  .feedback{margin-top:.5em;font-size:.95rem;min-height:1.4em}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--warn)}
+  textarea{width:100%;min-height:4.5em;font:inherit;padding:.5em;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .gen{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.8em 1em;margin:1em 0}
+  .gen .genaufgabe{margin:.6em 0;padding:.6em .8em;background:#fafaf7;border-radius:8px}
+  table.sortier{border-collapse:collapse;margin:.6em 0}
+  table.sortier td,table.sortier th{border:1px solid var(--line);padding:.35em .7em}
+  #toolbar{position:fixed;top:0;left:0;right:0;background:#20242b;color:#f3f4f6;
+    display:flex;gap:1em;align-items:center;justify-content:flex-end;padding:.35em 1em;font-size:.95rem;z-index:50}
+  #toolbar button{font:inherit;font-size:.8rem;background:#3a4150;color:#fff;border:0;border-radius:5px;padding:.15em .6em;cursor:pointer}
+  body{padding-top:2.4em}
+  body.beamer{font-size:26px;background:#fff}
+  body.beamer main{max-width:1180px}
+  body.beamer .nur-arbeit{display:none}
+  body.beamer section.slide{display:none;min-height:60vh}
+  body.beamer section.slide.aktiv{display:block}
+  body.beamer h2{font-size:1.5em}
+  /* ---- neue Bausteinfolge: Problem, Klaerung, Beispiel, Merksatz, Aufgaben ---- */
+  .vwahl{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .vknopf{font:inherit;font-size:.88rem;padding:.25em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .vknopf.aktiv{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .variante{display:none}
+  .variante.aktiv{display:block}
+  .problemkasten{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;
+    padding:.9em 1em;margin:.3em 0 1em;text-align:center;font-size:1.2rem;line-height:1.5}
+  .pfrage{font-weight:600;margin:.9em 0 .15em}
+  .pantwort{color:var(--ok);margin:.1em 0 .8em}
+  .bsp{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.5em .95em;margin:.7em 0}
+  .bsp h3{margin:.25em 0 .45em;color:var(--accent);font-size:1rem}
+  ol.bzeilen{list-style:none;margin:.2em 0;padding:0}
+  ol.bzeilen li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:.2em 1.2em;
+    align-items:baseline;padding:.3em 0;border-top:1px solid var(--line)}
+  ol.bzeilen li:first-child{border-top:0}
+  .brechnung{font-size:1.05em}
+  .bhinweis{color:var(--muted);font-size:.93em}
+  @media (max-width:800px){ol.bzeilen li{grid-template-columns:1fr}}
+  .merk{border:2px solid var(--accent);border-left-width:5px;border-radius:var(--radius);
+    background:#fff;padding:.6em 1em .7em;margin:.5em 0}
+  .merk ul{margin:.2em 0;padding-left:1.1em}
+  .merk li{margin:.5em 0}
+  .merk .regel{font-weight:600;display:block}
+  .merk .kurz{display:block;margin-top:.2em;color:var(--accent)}
+  .fehler{border:1px solid #e9cfcf;border-left:4px solid #b04a4a;border-radius:0 6px 6px 0;
+    background:#fdf6f6;padding:.55em .85em;margin:.5em 0}
+  .fehler p{margin:.2em 0;font-size:.95rem}
+  .typ,.afb{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;
+    padding:.14em .55em;border-radius:6px;margin:.2em .3em .2em 0;border:1px solid transparent}
+  .t-vor{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .t-rueck{background:#eef2f8;color:var(--accent);border-color:#cfe0ee}
+  .t-par{background:#f4eef8;color:#6b4a95;border-color:#ddd0ea}
+  .t-beur{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .afb1{background:#fbfbf9;color:var(--muted);border-color:var(--line)}
+  .afb2{background:#fbfbf9;color:var(--accent);border-color:#cfe0ee}
+  .afb3{background:#fbfbf9;color:var(--warn);border-color:#ecd9c2}
+  .spiegel{border:1px dashed var(--line);border-radius:var(--radius);background:#fbfbf9;margin:.5em 0 1em}
+  .spiegel>summary{cursor:pointer;padding:.5em .9em;font-size:.9rem;color:var(--muted);list-style:none}
+  .spiegel>summary::-webkit-details-marker{display:none}
+  .spiegel>summary::before{content:"\25b8 ";color:var(--accent)}
+  .spiegel[open]>summary::before{content:"\25be "}
+  .spiegel table.param,.spiegel p{margin:.2em .9em .7em}
+  .spiegel table.param th,.spiegel table.param td{text-align:center;padding:.35em .6em}
+  .bruch{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.15;margin:0 .12em;font-size:.92em;text-align:center}
+  .bruch .z{padding:0 .25em .05em;border-bottom:1.5px solid currentColor}
+  .bruch .n{padding:.05em .25em 0}
+  ol.bzeilen details.klapp{display:inline-block;margin:0}
+  ol.bzeilen details.klapp>summary{cursor:pointer;list-style:none;display:inline-block;font-size:.85rem;
+    padding:.1em .6em;border:1px solid var(--line);border-radius:999px;color:var(--accent);background:#fff}
+  ol.bzeilen details.klapp>summary::-webkit-details-marker{display:none}
+  ol.bzeilen details.klapp[open]>summary{background:var(--accent-soft)}
+  ol.bzeilen details.klapp .erg{margin-left:.6em;color:var(--ok);font-weight:600}
+  ol.bzeilen details.klapp:not([open]) .erg{display:none}
+  svg.plot{display:block;max-width:100%;height:auto;margin:.4em 0;background:#fff;border:1px solid var(--line);border-radius:6px}
+  svg.plot .gitter{stroke:#eceae4;stroke-width:1}
+  svg.plot .achse{stroke:#555;stroke-width:1.3}
+  svg.plot .tick{font-size:10px;fill:var(--muted)}
+  svg.plot .beschriftung{font-size:11px}
+  ol.bzeilen li:has(svg.plot){grid-template-columns:1fr}
+  .doppelbild .loesung{background:transparent;border:0;padding:0;margin-top:.3em}
+  .doppelbild .lknopf{margin:.2em 0}
+  .plots{display:flex;flex-wrap:wrap;gap:.6em;align-items:flex-start}
+  .plots svg.plot{margin:0}
+  body.beamer svg.plot{width:auto;height:auto}
+  .wurzel{display:inline-block;white-space:nowrap;vertical-align:baseline;line-height:1.15}
+  .wurzel .rad{display:inline-block;border-top:1.5px solid currentColor;padding:.04em .12em 0 .08em;
+    vertical-align:baseline;line-height:1.15}
+  ol.teile{margin:.4em 0 .2em;padding-left:1.6em}
+  ol.teile li{margin:.3em 0}
+  ol.teile li::marker{color:var(--accent);font-weight:700}
+  .limes{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.05;margin:0 .25em 0 .1em}
+  .limes .unter{font-size:.68em;color:var(--muted);white-space:nowrap}
+  body.beamer .problemkasten{font-size:1.15em}
+  .beamer-hinweis{position:fixed;bottom:.5em;right:1em;color:var(--muted);font-size:.75rem}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <a href="./" style="margin-right:auto;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:4px 6px">← Übersicht</a>
+  <button id="beamerKnopf">Beamer (B)</button>
+  <button id="alleLoesungenKnopf">Lösungen (L)</button>
+</div>
+
+<main>
+
+<section class="slide aktiv">
+  <h1>Block 07 · Verknüpfung und Verkettung</h1>
+  <p class="lead">Mathematik LK (eA) · <strong>Ziel:</strong> Verkettungen bilden, zerlegen und auswerten; Reihenfolge-Effekte und Eigenschaftsvererbung begründen.</p>
+  <p class="nur-arbeit"><em>Tasten: B Beamer · Pfeile Abschnitt · L Lösungen</em></p>
+</section>
+
+<section class="slide">
+  <h2>Überblick <span class="phase">vor dem Einstieg</span></h2>
+  <p class="lead">Der Werkzeugkasten komplett — hier werden die Klassen ineinander verschachtelt.</p>
+  <details class="ueberblick">
+    <summary><span>Das musst du über diese Funktionsklassen wissen</span>
+             <span class="ub-zusatz">9 Funktionsklassen</span></summary>
+    <div class="ub-koerper">
+      <div class="ub-huelle">
+      <table class="ub">
+        <thead>
+          <tr><th>Funktionsklasse</th><th>Beispiel</th><th>Was einsetzen?</th><th>Was kommt heraus?</th>
+              <th>Steigt oder fällt?</th><th>Symmetrie</th><th>Nullstellen</th></tr>
+        </thead>
+        <tbody>
+        <tr><th>Lineare Funktionen</th><td class="ub-bsp">f(x) = 2x − 1</td><td>alle Zahlen</td><td>alle Zahlen</td><td>steigend (m &gt; 0)<br>fallend (m &lt; 0)</td><td>punktsymmetrisch</td><td>genau eine</td></tr>
+        <tr><th>Quadratische Funktionen</th><td class="ub-bsp">f(x) = x²</td><td>alle Zahlen</td><td>ab Scheitel nach oben</td><td>erst fallend, dann steigend</td><td>achsensymmetrisch</td><td>keine, eine oder zwei</td></tr>
+        <tr><th>Kubische & Potenzfunktionen</th><td class="ub-bsp">f(x) = x³</td><td>alle Zahlen</td><td>alle Zahlen</td><td>immer steigend</td><td>punktsymmetrisch</td><td>eine (bei x = 0)</td></tr>
+        <tr><th>Wurzelfunktionen</th><td class="ub-bsp">f(x) = <span class="wurzel">√<span class="rad">x</span></span></td><td>nur x ≥ 0</td><td>nur y ≥ 0</td><td>steigend, immer langsamer</td><td>keine</td><td>eine (bei x = 0)</td></tr>
+        <tr><th>Sinus & Kosinus</th><td class="ub-bsp">f(x) = sin x</td><td>alle Zahlen</td><td>zwischen −1 und 1</td><td>immer auf und ab</td><td>sin: punktsym.<br>cos: achsensym.</td><td>unendlich viele</td></tr>
+        <tr><th>Exponentialfunktionen</th><td class="ub-bsp">f(x) = 2ˣ</td><td>alle Zahlen</td><td>immer y &gt; 0</td><td>immer steigend</td><td>keine</td><td>keine</td></tr>
+        <tr><th>Logarithmusfunktionen</th><td class="ub-bsp">f(x) = ln x</td><td>nur x &gt; 0</td><td>alle Zahlen</td><td>steigend, immer langsamer</td><td>keine</td><td>eine (bei x = 1)</td></tr>
+        <tr><th>Die e-Funktion</th><td class="ub-bsp">f(x) = eˣ</td><td>alle Zahlen</td><td>immer y &gt; 0</td><td>immer steigend</td><td>keine</td><td>keine</td></tr>
+        <tr><th>Umkehrfunktionen</th><td class="ub-bsp"><span class="wurzel">√<span class="rad">x</span></span> kehrt x² um</td><td>der Wertebereich von f</td><td>der Definitionsbereich von f</td><td>genau wie f</td><td>Spiegelung an y = x</td><td>y-Achsenabschnitt von f</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p class="ub-link">Alle neun Funktionsklassen mit Graph, Wertetabelle und Rechenwegen:
+         <a href="funktionsklassen-uebersicht.html" target="_blank" rel="noopener">Funktionsklassen im Überblick</a></p>
+    </div>
+  </details>
+</section>
+
+<section class="slide">
+  <span class="phase">1 · Problem</span>
+  <h2>Zwei Funktionen, hintereinander <span class="phase badge-kern">Einstieg</span></h2>
+  <div class="vwahl" role="group" aria-label="Einstieg wählen"><button type="button" class="vknopf aktiv" data-ziel="0">Problemorientiert</button><button type="button" class="vknopf" data-ziel="1">Streitgespräch</button></div>
+  <div class="variante aktiv">
+    <div class="problemkasten">Berechnet <span class="formel">h(1)</span> für <span class="formel">h(x) = (3x − 2)⁴</span> — ohne auszumultiplizieren.</div>
+    <p class="pfrage">Was rechnet man zuerst?</p>
+    <p class="pantwort">Erst die Klammer: <span class="formel">3·1 − 2 = 1</span>. Dann hoch vier: <span class="formel">1⁴ = 1</span>.</p>
+    <p class="pfrage">Wie viele Funktionen stecken in h?</p>
+    <p class="pantwort">Zwei. Eine <b>innere</b> <span class="formel">v(x) = 3x − 2</span> und eine <b>äußere</b> <span class="formel">u(x) = x⁴</span>. h ist keine neue Funktion, sondern eine Hintereinanderschaltung.</p>
+    <p class="pfrage">Warum lohnt sich diese Sicht?</p>
+    <p class="pantwort">Weil man ausmultiplizieren spart — und weil das Ableiten solcher Terme später genau dieser Zerlegung folgt (Kettenregel). Zerlegen ist Vorarbeit.</p>
+  </div>
+  <div class="variante">
+    <div class="problemkasten">„Bei <span class="formel">(u ∘ v)(x)</span> ersetzt man im Term von u jedes <span class="formel">v(x)</span> durch x.“</div>
+    <p class="pfrage">Testet die Behauptung an <span class="formel">u(x) = x²</span> und <span class="formel">v(x) = x + 3</span> bei <span class="formel">x = 1</span>.</p>
+    <p class="pantwort">Nach der Behauptung käme etwas mit x heraus, obwohl gar kein <span class="formel">v(x)</span> im Term von u steht. Die Regel ist genau <b>umgekehrt</b>.</p>
+    <p class="pfrage">Wie heißt sie richtig?</p>
+    <p class="pantwort">In u wird jedes <b>x</b> durch <span class="formel">v(x)</span> ersetzt: <span class="formel">(u ∘ v)(x) = (x + 3)²</span>, also <span class="formel">(1 + 3)² = 16</span>.</p>
+    <p class="pfrage">Und wenn man die Reihenfolge tauscht?</p>
+    <p class="pantwort"><span class="formel">(v ∘ u)(x) = x² + 3</span>, also <span class="formel">1 + 3 = 4</span>. <span class="formel">16 ≠ 4</span> — die Reihenfolge ist <b>nicht</b> vertauschbar.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">2 · Klärung</span>
+  <h2>Klärung — verketten und wieder zerlegen</h2>
+  <p class="lead">Eine Verkettung liest man von innen nach außen — und zerlegt sie genauso.</p>
+  <ol class="schritte">
+    <li><span class="frage">Die innere Funktion suchen</span><span class="ergebnis">Das, was zuerst gerechnet wird: der Klammerinhalt, der Radikand, der Exponent.</span></li>
+    <li><span class="frage">Die äußere Funktion benennen</span><span class="ergebnis">Was mit diesem Zwischenergebnis geschieht: quadrieren, Wurzel ziehen, potenzieren, <span class="formel">sin</span>.</span></li>
+    <li><span class="frage">Auswerten: erst innen, dann außen</span><span class="ergebnis"><span class="formel">(u ∘ v)(x) = u(v(x))</span> — in u wird jedes x durch <span class="formel">v(x)</span> ersetzt, nie umgekehrt.</span></li>
+    <li><span class="frage">Definitionsbereich prüfen</span><span class="ergebnis">Es muss beides passen: x muss in <span class="formel">D_v</span> liegen <b>und</b> <span class="formel">v(x)</span> in <span class="formel">D_u</span>. Der engere Bereich gewinnt.</span></li>
+    <li><span class="frage">Reihenfolge kontrollieren</span><span class="ergebnis">Gegenprobe mit einer Zahl. <span class="formel">u ∘ v</span> und <span class="formel">v ∘ u</span> sind fast immer verschieden.</span></li>
+  </ol>
+  <p class="tafel-merk">Verkettung ist <b>nacheinander</b> ausführen, Verknüpfung ist <b>nebeneinander</b> rechnen: <span class="formel">u(v(x))</span> gegen <span class="formel">u(x)·v(x)</span>.</p>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Beispiel — vollständig vorgerechnet</h2>
+  <div class="bsp"><h3>Beide Reihenfolgen: <span class="formel">u(x) = x²</span> und <span class="formel">v(x) = x + 3</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">(u ∘ v)(x) = (x + 3)²</span></span><span class="bhinweis">in u jedes x durch <span class="formel">v(x)</span> ersetzen</span></li><li><span class="brechnung"><span class="formel">(u ∘ v)(1) = 4² = 16</span></span><span class="bhinweis">erst <span class="formel">1 + 3</span>, dann quadrieren</span></li><li><span class="brechnung"><span class="formel">(v ∘ u)(x) = x² + 3</span></span><span class="bhinweis">umgekehrte Reihenfolge</span></li><li><span class="brechnung"><span class="formel">(v ∘ u)(1) = 1 + 3 = 4</span></span><span class="bhinweis">erst quadrieren, dann addieren</span></li><li><span class="brechnung"><span class="formel">16 ≠ 4</span></span><span class="bhinweis">die Reihenfolge ist nicht vertauschbar</span></li></ol>
+  </div>
+  <div class="bsp"><h3>Zerlegen und Definitionsbereich: <span class="formel">w(x) = <span class="wurzel">√<span class="rad">x − 2</span></span></span> und <span class="formel">k(x) = <span class="wurzel">√<span class="rad">x² + 1</span></span></span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">w: innen x − 2, außen √</span></span><span class="bhinweis">Wurzel verlangt <span class="formel">x − 2 ≥ 0</span></span></li><li><span class="brechnung"><span class="formel">D_w = [2; ∞)</span></span><span class="bhinweis">der Definitionsbereich folgt aus der inneren Funktion</span></li><li><span class="brechnung"><span class="formel">k: innen x² + 1, außen √</span></span><span class="bhinweis">gleiche Bauart, andere Lage</span></li><li><span class="brechnung"><span class="formel">x² + 1 ≥ 1 &gt; 0</span></span><span class="bhinweis">der Radikand wird nie negativ</span></li><li><span class="brechnung"><span class="formel">D_k = ℝ</span></span><span class="bhinweis">hier schränkt die Wurzel nichts ein</span></li></ol>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">4 · Merksatz</span>
+  <h2>Merksatz — Verkettung von Funktionen</h2>
+  <div class="merk"><ul><li><span class="regel">Bei <span class="formel">(u ∘ v)(x) = u(v(x))</span> wird in u jedes x durch <span class="formel">v(x)</span> ersetzt.</span><span class="kurz">v ist innen, u ist außen — gerechnet wird von innen nach außen</span></li><li><span class="regel">Die Reihenfolge ist nicht vertauschbar.</span><span class="kurz"><span class="formel">(u ∘ v)(1) = 16</span>, aber <span class="formel">(v ∘ u)(1) = 4</span></span></li><li><span class="regel">Der Definitionsbereich der Verkettung ist der engere der beiden.</span><span class="kurz"><span class="formel"><span class="wurzel">√<span class="rad">x − 2</span></span></span> gilt erst ab <span class="formel">x = 2</span></span></li><li><span class="regel">Zerlegen heißt: die innere Funktion benennen — das ist die Vorarbeit fürs Ableiten.</span><span class="kurz"><span class="formel">(2x + 1)³</span>: innen <span class="formel">2x + 1</span>, außen <span class="formel">x³</span></span></li></ul></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> Verkettung und Produkt verwechseln.</p><p><strong>Richtig:</strong> <span class="formel">u(v(x))</span> ist <b>nacheinander</b>, <span class="formel">u(x)·v(x)</span> ist <b>mal</b>. Für <span class="formel">u(x) = x²</span> und <span class="formel">v(x) = x + 3</span> ist <span class="formel">(u ∘ v)(1) = 16</span>, aber <span class="formel">u(1)·v(1) = 1·4 = 4</span>.</p></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> Beim Einsetzen von innen nach außen die Klammer weglassen.</p><p><strong>Richtig:</strong> Aus <span class="formel">u(x) = x³</span> und <span class="formel">v(x) = 3x + 1</span> wird <span class="formel">(3x + 1)³</span>, nicht <span class="formel">3x + 1³</span>. Was eingesetzt wird, bekommt Klammern.</p></div>
+</section>
+
+<section class="slide">
+  <h2 class="nur-arbeit">Aufgabengenerator: Verkettungen zerlegen und auswerten</h2>
+  <div class="gen nur-arbeit">
+    <p>Stufe:
+      <select id="genStufe">
+        <option value="1">1 · Potenz außen</option>
+        <option value="2">2 · beide Reihenfolgen vergleichen</option>
+        <option value="3">3 · Auswertung an einer Stelle</option>
+        <option value="4">4 · rückwärts (Term zerlegen)</option>
+      </select>
+      <button id="genNeu">Neue Aufgabe</button>
+      <button id="genLoesung">Lösungsweg ein/aus</button>
+    </p>
+    <div class="genaufgabe" id="genAusgabe"><em>Noch keine Aufgabe erzeugt.</em></div>
+    <div class="loesung" id="genLoesungFeld"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">5 · Aufgaben</span>
+  <h2>Aufgaben</h2>
+  <details class="spiegel nur-arbeit"><summary>Aufgabenspiegel: Typ × Anforderungsbereich</summary>
+    <table class="param"><thead><tr><th></th><th>AFB I</th><th>AFB II</th><th>AFB III</th></tr></thead><tbody><tr><th>Vorwärts</th><td>2</td><td>2</td><td>1</td></tr><tr><th>Rückwärts</th><td>2</td><td>1</td><td>—</td></tr><tr><th>Parameter</th><td>—</td><td>2</td><td>—</td></tr><tr><th>Beurteilen</th><td>—</td><td>1</td><td>1</td></tr></tbody></table>
+    <p class="lead">Verteilung der Bewertungseinheiten: AFB I 32 %; AFB II 47 %; AFB III 21 % (Richtwert 30 / 50 / 20).</p>
+  </details>
+  <details class="stufe" open><summary>Anforderungsbereich I — Reproduzieren <span class="lead">· angeben, berechnen, ablesen</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b07a1">
+    <div class="kopf"><strong>Aufgabe 1</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gegeben sind <span class="formel">u(x) = x³</span> und <span class="formel">v(x) = 3x + 1</span>. Gebt die Terme von <span class="formel">u ∘ v</span> und <span class="formel">v ∘ u</span> an und berechnet beide an der Stelle 1.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert von (u ∘ v)(1)?</p>
+      <input id="b07a1antwort" inputmode="text" placeholder="z. B. 8" aria-label="Antwort Aufgabe 1">
+      <button id="b07a1pruefen">Prüfen</button>
+      <div class="feedback" id="b07a1feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b07a1l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a1l"><p><span class="formel">(u ∘ v)(x) = (3x + 1)³</span>, also <span class="formel">4³ = 64</span> · <span class="formel">(v ∘ u)(x) = 3x³ + 1</span>, also <span class="formel">3 + 1 = 4</span>. Die Klammer gehört mit — <span class="formel">3x + 1³</span> wäre etwas anderes.</p></div>
+  </div>
+  <div class="aufgabe" id="b07a2">
+    <div class="kopf"><strong>Aufgabe 2</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Zerlegt <span class="formel">h(x) = (2x + 1)³</span> in die innere Funktion u und die äußere Funktion v mit <span class="formel">h = v(u(x))</span> und berechnet <span class="formel">h(1)</span> über die Zerlegung. Zerlegt ebenso (b) <span class="formel">m(x) = 2^(3x − 1)</span> und (c) <span class="formel">n(x) = sin(2x)</span>.</p>
+    <button class="lknopf" data-loesung="b07a2l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a2l"><p><ol class="teile"><li>innen <span class="formel">u(x) = 2x + 1</span>, außen <span class="formel">v(x) = x³</span>. Auswerten von innen nach außen: <span class="formel">u(1) = 3</span>, dann <span class="formel">v(3) = 3³ = 27</span>, also <span class="formel">h(1) = 27</span> — ohne die Klammer auszumultiplizieren.</li><li>innen <span class="formel">3x − 1</span>, außen <span class="formel">2^x</span></li><li>innen <span class="formel">2x</span>, außen <span class="formel">sin(x)</span>. Innen steht immer das, was zuerst gerechnet wird.</li></ol></p></div>
+  </div>
+  <div class="aufgabe" id="b07a3">
+    <div class="kopf"><strong>Aufgabe 3</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt zwei Funktionen u und v an, deren Verkettung <span class="formel">u(v(x)) = (x + 5)²</span> ergibt. Gibt es mehrere Möglichkeiten?</p>
+    <button class="lknopf" data-loesung="b07a3l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a3l"><p>Zum Beispiel <span class="formel">v(x) = x + 5</span> und <span class="formel">u(x) = x²</span>. Ja, es gibt mehrere: etwa <span class="formel">v(x) = (x + 5)²</span> und <span class="formel">u(x) = x</span>. Sinnvoll ist die Zerlegung, bei der beide Teile einfacher sind als das Ganze.</p></div>
+  </div>
+  <div class="aufgabe" id="b07a4">
+    <div class="kopf"><strong>Aufgabe 4</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine verkettete Funktion an, deren Definitionsbereich <span class="formel">(−∞; 2]</span> ist.</p>
+    <button class="lknopf" data-loesung="b07a4l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a4l"><p>Zum Beispiel <span class="formel">f(x) = <span class="wurzel">√<span class="rad">4 − 2x</span></span></span>: die Wurzel verlangt <span class="formel">4 − 2x ≥ 0</span>, also <span class="formel">x ≤ 2</span>. Ebenso möglich: <span class="formel"><span class="wurzel">√<span class="rad">2 − x</span></span></span>. Der Definitionsbereich wird immer von der inneren Funktion unter der Wurzel bestimmt.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich II — Zusammenhänge herstellen <span class="lead">· bestimmen, untersuchen, erläutern</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b07a5">
+    <div class="kopf"><strong>Aufgabe 5</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Bestimmt den maximalen Definitionsbereich von <ol class="teile"><li><span class="formel">f(x) = <span class="wurzel">√<span class="rad">x − 2</span></span></span></li><li><span class="formel">g(x) = <span class="bruch"><span class="z">1</span><span class="n">2 + 3x</span></span></span></li><li><span class="formel">h(x) = <span class="wurzel">√<span class="rad">x² + 1</span></span></span> und begründet jeweils.</li></ol></p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Kleinste erlaubte Zahl bei (a)?</p>
+      <input id="b07a5antwort" inputmode="text" placeholder="z. B. 3" aria-label="Antwort Aufgabe 5">
+      <button id="b07a5pruefen">Prüfen</button>
+      <div class="feedback" id="b07a5feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b07a5l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a5l"><p><ol class="teile"><li><span class="formel">x − 2 ≥ 0 ⇒ D = [2; ∞)</span></li><li><span class="formel">2 + 3x ≠ 0 ⇒ x ≠ <span class="bruch"><span class="z">−2</span><span class="n">3</span></span></span>, also <span class="formel">D = ℝ \ {<span class="bruch"><span class="z">−2</span><span class="n">3</span></span>}</span></li><li><span class="formel">x² + 1 ≥ 1 &gt; 0</span> für alle x, also <span class="formel">D = ℝ</span>. Die innere Funktion entscheidet.</li></ol></p></div>
+  </div>
+  <div class="aufgabe" id="b07a6">
+    <div class="kopf"><strong>Aufgabe 6</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Ordnet ohne Rechnung zu und begründet je in einem Satz: <span class="formel">3·2^x</span>, <span class="formel">2x³ − x</span>, <span class="formel">4·sin(2x) − 1</span> zu <ol class="teile"><li>Wertebereich <span class="formel">[−5; 3]</span>,</li><li>punktsymmetrischer Graph,</li><li>Verdopplung des Funktionswerts pro Schritt <span class="formel">+1</span>.</li></ol></p>
+    <button class="lknopf" data-loesung="b07a6l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a6l"><p><ol class="teile"><li>→ <span class="formel">4·sin(2x) − 1</span>: Mittellinie <span class="formel">−1</span>, Amplitude 4, also <span class="formel">−1 ± 4 = [−5; 3]</span>.</li><li>→ <span class="formel">2x³ − x</span>: nur ungerade Potenzen, also <span class="formel">f(−x) = −f(x)</span>.</li><li>→ <span class="formel">3·2^x</span>: <span class="formel">3·2^(x+1) = 2·(3·2^x)</span> — jeder Schritt um 1 verdoppelt den Wert. Alle drei Funktionsklassen aus den vorangegangenen Blöcken auf einen Blick.</li></ol></p></div>
+  </div>
+  <div class="aufgabe" id="b07a7">
+    <div class="kopf"><strong>Aufgabe 7</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gebt zwei Funktionen u und v an mit <span class="formel">(u ∘ v)(x) ≠ (v ∘ u)(x)</span>, aber <span class="formel">(u ∘ v)(0) = (v ∘ u)(0)</span>. Belegt beides.</p>
+    <button class="lknopf" data-loesung="b07a7l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a7l"><p>Zum Beispiel <span class="formel">u(x) = x²</span> und <span class="formel">v(x) = 2x</span>: <span class="formel">(u ∘ v)(x) = 4x²</span> und <span class="formel">(v ∘ u)(x) = 2x²</span> — verschieden, denn bei <span class="formel">x = 1</span> steht 4 gegen 2. An der Stelle 0 liefern jedoch beide 0. Übereinstimmung an <b>einer</b> Stelle beweist keine Gleichheit.</p></div>
+  </div>
+  <div class="aufgabe" id="b07a8">
+    <div class="kopf"><strong>Aufgabe 8</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben sind <span class="formel">u(x) = x²</span> und <span class="formel">v_a(x) = x + a</span>. Bestimmt <span class="formel">(u ∘ v_a)(x)</span> und <span class="formel">(v_a ∘ u)(x)</span> und gebt an, für welche a beide Terme übereinstimmen.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert von a?</p>
+      <input id="b07a8antwort" inputmode="text" placeholder="z. B. 1" aria-label="Antwort Aufgabe 8">
+      <button id="b07a8pruefen">Prüfen</button>
+      <div class="feedback" id="b07a8feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b07a8l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a8l"><p><span class="formel">(u ∘ v_a)(x) = (x + a)² = x² + 2ax + a²</span> und <span class="formel">(v_a ∘ u)(x) = x² + a</span>. Gleichheit für alle x verlangt <span class="formel">2ax + a² = a</span>, also zunächst <span class="formel">2a = 0</span> und damit <span class="formel">a = 0</span> (dann stimmt auch <span class="formel">a² = a</span>). Nur die triviale Verschiebung um 0 macht die Reihenfolge gleichgültig.</p></div>
+  </div>
+  <div class="aufgabe" id="b07a9">
+    <div class="kopf"><strong>Aufgabe 9</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Für welche Werte von a ist <span class="formel">f_a(x) = <span class="wurzel">√<span class="rad">x² + a</span></span></span> auf ganz <span class="formel">ℝ</span> definiert?</p>
+    <button class="lknopf" data-loesung="b07a9l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a9l"><p>Nötig ist <span class="formel">x² + a ≥ 0</span> für alle x. Der kleinste Wert von <span class="formel">x²</span> ist 0 (bei <span class="formel">x = 0</span>), also muss <span class="formel">a ≥ 0</span> gelten. Für <span class="formel">a &lt; 0</span> fällt ein Intervall um 0 heraus, z. B. bei <span class="formel">a = −4</span> der Bereich <span class="formel">−2 &lt; x &lt; 2</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b07a10">
+    <div class="kopf"><strong>Aufgabe 10</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Beurteilt: „<span class="formel">u ∘ v</span> und <span class="formel">u · v</span> bedeuten dasselbe — in beiden Fällen werden ja zwei Funktionen zusammengesetzt.“</p>
+    <button class="lknopf" data-loesung="b07a10l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a10l"><p><b>Falsch.</b> <span class="formel">u ∘ v</span> heißt <b>nacheinander</b> ausführen, <span class="formel">u · v</span> heißt <b>malnehmen</b>. Mit <span class="formel">u(x) = x²</span> und <span class="formel">v(x) = x + 3</span>: <span class="formel">(u ∘ v)(1) = (1 + 3)² = 16</span>, aber <span class="formel">u(1)·v(1) = 1·4 = 4</span>. Auch die Terme unterscheiden sich: <span class="formel">(x + 3)²</span> gegen <span class="formel">x²·(x + 3)</span>.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich III — Verallgemeinern und beurteilen <span class="lead">· begründen, beurteilen, entwickeln</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b07a11">
+    <div class="kopf"><strong>Aufgabe 11</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Begründet allgemein, welche Bedingungen ein x erfüllen muss, damit <span class="formel">u(v(x))</span> definiert ist. Wendet eure Regel auf <span class="formel">u(x) = <span class="wurzel">√<span class="rad">x</span></span></span> mit <span class="formel">v(x) = x − 2</span> und auf <span class="formel">u(x) = <span class="bruch"><span class="z">1</span><span class="n">x</span></span></span> mit <span class="formel">v(x) = x² − 4</span> an.</p>
+    <button class="lknopf" data-loesung="b07a11l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a11l"><p>Zwei Bedingungen zugleich: x muss im Definitionsbereich von v liegen <b>und</b> der Zwischenwert <span class="formel">v(x)</span> im Definitionsbereich von u. Kurz: <span class="formel">D = {x ∈ D_v : v(x) ∈ D_u}</span>.<br>Erster Fall: <span class="formel">D_u = [0; ∞)</span>, also wird <span class="formel">x − 2 ≥ 0</span> verlangt — <span class="formel">D = [2; ∞)</span>.<br>Zweiter Fall: u ist bei 0 nicht definiert, also muss <span class="formel">x² − 4 ≠ 0</span> sein — <span class="formel">D = ℝ \ {−2; 2}</span>. Die innere Funktion entscheidet, was ankommt; die äußere, was sie annehmen darf.</p></div>
+  </div>
+  <div class="aufgabe" id="b07a12">
+    <div class="kopf"><strong>Aufgabe 12</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Beurteilt; begründet wahre Aussagen allgemein und widerlegt falsche durch ein Gegenbeispiel. <ol class="teile"><li>Für alle f und g gilt <span class="formel">f(g(x)) = g(f(x))</span>.</li><li>Sind f und g streng monoton wachsend, dann auch <span class="formel">f(g(x))</span>.</li><li>Sind f und g gerade Funktionen, dann ist auch <span class="formel">f(g(x))</span> gerade.</li></ol></p>
+    <button class="lknopf" data-loesung="b07a12l">Lösung ein/aus</button>
+    <div class="loesung" id="b07a12l"><p><ol class="teile"><li><b>falsch</b>: <span class="formel">f(x) = x²</span> und <span class="formel">g(x) = x + 3</span> liefern an der Stelle 1 einmal <span class="formel">(1 + 3)² = 16</span> und einmal <span class="formel">1² + 3 = 4</span>.</li><li><b>wahr</b>: aus <span class="formel">x₁ &lt; x₂</span> folgt <span class="formel">g(x₁) &lt; g(x₂)</span> (g wächst) und daraus <span class="formel">f(g(x₁)) &lt; f(g(x₂))</span> (f wächst).</li><li><b>wahr</b>: aus <span class="formel">g(−x) = g(x)</span> folgt sofort <span class="formel">f(g(−x)) = f(g(x))</span>. Dass g gerade ist, genügt hier schon — auf f kommt es gar nicht an. Beispiel: <span class="formel"><span class="wurzel">√<span class="rad">x² + 1</span></span></span> ist gerade, obwohl die Wurzel es allein nicht ist.</li></ol></p></div>
+  </div>
+    </div>
+  </details>
+  
+</section>
+
+<section class="slide">
+  <details class="stufe"><summary>Zum Nachschlagen: Verknüpfung und Verkettung <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: g(f(x)) — innen und außen</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">Was ist eine Verkettung?</td><td class="rform">(g ∘ f)(x) = g(f(x))</td><td class="rtext">Zwei Funktionen hintereinander: erst f auf x anwenden, dann g auf das Ergebnis. Wie zwei Maschinen in Reihe — was die erste ausspuckt, frisst die zweite.</td></tr>
+        <tr><td class="rname">Innen und außen</td><td class="rform">f ist innen, g ist außen</td><td class="rtext">Bei g(f(x)) heißt f die <strong>innere</strong> und g die <strong>äußere</strong> Funktion. Merkhilfe: Was zuerst passiert, steht innen in der Klammer.</td></tr>
+        <tr><td class="rname">Verketten heißt einsetzen</td><td class="rform">f(x) einsetzen, wo in g ein x steht</td><td class="rtext">Mit f(x) = x + 1 und g(x) = x² ist g(f(x)) = (x + 1)². Jedes x in g wird durch den ganzen Term von f ersetzt.</td></tr>
+        <tr><td class="rname">Reihenfolge ist entscheidend</td><td class="rform">g(f(x)) ≠ f(g(x))</td><td class="rtext">Mit denselben Funktionen: f(g(x)) = x² + 1. Das ist etwas ganz anderes als (x + 1)². Verkettung ist <strong>nicht vertauschbar</strong>.</td></tr>
+        <tr><td class="rname">Zerlegen</td><td class="rform">Was ist die letzte Rechenoperation?</td><td class="rtext">Um h(x) = (3x − 5)⁴ zu zerlegen: Zuletzt wird potenziert, also ist g(x) = x⁴ die äußere und f(x) = 3x − 5 die innere Funktion. <strong>Von außen nach innen fragen.</strong></td></tr>
+        <tr><td class="rname">Typische Bausteine</td><td class="rform">Klammer hoch n; Wurzel · e-Potenz · ln</td><td class="rtext">Bei <span class="wurzel">√<span class="rad">x² + 1</span></span> ist die Wurzel außen, x² + 1 innen. Bei e^(2x) ist die e-Funktion außen, 2x innen. Bei ln(x − 3) ist ln außen, x − 3 innen.</td></tr>
+        <tr><td class="rname">Definitionsbereich</td><td class="rform">beide Bedingungen zusammen</td><td class="rtext">Bei g(f(x)) muss x im Definitionsbereich von f liegen <strong>und</strong> f(x) im Definitionsbereich von g. Bei <span class="wurzel">√<span class="rad">x − 3</span></span> also x − 3 ≥ 0.</td></tr>
+        <tr><td class="rname">Wozu das Ganze?</td><td class="rform">Vorbereitung auf die Kettenregel</td><td class="rtext">Fast jede zusammengesetzte Funktion ist eine Verkettung. Wer sie zerlegen kann, kann später ableiten: „äußere Ableitung mal innere Ableitung".</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+</section>
+
+</main>
+<div class="beamer-hinweis">B = Beamer · ◀ ▶ = Navigation · L = Lösungen</div>
+
+<script id="gen-lib">
+"use strict";
+function mulberry(seed){
+  var t = seed >>> 0;
+  return function(){
+    t = (t + 0x6D2B79F5) >>> 0;
+    var r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ganz(rnd, von, bis){ return von + Math.floor(rnd() * (bis - von + 1)); }
+
+function kettVz(w){ return w > 0 ? " + " + w : " − " + (-w); }
+function kettGgt(p, q){ p = Math.abs(p); q = Math.abs(q); while (q){ var r = p % q; p = q; q = r; } return p || 1; }
+function kettBruch(z, n){
+  var vz = (z * n < 0) ? "−" : "";
+  var az = Math.abs(z), an = Math.abs(n);
+  if (az % an === 0) return (z === 0 ? "0" : vz + (az / an));
+  var g = kettGgt(az, an);
+  return vz + (az / g) + "/" + (an / g);
+}
+function kettZ(w){ return w < 0 ? "−" + (-w) : "" + w; }
+function kettMake(seed, level){
+  var rnd = mulberry(seed * 4 + level + 700);
+  var m = ganz(rnd, 2, 3);
+  var c = ganz(rnd, -3, 3);
+  if (c === 0) c = 1;
+  var n = [2, 3][ganz(rnd, 0, 1)];
+  var x0 = ganz(rnd, 0, 2);
+  // Reihenfolge-Effekt muss sichtbar sein: v(u(x0)) != u-aussen-vertauscht
+  var tries = 0;
+  while (Math.pow(m * x0 + c, n) === m * Math.pow(x0, n) + c && tries < 8){
+    c = c + 1; if (c === 0) c = 1; tries++;
+  }
+  var innen = m + "x" + kettVz(c);
+  var aussenTerm = m + "x^" + n + kettVz(c);
+  var u0 = m * x0 + c, h0 = Math.pow(u0, n);
+  var gf0 = m * Math.pow(x0, n) + c;
+  var text, schritte;
+  var basis = { typ: "verkettung", seed: seed, level: level, m: m, c: c, n: n, x0: x0 };
+  function fertig(v, felder){
+    basis.variante = v; basis.text = text; basis.schritte = schritte;
+    for (var k in felder) basis[k] = felder[k];
+    if (!basis.ergebnis) basis.ergebnis = {};
+    return basis;
+  }
+  if (level === 1){
+    var v1 = ganz(rnd, 0, 2);
+    if (v1 === 0){
+      text = "Zerlegen Sie h(x) = (" + innen + ")^" + n + " in eine innere Funktion u und eine aeussere Funktion v mit h(x) = v(u(x)).";
+      schritte = ["innen (zuerst ausgefuehrt): u(x) = " + innen,
+        "aussen: v(u) = u^" + n,
+        "Probe an der Stelle " + x0 + ": u(" + x0 + ") = " + kettZ(u0) + ", v(" + kettZ(u0) + ") = " + kettZ(h0)];
+      return fertig(0, { ergebnis: { u0: u0, h0: h0 } });
+    }
+    if (v1 === 1){
+      text = "Eine Verkettung h = v ∘ u hat die innere Funktion u(x) = " + innen + " und die aeussere Funktion v(u) = u^" + n +
+        ". Geben Sie den Term von h(x) an und berechnen Sie h(" + x0 + ").";
+      schritte = ["h(x) = v(u(x)) = (" + innen + ")^" + n,
+        "u(" + x0 + ") = " + m + "·" + x0 + kettVz(c) + " = " + kettZ(u0),
+        "h(" + x0 + ") = " + kettZ(u0) + "^" + n + " = " + kettZ(h0)];
+      return fertig(1, { ergebnis: { u0: u0, h0: h0 } });
+    }
+    text = "Fehlersuche: Zu h(x) = (" + innen + ")^" + n + " notiert ein Schueler die Zerlegung innen u(x) = x^" + n +
+      ", aussen v(u) = " + m + "·u" + kettVz(c) + ". Pruefen Sie an der Stelle " + x0 + " und geben Sie die richtige Zerlegung an.";
+    schritte = ["Schuelerweg liefert " + m + "·" + x0 + "^" + n + kettVz(c) + " = " + kettZ(gf0),
+      "richtig ist h(" + x0 + ") = (" + m + "·" + x0 + kettVz(c) + ")^" + n + " = " + kettZ(h0) + " — also falsch",
+      "richtige Zerlegung: innen u(x) = " + innen + ", aussen v(u) = u^" + n];
+    return fertig(2, { ergebnis: { u0: u0, h0: h0, falschWert: gf0 } });
+  }
+  if (level === 2){
+    var v2 = ganz(rnd, 0, 2);
+    if (v2 === 0){
+      text = "Gegeben sind f(x) = x^" + n + " und g(x) = " + innen +
+        ". Bilden Sie die Terme von f(g(x)) und g(f(x)) und vergleichen Sie beide Werte an der Stelle " + x0 + ".";
+      schritte = ["f(g(x)) = (" + innen + ")^" + n + "; an der Stelle " + x0 + ": " + kettZ(h0),
+        "g(f(x)) = " + aussenTerm + "; an der Stelle " + x0 + ": " + kettZ(gf0),
+        "verschieden (" + kettZ(h0) + " ≠ " + kettZ(gf0) + "): die Reihenfolge entscheidet"];
+      return fertig(0, { ergebnis: { u0: u0, h0: h0, gf0: gf0 } });
+    }
+    if (v2 === 1){
+      text = "Gegeben sind f(x) = x^" + n + " und g(x) = " + innen +
+        ". Entscheiden Sie mit Rechnung, welcher der beiden Werte f(g(" + x0 + ")) und g(f(" + x0 + ")) groesser ist.";
+      schritte = ["f(g(" + x0 + ")) = (" + kettZ(u0) + ")^" + n + " = " + kettZ(h0),
+        "g(f(" + x0 + ")) = " + m + "·" + Math.pow(x0, n) + kettVz(c) + " = " + kettZ(gf0),
+        (h0 > gf0 ? "f(g(" + x0 + ")) ist groesser" : "g(f(" + x0 + ")) ist groesser")];
+      return fertig(1, { ergebnis: { u0: u0, h0: h0, gf0: gf0, groesser: (h0 > gf0 ? "fg" : "gf") } });
+    }
+    text = "Fehlersuche: Fuer f(x) = x^" + n + " und g(x) = " + innen + " schreibt ein Schueler f(g(x)) = " + aussenTerm +
+      ". Finden Sie den Fehler, geben Sie den richtigen Term an und pruefen Sie an der Stelle " + x0 + ".";
+    schritte = ["Der Schueler hat g(f(x)) gebildet: dort wird erst potenziert, dann " + m + "-fach genommen",
+      "richtig: f(g(x)) = (" + innen + ")^" + n + ", denn g(x) wandert als Ganzes in die Potenz",
+      "Probe: richtig " + kettZ(h0) + ", Schuelerterm " + kettZ(gf0)];
+    return fertig(2, { ergebnis: { u0: u0, h0: h0, gf0: gf0, falschWert: gf0 } });
+  }
+  if (level === 3){
+    var v3 = ganz(rnd, 0, 2);
+    if (v3 === 0){
+      text = "Gegeben ist h(x) = (" + innen + ")^" + n + ". Berechnen Sie h(" + x0 + ") ueber die Zerlegung (erst innen, dann aussen).";
+      schritte = ["innen: u(" + x0 + ") = " + m + "·" + x0 + kettVz(c) + " = " + kettZ(u0),
+        "aussen: v(" + kettZ(u0) + ") = " + kettZ(u0) + "^" + n + " = " + kettZ(h0)];
+      return fertig(0, { ergebnis: { u0: u0, h0: h0 } });
+    }
+    if (v3 === 1){
+      var cR = c, u0R = m * x0 + cR;
+      if (u0R < 1){ cR = cR + (1 - u0R); u0R = 1; }
+      if (cR === 0){ cR = 1; u0R = m * x0 + 1; }
+      var h0R = Math.pow(u0R, n);
+      text = "Von h(x) = (" + m + "x + c)^" + n + " ist bekannt: h(" + x0 + ") = " + h0R +
+        ", und der innere Wert u(" + x0 + ") = " + (m * x0) + " + c ist positiv. Bestimmen Sie c.";
+      schritte = ["aussen rueckwaerts: u(" + x0 + ")^" + n + " = " + kettZ(h0R) + " → u(" + x0 + ") = " + kettZ(u0R) + " (positiv gefordert)",
+        "innen rueckwaerts: " + m + "·" + x0 + " + c = " + kettZ(u0R) + " → c = " + (m * x0 === 0 ? kettZ(cR) : kettZ(u0R) + " − " + (m * x0) + " = " + kettZ(cR)),
+        "Probe: (" + m + "·" + x0 + kettVz(cR) + ")^" + n + " = " + kettZ(h0R)];
+      return fertig(1, { c: cR, ergebnis: { u0: u0R, h0: h0R, cGesucht: cR } });
+    }
+    text = "Deuten Sie: Warum ist h(" + x0 + ") fuer h(x) = (" + innen + ")^" + n + " nicht gleich dem Wert des Terms " +
+      aussenTerm + " an der Stelle " + x0 + "? Geben Sie beide Zahlen an und benennen Sie den Unterschied.";
+    schritte = ["Bei h wird zuerst innen gerechnet: u(" + x0 + ") = " + kettZ(u0) + ", dann potenziert: " + kettZ(h0),
+      "der andere Term potenziert zuerst x: " + m + "·" + Math.pow(x0, n) + kettVz(c) + " = " + kettZ(gf0),
+      "Unterschied: Verkettung (innen zuerst) statt Verknuepfung von Werten — " + kettZ(h0) + " ≠ " + kettZ(gf0)];
+    return fertig(2, { ergebnis: { u0: u0, h0: h0, gf0: gf0, falschWert: gf0 } });
+  }
+  var v4 = ganz(rnd, 0, 2);
+  if (v4 === 0){
+    text = "Zerlegen Sie p(x) = 2^(" + innen + ") in innere und aeussere Funktion und berechnen Sie den inneren Wert an der Stelle " + x0 + ".";
+    schritte = ["innen: u(x) = " + innen + ", aussen: v(u) = 2^u",
+      "u(" + x0 + ") = " + kettZ(u0) + ", also p(" + x0 + ") = 2^" + kettZ(u0),
+      "Merke: der Exponent ist die innere Funktion"];
+    return fertig(0, { ergebnis: { u0: u0, h0: h0 } });
+  }
+  if (v4 === 1){
+    text = "Zerlegen Sie k(x) = (" + innen + ")^" + n + " + 1 in drei Schritte (Kette von innen nach aussen) und berechnen Sie k(" + x0 + ").";
+    schritte = ["Schritt 1: u(x) = " + innen + " → u(" + x0 + ") = " + kettZ(u0),
+      "Schritt 2: w(u) = u^" + n + " → w(" + kettZ(u0) + ") = " + kettZ(h0),
+      "Schritt 3: v(w) = w + 1 → k(" + x0 + ") = " + kettZ(h0 + 1)];
+    return fertig(1, { ergebnis: { u0: u0, h0: h0, k0: h0 + 1 } });
+  }
+  text = "Zerlegen Sie q(x) = 1/(" + innen + ")^" + n + " in innere und aeussere Funktion und geben Sie die Stelle an, die nicht zum Definitionsbereich gehoert.";
+  schritte = ["innen: u(x) = " + innen + ", aussen: v(u) = 1/u^" + n,
+    "Definitionsluecke, wo die innere Funktion 0 wird: " + m + "x" + kettVz(c) + " = 0 → x = " + kettBruch(-c, m),
+    "Probe: u(" + kettBruch(-c, m) + ") = 0, dort ist v nicht definiert"];
+  return fertig(2, { ergebnis: { u0: u0, h0: h0, polZ: -c, polN: m } });
+}
+function kettVerify(t){
+  if (!t.schritte || t.schritte.length < 2) return "Loesungsweg unvollstaendig";
+  for (var i = 0; i < t.schritte.length; i++){
+    if (typeof t.schritte[i] !== "string" || /undefined|NaN|Infinity/.test(t.schritte[i])) return "Schritt defekt";
+  }
+  if (typeof t.text !== "string" || /undefined|NaN|Infinity/.test(t.text)) return "Text defekt";
+  if ([t.m, t.c, t.n, t.x0].some(function(z){ return typeof z !== "number" || z !== Math.round(z); })) return "Parameter unsauber";
+  if (t.c === 0) return "c = 0 (Zerlegung trivial)";
+  if (Math.abs(t.c) > 12) return "c zu gross";
+  if (t.m < 2 || t.m > 3) return "m unzulaessig";
+  if (t.n !== 2 && t.n !== 3) return "Exponent unzulaessig";
+  if (t.x0 < 0 || t.x0 > 2) return "Auswertungsstelle unzulaessig";
+  var u0 = t.m * t.x0 + t.c;
+  var h0 = Math.pow(u0, t.n);
+  var gf0 = t.m * Math.pow(t.x0, t.n) + t.c;
+  if (t.ergebnis.u0 !== u0) return "innerer Wert falsch";
+  if (t.ergebnis.h0 !== h0) return "aeusserer Wert falsch";
+  if (t.text.indexOf(t.m + "x") < 0) return "innerer Term fehlt im Text";
+  if (t.level === 1 && t.variante === 2){
+    if (t.ergebnis.falschWert !== gf0) return "Schuelerwert falsch berechnet";
+    if (gf0 === h0) return "Fehlersuche ohne Fehler";
+  }
+  if (t.level === 2){
+    if (t.ergebnis.gf0 !== gf0) return "vertauschte Reihenfolge falsch berechnet";
+    if (gf0 === h0) return "Reihenfolge-Effekt nicht sichtbar";
+    if (t.variante === 1 && t.ergebnis.groesser !== (h0 > gf0 ? "fg" : "gf")) return "Vergleich falsch";
+    if (t.variante === 2 && t.ergebnis.falschWert !== gf0) return "Schuelerwert falsch";
+  }
+  if (t.level === 3 && t.variante === 1){
+    if (t.ergebnis.cGesucht !== t.c) return "rueckwaerts bestimmtes c inkonsistent";
+    if (u0 <= 0) return "innerer Wert nicht positiv";
+    if (Math.pow(u0, t.n) !== t.ergebnis.h0) return "Rueckwaertsprobe verletzt";
+  }
+  if (t.level === 3 && t.variante === 2){
+    if (t.ergebnis.gf0 !== gf0 || gf0 === h0) return "Deutungskontrast fehlt";
+  }
+  if (t.level === 4 && t.variante === 1 && t.ergebnis.k0 !== h0 + 1) return "dritter Kettenschritt falsch";
+  if (t.level === 4 && t.variante === 2){
+    if (t.ergebnis.polZ !== -t.c || t.ergebnis.polN !== t.m) return "Definitionsluecke falsch";
+    if (Math.abs(t.m * (t.ergebnis.polZ / t.ergebnis.polN) + t.c) > 1e-9) return "Nullstellenprobe innen verletzt";
+  }
+  return null;
+}
+var GENERATORS = { verkettung: { make: kettMake, verify: kettVerify } };
+
+</script>
+
+<script>
+
+"use strict";
+(function(){
+  var alleOffen = false;
+  document.querySelectorAll("[data-loesung]").forEach(function(knopf){
+    knopf.addEventListener("click", function(){
+      var ziel = document.getElementById(knopf.getAttribute("data-loesung"));
+      if (ziel) ziel.classList.toggle("offen");
+    });
+  });
+  function alleLoesungen(){
+    alleOffen = !alleOffen;
+    document.querySelectorAll(".loesung").forEach(function(el){ el.classList.toggle("offen", alleOffen); });
+  }
+  document.getElementById("alleLoesungenKnopf").addEventListener("click", alleLoesungen);
+
+  var HOCH = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+               "-":"⁻","−":"⁻","+":"⁺","(":"⁽",")":"⁾",".":"˙",",":"˙",
+               "x":"ˣ","n":"ⁿ","k":"ᵏ","a":"ᵃ","b":"ᵇ","i":"ⁱ","j":"ʲ","m":"ᵐ","t":"ᵗ","u":"ᵘ",
+               "h":"ʰ","p":"ᵖ","r":"ʳ","s":"ˢ","v":"ᵛ","w":"ʷ","y":"ʸ","z":"ᶻ",
+               "c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ","l":"ˡ","o":"ᵒ"," ":" ",
+               // schon hochgestellte Zeichen bleiben, wie sie sind: e^(x²) -> eˣ²
+               "⁰":"⁰","¹":"¹","²":"²","³":"³","⁴":"⁴","⁵":"⁵","⁶":"⁶","⁷":"⁷","⁸":"⁸","⁹":"⁹",
+               "⁻":"⁻","⁺":"⁺" };
+  // Tiefgestellte Zeichen fuer Scharen und indizierte Groessen: f_a wird zu fₐ,
+  // x_1 zu x₁. Unicode kennt nur diese Buchstaben tiefgestellt - fehlt einer,
+  // bleibt der Term unveraendert stehen (lieber f_b als ein halb gesetztes fᵇ).
+  var TIEF = { "a":"ₐ","e":"ₑ","h":"ₕ","i":"ᵢ","j":"ⱼ","k":"ₖ",
+               "l":"ₗ","m":"ₘ","n":"ₙ","o":"ₒ","p":"ₚ","r":"ᵣ",
+               "s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","x":"ₓ",
+               "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄",
+               "5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" };
+  function tief(z){
+    var aus = "";
+    for (var i = 0; i < z.length; i++){
+      if (!TIEF[z[i]]) return null;
+      aus += TIEF[z[i]];
+    }
+    return aus;
+  }
+  // Vorzeichen- und Faktornormalisierung. Hier stehen nur Umformungen, die IMMER
+  // richtig sind, unabhaengig vom Kontext - "x − -4" heisst auch in einem zitierten
+  // Schuelerfehler "x + 4". Kontextabhaengiges (1x, + 0) gehoert in die Generatoren.
+  function termNormal(s){
+    var t = String(s), vorher;
+    do {
+      vorher = t;
+      t = t
+        // Vorzeichenketten: "− -4" -> "+ 4", "+ -4" -> "− 4"
+        .replace(/([−-])\s*[−-]\s*(?=[\dxa-z(])/g, "+ ")
+        .replace(/\+\s*[−-]\s*(?=[\dxa-z(])/g, "− ")
+        // nur nach Variablen/Klammern kuerzen: x^1 -> x, aber 2^1 · 2^x bleibt
+        .replace(/([a-zA-Z)])(?:\^1(?![\d,.])|\^\(1\))/g, "$1")
+        .replace(/\s*\/\s*1(?![\d,.])/g, "")
+        .replace(/(^|[^0-9a-zA-Z.,])1\s*[·*]\s*(?=[a-z(])/g, "$1")
+        .replace(/(^|[^0-9a-zA-Z.,])1(?=[a-z])/g, "$1")
+        .replace(/\s*[·*]\s*1(?![\d,.])/g, "")
+        .replace(/\(\s*([a-z])\s*[+−-]\s*0\s*\)/g, "$1")
+        // "+ 0" nur nach einem Term mit Variable streichen. Kein Wort davor
+        // ("wird + 0 −"), keine Hochzahl danach ("p − 0²" ist ein eingesetzter
+        // Wert) und kein Vorzeichen danach (Monotoniefolge "+ 0 −").
+        .replace(/(^|[^a-zA-Z])([a-z][0-9²³]*)\s*[+−-]\s*0(?![\d,.²³⁰¹⁴-⁹^])(?!\s*[+−-])/g, "$1$2");
+    } while (t !== vorher);
+    return t.replace(/[ 	]{2,}/g, " ");
+  }
+  // Setzt einen Exponenten hoch - aber nur, wenn JEDES Zeichen ein Hochzeichen hat.
+  // Sonst bliebe eine Mischung wie "2ˣ⁺?" stehen, die schlechter lesbar ist als 2^(x + ?).
+  function hoch(z){
+    // Das Malzeichen entfaellt im Exponenten: e^(a·x) wird zu eᵃˣ - so schreibt man es
+    // auch von Hand, und ein hochgestellter Malpunkt ist typografisch nicht vorgesehen.
+    // innere Exponenten zuerst aufloesen, sonst scheitert e^(x^2) am "^" im Inneren
+    var t = z.replace(/\^(-?\d+)/g, function(_, d){
+              return d.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+             .replace(/([0-9a-z])\s*[·*]\s*(?=[0-9a-z])/g, "$1");
+    var aus = "";
+    for (var i = 0; i < t.length; i++){
+      if (!HOCH[t[i]]) return null;
+      aus += HOCH[t[i]];
+    }
+    return aus;
+  }
+  function schoenMathe(s){
+    return termNormal(String(s))
+      // geklammerte Exponenten zuerst: 2^(x−1) -> 2ˣ⁻¹, e^(2x) -> e²ˣ
+      .replace(/\^\(([^()]{1,12})\)/g, function(ganz, z){
+        var h = hoch(z);
+        if (h === null) return ganz;
+        // Zusammengesetzte Exponenten bekommen hochgestellte Klammern: sonst liest sich
+        // 2^(x-1) als 2 hoch x hoch -1. Ein blosses Vorzeichen (e^(-x)) ist eindeutig.
+        return /[^-−+].*[-−+]/.test(z) ? "⁽" + h + "⁾" : h;
+      })
+      .replace(/\^(-?\d+)/g, function(_, z){ return z.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+      .replace(/\^([a-z])(?![a-zA-Z0-9])/g, function(ganz, z){ return HOCH[z] || ganz; })
+      .replace(/(\d)\.(\d)/g, "$1,$2");
+  }
+  function maskiere(s){
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  // Was schoenMathe() nicht in Unicode setzen konnte, wird hier echtes <sup>/<sub>:
+  // x^(1/2), e^(v(x)), Integralgrenzen ∫0^√a, und Indizes mit beliebigem Buchstaben.
+  // Dateinamen, Pfade und Adressen sind keine Formeln - dort bedeutet "_" nichts.
+  function istKeineFormel(s){
+    return /\.(?:md|html|py|json|txt)\b|:\/\//.test(s);
+  }
+  function markup(s){
+    if (istKeineFormel(s)) { return maskiere(s); }
+    return maskiere(s)
+      // Exponent mit eigener Klammer zuerst: e^(v(x)), 2^(f(x) + 1)
+      .replace(/\^\(((?:[^()]|\([^()]*\)){1,28})\)/g, "<sup>$1</sup>")
+      .replace(/\^([A-Za-z0-9,.√−α-ωΑ-Ω+-]+)/g, "<sup>$1</sup>")
+      .replace(/([A-Za-z])_\(([^()]{1,24})\)/g, "$1<sub>$2</sub>")
+      .replace(/([A-Za-z])_([A-Za-z0-9]+)/g, "$1<sub>$2</sub>");
+  }
+  // Notation vereinheitlichen: Hochzahlen auch im statischen Folientext (x^2 -> x2 hoch)
+  (function hochAlles(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var knoten = [];
+    while (walker.nextNode()){
+      var t = walker.currentNode, el = t.parentNode;
+      if (el && el.tagName !== "SCRIPT" && el.tagName !== "STYLE" &&
+          (t.nodeValue.indexOf("^") >= 0 || t.nodeValue.indexOf("_") >= 0)) knoten.push(t);
+    }
+    knoten.forEach(function(t){
+      var neu = schoenMathe(t.nodeValue);
+      var mk = markup(neu);
+      if (mk === maskiere(neu)) { t.nodeValue = neu; return; }
+      // Echtes Markup noetig: den Textknoten durch ein <span> ersetzen.
+      var sp = document.createElement("span");
+      sp.innerHTML = mk;
+      if (t.parentNode) { t.parentNode.replaceChild(sp, t); }
+    });
+  })();
+
+  function bindeCheck(feldId, knopfId, ausgabeId, pruefer){
+    var feld = document.getElementById(feldId), knopf = document.getElementById(knopfId),
+        ausgabe = document.getElementById(ausgabeId);
+    if (!feld || !knopf || !ausgabe) return;
+    function lauf(){
+      var r = pruefer((feld.value || "").trim().replace(",", "."));
+      ausgabe.textContent = schoenMathe(r.text); ausgabe.className = "feedback " + (r.ok ? "ok" : "no");
+    }
+    knopf.addEventListener("click", lauf);
+    feld.addEventListener("keydown", function(ev){ if (ev.key === "Enter") lauf(); });
+  }
+
+  // ---- Umschalten zwischen Einstiegs-Varianten ----
+  document.querySelectorAll(".vwahl").forEach(function(w){
+    w.addEventListener("click", function(ev){
+      var k = ev.target.closest(".vknopf"); if (!k) { return; }
+      var sec = w.closest("section") || document;
+      w.querySelectorAll(".vknopf").forEach(function(b){ b.classList.toggle("aktiv", b === k); });
+      var ziel = parseInt(k.getAttribute("data-ziel"), 10);
+      sec.querySelectorAll(".variante").forEach(function(v, j){ v.classList.toggle("aktiv", j === ziel); });
+    });
+  });
+
+  bindeCheck("b07a1antwort", "b07a1pruefen", "b07a1feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 64) return { ok: true, text: "Stimmt: erst 3*1 + 1 = 4, dann 4^3 = 64. Und (v o u)(1)?" };
+    return { ok: false, text: "Noch nicht — erst die Klammer 3x + 1 ausrechnen, DANN hoch 3." };
+  });
+  bindeCheck("b07a5antwort", "b07a5pruefen", "b07a5feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 2) return { ok: true, text: "Stimmt: die Wurzel verlangt x - 2 >= 0, also ab x = 2." };
+    return { ok: false, text: "Noch nicht — welche Bedingung stellt der Radikand?" };
+  });
+  bindeCheck("b07a8antwort", "b07a8pruefen", "b07a8feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 0) return { ok: true, text: "Stimmt: nur a = 0 macht beide Terme gleich." };
+    return { ok: false, text: "Noch nicht — vergleiche (x + a)^2 mit x^2 + a Koeffizient fuer Koeffizient." };
+  });
+
+
+  var genZaehler = 1, letzteAufgabe = null;
+  var genWahl = document.getElementById("genStufe");
+  var genTypWahl = document.getElementById("genTyp");
+  // Trainingsbloecke buendeln mehrere Generatoren und bieten eine Typenwahl an.
+  // Fehlt das Auswahlfeld (alle Lernbloecke), bleibt es beim einzigen Generator.
+  function genName(){
+    if (genTypWahl && genTypWahl.value && GENERATORS[genTypWahl.value]) return genTypWahl.value;
+    return Object.keys(GENERATORS)[0];
+  }
+  function genNeu(){
+    var stufe = Number(genWahl.value);
+    var g = GENERATORS[genName()];
+    // verify ist der Qualitaetswaechter: eine beanstandete Aufgabe wird verworfen
+    // und neu gewuerfelt (Gate A fuzzt dieselbe Pruefung offline).
+    var versuch = 0;
+    do {
+      letzteAufgabe = g.make(Date.now() % 100000 + genZaehler++, stufe);
+      versuch++;
+    } while (versuch < 20 && g.verify(letzteAufgabe));
+    document.getElementById("genAusgabe").textContent = schoenMathe(letzteAufgabe.text);
+    var feld = document.getElementById("genLoesungFeld");
+    feld.classList.remove("offen");
+    feld.innerHTML = "<ol><li>" + letzteAufgabe.schritte.map(schoenMathe).join("</li><li>") + "</li></ol>";
+  }
+  if (document.getElementById("genNeu")){
+    document.getElementById("genNeu").addEventListener("click", genNeu);
+    document.getElementById("genLoesung").addEventListener("click", function(){
+      if (letzteAufgabe) document.getElementById("genLoesungFeld").classList.toggle("offen");
+    });
+  }
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll("section.slide"));
+  var slideIdx = 0;
+  function zeigeSlide(i){
+    slideIdx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, j){ s.classList.toggle("aktiv", j === slideIdx); });
+  }
+  function beamerUmschalten(){
+    document.body.classList.toggle("beamer");
+    if (document.body.classList.contains("beamer")) zeigeSlide(slideIdx);
+    else slides.forEach(function(s){ s.classList.add("aktiv"); });
+  }
+  document.getElementById("beamerKnopf").addEventListener("click", beamerUmschalten);
+  document.addEventListener("keydown", function(ev){
+    if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA" || ev.target.tagName === "SELECT")) return;
+    var k = ev.key.toLowerCase();
+    if (k === "b") beamerUmschalten();
+    else if (k === "l") alleLoesungen();
+    else if (document.body.classList.contains("beamer")){
+      if (ev.key === "ArrowRight" || ev.key === "PageDown") zeigeSlide(slideIdx + 1);
+      if (ev.key === "ArrowLeft" || ev.key === "PageUp") zeigeSlide(slideIdx - 1);
+    }
+  });
+  slides.forEach(function(s){ s.classList.add("aktiv"); });
+})();
+
+</script>
+</body>
+</html>

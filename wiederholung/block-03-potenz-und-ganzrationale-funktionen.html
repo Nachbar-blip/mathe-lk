@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block 03 · Potenz- und ganzrationale Funktionen</title>
+<!--
+  analysis-lk Block 03 (Mathematik LK, eA). MasterMind-Aufbau, neutrales Design.
+  Single-File, keine externen Abhaengigkeiten, ASCII-only JS-Bezeichner, kein Browser-Storage.
+  Tasten: B Beamer, Pfeile Abschnitt (Beamer), L alle Loesungen.
+  Erzeugt aus _skelett.py - Aenderungen am Rahmen dort vornehmen, Inhalt in _inhalt_bXX.py.
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --accent-soft:#eaf1f7; --ok:#2e7d5a; --warn:#b06a2e;
+    --maxw:920px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  main{max-width:var(--maxw);margin:0 auto;padding:28px 18px 64px;}
+  h1{font-size:1.5rem;margin:.2em 0 .1em}
+  h2{font-size:1.2rem;margin:1.5em 0 .4em;border-bottom:2px solid var(--line);padding-bottom:.2em}
+  p{margin:.5em 0}
+  .lead{color:var(--muted)}
+  .formel{white-space:nowrap}
+  sub,sup{font-size:.72em;line-height:0}
+  .spvek{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.08;font-size:.94em;padding:0 .12em;margin:0 .1em;position:relative}
+  .spvek::before,.spvek::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;
+    border:1.5px solid currentColor}
+  .spvek::before{left:-.22em;border-right:none;border-radius:.5em 0 0 .5em}
+  .spvek::after{right:-.22em;border-left:none;border-radius:0 .5em .5em 0}
+  .spvek span{display:block;padding:0 .18em}
+  .phase{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:.18em .6em;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid #cfe0ee;margin:.2em .3em .2em 0;}
+  .badge-kern{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .badge-vert{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .bluete{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;overflow:hidden;background:#fff;}
+  .bluete>summary{cursor:pointer;padding:.7em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;}
+  .bluete>summary::-webkit-details-marker{display:none}
+  .lvl{font-size:.74rem;font-weight:600;padding:.1em .5em;border-radius:6px}
+  .lvl.l1{background:#eef6f0;color:var(--ok)}
+  .lvl.l2{background:#eef2f8;color:var(--accent)}
+  .lvl.l3{background:#f7efe6;color:var(--warn)}
+  .bluete[open]>summary{border-bottom:1px solid var(--line)}
+  .bluete .body{padding:.3em .9em .9em}
+  .iqb{margin:.45em 0 0;font-size:.82rem}
+  .iqb>summary{cursor:pointer;color:var(--muted);list-style:none;display:inline-flex;
+    align-items:center;gap:.4em;padding:.12em .6em;border:1px solid var(--line);
+    border-radius:999px;background:#fbfbf9}
+  .iqb>summary::-webkit-details-marker{display:none}
+  .iqb>summary::before{content:"IQB";font-weight:700;font-size:.72rem;letter-spacing:.03em;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:.05em .35em}
+  .iqb>summary:hover{border-color:var(--accent);color:var(--accent)}
+  .iqb .iqb-text{margin:.4em 0 0;padding:.5em .7em;background:#fbfbf9;border-left:3px solid var(--line);
+    border-radius:0 6px 6px 0;color:var(--muted);line-height:1.5}
+  .iqb .iqb-text .iqb-fund{display:block;margin-top:.3em;font-size:.95em;opacity:.85}
+  .hinfuehrung{border:1px solid #ecd9c2;border-left:4px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;
+    background:#fffdf5;padding:.85em 1em;margin:.4em 0 1em}
+  .hinfuehrung h3{margin:0 0 .4em;font-size:1rem;color:var(--warn)}
+  .hinfuehrung p{margin:.35em 0}
+  .hinfuehrung .frage{font-weight:600;font-size:1.02rem}
+  .hinfuehrung .aufloesung{margin-top:.6em;padding-top:.5em;border-top:1px dashed #ecd9c2;
+    font-size:.94rem;color:var(--muted)}
+  table.wertereihe{border-collapse:collapse;margin:.3em 0 .4em;font-size:.9rem;background:#fff}
+  table.wertereihe th,table.wertereihe td{border:1px solid var(--line);padding:.25em .6em;text-align:center}
+  table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .hinfuehrung table.wertereihe{border-collapse:collapse;margin:.5em 0;font-size:.92rem;background:#fff}
+  .hinfuehrung table.wertereihe th,.hinfuehrung table.wertereihe td{border:1px solid var(--line);
+    padding:.3em .7em;text-align:center}
+  .hinfuehrung table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .tafel{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;margin:.8em 0;overflow:hidden}
+  .tafel>h3{margin:0;padding:.6em .9em;background:var(--accent);color:#fff;font-size:1rem}
+  .tafel .tafel-koerper{padding:.85em .9em}
+  .tafel-form{text-align:center;font-size:1.15rem;margin:.2em 0 .9em;padding:.5em;
+    background:var(--accent-soft);border-radius:6px;color:var(--accent);font-weight:600}
+  .tafel-form .zeiger{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:.25em}
+  table.param{border-collapse:collapse;width:100%;margin:.3em 0}
+  table.param th,table.param td{border:1px solid var(--line);padding:.5em .65em;text-align:left;vertical-align:top}
+  table.param thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  table.param .pz{font-weight:700;color:var(--accent);font-size:1.05rem;text-align:center;width:2.4em}
+  table.param .pbsp{font-size:.9rem;color:var(--muted)}
+  table.param .pbsp code{background:#fbfbf9;padding:.05em .3em;border-radius:3px;color:var(--fg)}
+  .tafel-merk{margin:.5em 0 0;padding:.45em .7em;background:#fffdf5;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.93rem}
+  .tafel-merk::before{content:"Merke: ";font-weight:700;color:var(--warn)}
+  ol.schritte{counter-reset:s;list-style:none;padding:0;margin:.4em 0 0}
+  ol.schritte li{counter-increment:s;position:relative;padding:.5em .7em .5em 2.6em;margin:.4em 0;
+    background:#fafaf7;border-radius:6px}
+  ol.schritte li::before{content:counter(s);position:absolute;left:.7em;top:.5em;width:1.5em;height:1.5em;
+    background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:.82rem;font-weight:700}
+  ol.schritte .frage{font-weight:600;display:block}
+  ol.schritte .ergebnis{display:block;margin-top:.25em;font-size:.9rem;color:var(--ok);font-weight:600}
+  table.reihen{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.93rem}
+  table.reihen th,table.reihen td{border:1px solid var(--line);padding:.45em .65em;text-align:left}
+  table.reihen thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .stufe{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;background:#fff;overflow:hidden}
+  .stufe>summary{cursor:pointer;padding:.6em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em;background:#fbfbf9}
+  .stufe>summary::-webkit-details-marker{display:none}
+  .stufe>summary::before{content:"\25b8";color:var(--accent);font-weight:400}
+  .stufe[open]>summary::before{content:"\25be"}
+  .stufe .stufe-koerper{padding:.7em .9em}
+  .tauf{margin:0 0 .9em;padding-bottom:.7em;border-bottom:1px dashed var(--line)}
+  .tauf:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+  .tauf .tfrage{margin:0 0 .4em}
+  .tauf .tfrage strong.nr{color:var(--accent);margin-right:.3em}
+  .ueberblick{border:1px solid #cfe0ee;border-radius:var(--radius);background:#fff;margin:.2em 0 1.1em}
+  .ueberblick>summary{cursor:pointer;padding:.7em .9em;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);list-style:none;border-radius:var(--radius);
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .ueberblick>summary::-webkit-details-marker{display:none}
+  .ueberblick>summary::before{content:"\25b8";font-weight:400;margin-right:.15em}
+  .ueberblick[open]>summary::before{content:"\25be"}
+  .ueberblick[open]>summary{border-radius:var(--radius) var(--radius) 0 0}
+  .ueberblick .ub-zusatz{font-weight:400;font-size:.85rem;color:var(--muted)}
+  .ueberblick .ub-koerper{padding:.8em .9em}
+  .ub-huelle{overflow-x:auto}
+  table.ub{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+  table.ub th,table.ub td{border:1px solid var(--line);padding:.42em .6em;text-align:left;vertical-align:top}
+  table.ub thead th{background:#fbfbf9;font-size:.82rem;color:var(--muted);font-weight:600}
+  table.ub tbody th{white-space:nowrap;font-weight:600}
+  table.ub .ub-bsp{white-space:nowrap;color:var(--accent);font-size:.88rem}
+  .ub-detail{margin:.9em 0 0;padding:.6em .8em;border-left:3px solid var(--line);background:#fafaf7;border-radius:0 6px 6px 0}
+  .ub-detail h4{margin:0 0 .25em;font-size:.93rem;color:var(--accent)}
+  .ub-detail p{margin:.2em 0;font-size:.93rem}
+  .ub-detail .ub-fehler{color:var(--warn)}
+  .ub-detail ol{margin:.3em 0 0;padding-left:1.4em;font-size:.93rem}
+  .ub-detail ol li{margin:.25em 0}
+  .ub-link{margin:.9em 0 0;font-size:.92rem}
+  .ub-link a{color:var(--accent);font-weight:600}
+  .grundtafel table.regeln{border-collapse:collapse;width:100%;margin:.3em 0}
+  .grundtafel table.regeln th,.grundtafel table.regeln td{border:1px solid var(--line);
+    padding:.5em .65em;text-align:left;vertical-align:top}
+  .grundtafel table.regeln thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .grundtafel table.regeln td.rname{font-weight:600;white-space:nowrap;width:11em}
+  .grundtafel table.regeln td.rform{color:var(--accent);font-weight:600;white-space:nowrap}
+  .grundtafel table.regeln td.rtext{font-size:.93rem}
+  .aufgabe{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+    background:#fff;padding:.8em 1em;margin:1em 0}
+  .aufgabe .kopf{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-bottom:.3em}
+  .loesung{display:none;margin-top:.7em;padding:.7em .9em;background:#f2f7f3;border:1px solid #cbe4d4;border-radius:8px}
+  .loesung.offen{display:block}
+  .lknopf{font:inherit;font-size:.85rem;padding:.3em .7em;border:1px solid var(--line);
+    border-radius:6px;background:#fff;cursor:pointer;color:var(--accent)}
+  .check{margin:.8em 0;padding:.8em .9em;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .check input,.check select{font:inherit;padding:.35em .5em;border:1px solid var(--line);border-radius:6px}
+  .check button,.gen button{font:inherit;padding:.4em .8em;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-left:.4em}
+  .feedback{margin-top:.5em;font-size:.95rem;min-height:1.4em}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--warn)}
+  textarea{width:100%;min-height:4.5em;font:inherit;padding:.5em;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .gen{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.8em 1em;margin:1em 0}
+  .gen .genaufgabe{margin:.6em 0;padding:.6em .8em;background:#fafaf7;border-radius:8px}
+  table.sortier{border-collapse:collapse;margin:.6em 0}
+  table.sortier td,table.sortier th{border:1px solid var(--line);padding:.35em .7em}
+  #toolbar{position:fixed;top:0;left:0;right:0;background:#20242b;color:#f3f4f6;
+    display:flex;gap:1em;align-items:center;justify-content:flex-end;padding:.35em 1em;font-size:.95rem;z-index:50}
+  #toolbar button{font:inherit;font-size:.8rem;background:#3a4150;color:#fff;border:0;border-radius:5px;padding:.15em .6em;cursor:pointer}
+  body{padding-top:2.4em}
+  body.beamer{font-size:26px;background:#fff}
+  body.beamer main{max-width:1180px}
+  body.beamer .nur-arbeit{display:none}
+  body.beamer section.slide{display:none;min-height:60vh}
+  body.beamer section.slide.aktiv{display:block}
+  body.beamer h2{font-size:1.5em}
+  /* ---- neue Bausteinfolge: Problem, Klaerung, Beispiel, Merksatz, Aufgaben ---- */
+  .vwahl{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .vknopf{font:inherit;font-size:.88rem;padding:.25em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .vknopf.aktiv{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .variante{display:none}
+  .variante.aktiv{display:block}
+  .problemkasten{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;
+    padding:.9em 1em;margin:.3em 0 1em;text-align:center;font-size:1.2rem;line-height:1.5}
+  .pfrage{font-weight:600;margin:.9em 0 .15em}
+  .pantwort{color:var(--ok);margin:.1em 0 .8em}
+  .bsp{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.5em .95em;margin:.7em 0}
+  .bsp h3{margin:.25em 0 .45em;color:var(--accent);font-size:1rem}
+  ol.bzeilen{list-style:none;margin:.2em 0;padding:0}
+  ol.bzeilen li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:.2em 1.2em;
+    align-items:baseline;padding:.3em 0;border-top:1px solid var(--line)}
+  ol.bzeilen li:first-child{border-top:0}
+  .brechnung{font-size:1.05em}
+  .bhinweis{color:var(--muted);font-size:.93em}
+  @media (max-width:800px){ol.bzeilen li{grid-template-columns:1fr}}
+  .merk{border:2px solid var(--accent);border-left-width:5px;border-radius:var(--radius);
+    background:#fff;padding:.6em 1em .7em;margin:.5em 0}
+  .merk ul{margin:.2em 0;padding-left:1.1em}
+  .merk li{margin:.5em 0}
+  .merk .regel{font-weight:600;display:block}
+  .merk .kurz{display:block;margin-top:.2em;color:var(--accent)}
+  .fehler{border:1px solid #e9cfcf;border-left:4px solid #b04a4a;border-radius:0 6px 6px 0;
+    background:#fdf6f6;padding:.55em .85em;margin:.5em 0}
+  .fehler p{margin:.2em 0;font-size:.95rem}
+  .typ,.afb{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;
+    padding:.14em .55em;border-radius:6px;margin:.2em .3em .2em 0;border:1px solid transparent}
+  .t-vor{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .t-rueck{background:#eef2f8;color:var(--accent);border-color:#cfe0ee}
+  .t-par{background:#f4eef8;color:#6b4a95;border-color:#ddd0ea}
+  .t-beur{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .afb1{background:#fbfbf9;color:var(--muted);border-color:var(--line)}
+  .afb2{background:#fbfbf9;color:var(--accent);border-color:#cfe0ee}
+  .afb3{background:#fbfbf9;color:var(--warn);border-color:#ecd9c2}
+  .spiegel{border:1px dashed var(--line);border-radius:var(--radius);background:#fbfbf9;margin:.5em 0 1em}
+  .spiegel>summary{cursor:pointer;padding:.5em .9em;font-size:.9rem;color:var(--muted);list-style:none}
+  .spiegel>summary::-webkit-details-marker{display:none}
+  .spiegel>summary::before{content:"\25b8 ";color:var(--accent)}
+  .spiegel[open]>summary::before{content:"\25be "}
+  .spiegel table.param,.spiegel p{margin:.2em .9em .7em}
+  .spiegel table.param th,.spiegel table.param td{text-align:center;padding:.35em .6em}
+  .bruch{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.15;margin:0 .12em;font-size:.92em;text-align:center}
+  .bruch .z{padding:0 .25em .05em;border-bottom:1.5px solid currentColor}
+  .bruch .n{padding:.05em .25em 0}
+  ol.bzeilen details.klapp{display:inline-block;margin:0}
+  ol.bzeilen details.klapp>summary{cursor:pointer;list-style:none;display:inline-block;font-size:.85rem;
+    padding:.1em .6em;border:1px solid var(--line);border-radius:999px;color:var(--accent);background:#fff}
+  ol.bzeilen details.klapp>summary::-webkit-details-marker{display:none}
+  ol.bzeilen details.klapp[open]>summary{background:var(--accent-soft)}
+  ol.bzeilen details.klapp .erg{margin-left:.6em;color:var(--ok);font-weight:600}
+  ol.bzeilen details.klapp:not([open]) .erg{display:none}
+  svg.plot{display:block;max-width:100%;height:auto;margin:.4em 0;background:#fff;border:1px solid var(--line);border-radius:6px}
+  svg.plot .gitter{stroke:#eceae4;stroke-width:1}
+  svg.plot .achse{stroke:#555;stroke-width:1.3}
+  svg.plot .tick{font-size:10px;fill:var(--muted)}
+  svg.plot .beschriftung{font-size:11px}
+  ol.bzeilen li:has(svg.plot){grid-template-columns:1fr}
+  .doppelbild .loesung{background:transparent;border:0;padding:0;margin-top:.3em}
+  .doppelbild .lknopf{margin:.2em 0}
+  .plots{display:flex;flex-wrap:wrap;gap:.6em;align-items:flex-start}
+  .plots svg.plot{margin:0}
+  body.beamer svg.plot{width:auto;height:auto}
+  .wurzel{display:inline-block;white-space:nowrap;vertical-align:baseline;line-height:1.15}
+  .wurzel .rad{display:inline-block;border-top:1.5px solid currentColor;padding:.04em .12em 0 .08em;
+    vertical-align:baseline;line-height:1.15}
+  ol.teile{margin:.4em 0 .2em;padding-left:1.6em}
+  ol.teile li{margin:.3em 0}
+  ol.teile li::marker{color:var(--accent);font-weight:700}
+  .limes{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.05;margin:0 .25em 0 .1em}
+  .limes .unter{font-size:.68em;color:var(--muted);white-space:nowrap}
+  body.beamer .problemkasten{font-size:1.15em}
+  .beamer-hinweis{position:fixed;bottom:.5em;right:1em;color:var(--muted);font-size:.75rem}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <a href="./" style="margin-right:auto;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:4px 6px">← Übersicht</a>
+  <button id="beamerKnopf">Beamer (B)</button>
+  <button id="alleLoesungenKnopf">Lösungen (L)</button>
+</div>
+
+<main>
+
+<section class="slide aktiv">
+  <h1>Block 03 · Potenz- und ganzrationale Funktionen</h1>
+  <p class="lead">Mathematik LK (eA) · <strong>Ziel:</strong> Nullstellen mit Vielfachheit deuten, Globalverlauf aus Grad und Leitkoeffizient lesen, Graphen ohne Wertetabelle skizzieren.</p>
+  <p class="nur-arbeit"><em>Tasten: B Beamer · Pfeile Abschnitt · L Lösungen</em></p>
+</section>
+
+<section class="slide">
+  <h2>Überblick <span class="phase">vor dem Einstieg</span></h2>
+  <p class="lead">Potenzfunktionen und ihre Verwandten — und was der Exponent über den Graphen verrät.</p>
+  <details class="ueberblick" open>
+    <summary><span>Das musst du über diese Funktionsklassen wissen</span>
+             <span class="ub-zusatz">2 Funktionsklassen</span></summary>
+    <div class="ub-koerper">
+      <div class="ub-huelle">
+      <table class="ub">
+        <thead>
+          <tr><th>Funktionsklasse</th><th>Beispiel</th><th>Was einsetzen?</th><th>Was kommt heraus?</th>
+              <th>Steigt oder fällt?</th><th>Symmetrie</th><th>Nullstellen</th></tr>
+        </thead>
+        <tbody>
+        <tr><th>Kubische & Potenzfunktionen</th><td class="ub-bsp">f(x) = x³</td><td>alle Zahlen</td><td>alle Zahlen</td><td>immer steigend</td><td>punktsymmetrisch</td><td>eine (bei x = 0)</td></tr>
+        <tr><th>Wurzelfunktionen</th><td class="ub-bsp">f(x) = <span class="wurzel">√<span class="rad">x</span></span></td><td>nur x ≥ 0</td><td>nur y ≥ 0</td><td>steigend, immer langsamer</td><td>keine</td><td>eine (bei x = 0)</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="ub-detail"><h4>Kubische & Potenzfunktionen</h4><p>Bei ganzrationalen Funktionen bestimmen Grad und Leitkoeffizient den Globalverlauf.</p><p class="ub-fehler"><strong>Typischer Fehler:</strong> Vielfachheit übersehen: (x−2)² hat bei x = 2 eine Berührstelle, keinen Vorzeichenwechsel.</p><p><strong>Nullstellen ganzrationaler Funktionen — in dieser Reihenfolge</strong></p><ol><li><strong>Ausklammern, wenn kein absolutes Glied da ist:</strong> x³ − 4x = x(x² − 4) → x = 0 oder x² = 4.</li><li>Satz vom Nullprodukt anwenden: x = 0, x = 2, x = −2.</li><li><strong>Substitution bei nur geraden Exponenten:</strong> x⁴ − 5x² + 4 = 0 mit u = x² wird zu u² − 5u + 4 = 0 → u = 1, u = 4; zurück: x = ±1, x = ±2.</li><li><strong>Polynomdivision,</strong> wenn beides nicht geht: eine Nullstelle raten (Teiler des absoluten Glieds probieren), dann durch (x − x₀) teilen und den Rest mit der pq-Formel lösen.</li></ol></div>      <div class="ub-detail"><h4>Wurzelfunktionen</h4><p><span class="wurzel">√<span class="rad">x</span></span> ist die Umkehrfunktion von x² für x ≥ 0 — Spiegelung an der Winkelhalbierenden y = x.</p><p class="ub-fehler"><strong>Typischer Fehler:</strong> <span class="wurzel">√<span class="rad">x²</span></span> = |x|, nicht x. Für negative x liefert die Wurzel den Betrag.</p><p><strong>Wurzelgleichung lösen — Probe ist Pflicht</strong></p><ol><li>Wurzel allein auf eine Seite bringen: <span class="wurzel">√<span class="rad">x + 6</span></span> = x.</li><li>Beide Seiten quadrieren: x + 6 = x².</li><li>Umstellen und mit der pq-Formel lösen: x² − x − 6 = 0 → x₁ = 3, x₂ = −2.</li><li><strong>Probe einsetzen</strong>, denn Quadrieren ist keine Äquivalenzumformung: <span class="wurzel">√<span class="rad">3 + 6</span></span> = 3 ✓, aber <span class="wurzel">√<span class="rad">−2 + 6</span></span> = 2 ≠ −2 ✗.</li><li>Nur x = 3 ist Lösung. x = −2 ist eine Scheinlösung.</li></ol></div>
+      <p class="ub-link">Alle neun Funktionsklassen mit Graph, Wertetabelle und Rechenwegen:
+         <a href="funktionsklassen-uebersicht.html" target="_blank" rel="noopener">Funktionsklassen im Überblick</a></p>
+    </div>
+  </details>
+</section>
+
+<section class="slide">
+  <span class="phase">1 · Problem</span>
+  <h2>Nullstellen jenseits der Lösungsformel <span class="phase badge-kern">Einstieg</span></h2>
+  <div class="vwahl" role="group" aria-label="Einstieg wählen"><button type="button" class="vknopf aktiv" data-ziel="0">Problemorientiert</button><button type="button" class="vknopf" data-ziel="1">Entdeckend</button></div>
+  <div class="variante aktiv">
+    <div class="problemkasten">Bestimmt alle Nullstellen von <span class="formel">f(x) = x⁴ − 5x² + 4</span>.</div>
+    <p class="pfrage">Was stört an dieser Gleichung?</p>
+    <p class="pantwort">Sie ist vom Grad 4. Eine Lösungsformel gibt es nur bis Grad 2 — hier greift keine der bekannten Formeln direkt.</p>
+    <p class="pfrage">Schaut den Term genau an: welche Potenzen kommen vor?</p>
+    <p class="pantwort">Nur <span class="formel">x⁴</span> und <span class="formel">x²</span> — und <span class="formel">x⁴ = (x²)²</span>. Setzt man <span class="formel">u = x²</span>, entsteht <span class="formel">u² − 5u + 4 = 0</span>, also <span class="formel">u = 4</span> oder <span class="formel">u = 1</span>. Das ist wieder quadratisch.</p>
+    <p class="pfrage">Ist man damit fertig?</p>
+    <p class="pantwort">Nein — gesucht war x, nicht u. Rücksubstitution: <span class="formel">x² = 4</span> liefert <span class="formel">x = ±2</span>, <span class="formel">x² = 1</span> liefert <span class="formel">x = ±1</span>. Vier Nullstellen, und mehr kann eine Funktion vierten Grades gar nicht haben.</p>
+  </div>
+  <div class="variante">
+    <div class="problemkasten">Der Graph von <span class="formel">f(x) = (x + 1)(x − 2)²</span> berührt die x-Achse an einer Stelle und schneidet sie an einer anderen. Welche ist welche — ohne zu zeichnen?</div>
+    <p class="pfrage">Wo liegen überhaupt die Nullstellen?</p>
+    <p class="pantwort">Ein Produkt ist null, wenn ein Faktor null ist: <span class="formel">x = −1</span> und <span class="formel">x = 2</span>. Die 2 steckt im Quadrat — sie zählt <b>doppelt</b>.</p>
+    <p class="pfrage">Was passiert mit dem Vorzeichen bei <span class="formel">x = 2</span>?</p>
+    <p class="pantwort"><span class="formel">(x − 2)²</span> ist links und rechts der 2 positiv. Das Vorzeichen von f ändert sich dort also nicht — der Graph kommt an die Achse und kehrt um: <b>Berührung</b>. Bei <span class="formel">x = −1</span> wechselt der einfache Faktor das Vorzeichen: <b>Schnitt</b>.</p>
+    <p class="pfrage">Was leistet der Grad dabei?</p>
+    <p class="pantwort">Der Grad ist 3, und <span class="formel">1 + 2 = 3</span> — die Vielfachheiten summieren sich genau zum Grad. Grad und Vielfachheit steuern zusammen den ganzen Verlauf.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">2 · Klärung</span>
+  <h2>Klärung — was Grad, Nullstellen und Vielfachheit verraten</h2>
+  <p class="lead">Bei ganzrationalen Funktionen liest man das Meiste am Term ab — man muss nur wissen, wonach man sieht.</p>
+  <ol class="schritte">
+    <li><span class="frage">Grad und Leitkoeffizient ablesen</span><span class="ergebnis">Das legt den Globalverlauf fest: gerader Grad → beide Enden in dieselbe Richtung, ungerader Grad → gegenläufig. Ein negativer Leitkoeffizient dreht beides um.</span></li>
+    <li><span class="frage">Nullstellen finden — drei Wege</span><span class="ergebnis"><b>Ausklammern</b>, wenn kein absolutes Glied da ist. <b>Substitution</b> <span class="formel">u = x²</span>, wenn nur gerade Potenzen vorkommen. <b>Polynomdivision</b>, nachdem man eine Nullstelle unter den Teilern des absoluten Gliedes geraten hat.</span></li>
+    <li><span class="frage">Vielfachheit deuten</span><span class="ergebnis">einfach → Schnitt · doppelt → Berührung · dreifach → Schnitt mit waagerechter Tangente (Sattelpunkt). Die Vielfachheiten summieren sich höchstens zum Grad.</span></li>
+    <li><span class="frage">Symmetrie am Term ablesen</span><span class="ergebnis">Nur gerade Exponenten → achsensymmetrisch zur y-Achse. Nur ungerade → punktsymmetrisch zum Ursprung. Gemischt → keines von beidem.</span></li>
+  </ol>
+  <p class="tafel-merk">Der Grad n begrenzt alles: höchstens n Nullstellen — und die Summe der Vielfachheiten übersteigt n nie.</p>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Beispiel — vollständig vorgerechnet</h2>
+  <div class="bsp"><h3>Substitution: <span class="formel">f(x) = x⁴ − 13x² + 36</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">u = x² ⟹ u² − 13u + 36 = 0</span></span><span class="bhinweis">nur gerade Potenzen — Substitution lohnt</span></li><li><span class="brechnung"><span class="formel">u = <span class="bruch"><span class="z">13 ± <span class="wurzel">√<span class="rad">169 − 144</span></span></span><span class="n">2</span></span> = <span class="bruch"><span class="z">13 ± 5</span><span class="n">2</span></span></span></span><span class="bhinweis">Lösungsformel auf die u-Gleichung</span></li><li><span class="brechnung"><span class="formel">u₁ = 9 · u₂ = 4</span></span><span class="bhinweis">beide sind positiv, also brauchbar</span></li><li><span class="brechnung"><span class="formel">x² = 9 ⟹ x = ±3</span> · <span class="formel">x² = 4 ⟹ x = ±2</span></span><span class="bhinweis">Rücksubstitution — je zwei x-Werte</span></li><li><span class="brechnung">Grad 4, Leitkoeffizient <span class="formel">1 &gt; 0</span>, nur gerade Exponenten</span><span class="bhinweis">beide Enden nach <span class="formel">+∞</span>, Graph achsensymmetrisch, <span class="formel">f(0) = 36</span></span></li></ol>
+  </div>
+  <div class="bsp"><h3>Polynomdivision: <span class="formel">f(x) = x³ − 3x² − 4x + 12</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">f(2) = 8 − 12 − 8 + 12 = 0</span></span><span class="bhinweis">geraten unter den Teilern von 12 — 2 passt</span></li><li><span class="brechnung"><span class="formel">(x³ − 3x² − 4x + 12) : (x − 2) = x² − x − 6</span></span><span class="bhinweis">Polynomdivision</span></li><li><span class="brechnung"><span class="formel">x² − x − 6 = 0 ⟹ x = <span class="bruch"><span class="z">1 ± 5</span><span class="n">2</span></span></span></span><span class="bhinweis">Diskriminante <span class="formel">1 + 24 = 25</span></span></li><li><span class="brechnung"><span class="formel">x = 3</span> und <span class="formel">x = −2</span></span><span class="bhinweis">zusammen mit der 2: drei einfache Nullstellen</span></li><li><span class="brechnung"><span class="formel">f(x) = (x − 2)(x − 3)(x + 2)</span></span><span class="bhinweis">Probe durch Ausmultiplizieren; drei Schnittpunkte</span></li></ol>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">4 · Merksatz</span>
+  <h2>Merksatz — Potenz- und ganzrationale Funktionen</h2>
+  <div class="merk"><ul><li><span class="regel">Eine ganzrationale Funktion vom Grad n hat höchstens n Nullstellen.</span><span class="kurz">Grad 4 → höchstens vier, oft weniger</span></li><li><span class="regel">Globalverlauf allein aus Grad und Leitkoeffizient.</span><span class="kurz"><span class="formel">−2x⁵</span>: ungerader Grad, negativer Leitkoeffizient → von <span class="formel">+∞</span> nach <span class="formel">−∞</span></span></li><li><span class="regel">Die Vielfachheit sagt, <b>wie</b> der Graph die Achse trifft.</span><span class="kurz">einfach = Schnitt · doppelt = Berührung · dreifach = Sattel</span></li><li><span class="regel">Symmetrie steht im Term: nur gerade Exponenten achsensymmetrisch, nur ungerade punktsymmetrisch.</span><span class="kurz"><span class="formel">x⁵ − 4x³</span> ist punktsymmetrisch zum Ursprung</span></li></ul></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „<span class="formel">x⁴ − 5x² + 4 = 0</span> hat zwei Lösungen — die Lösungsformel liefert ja zwei.“</p><p><strong>Richtig:</strong> Die Formel liefert die beiden <b>u</b>-Werte. Erst die Rücksubstitution <span class="formel">x² = u</span> macht daraus je zwei x-Werte: insgesamt vier.</p></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „<span class="formel">x³ + x²</span> ist punktsymmetrisch, <span class="formel">x³</span> ist es doch auch.“</p><p><strong>Richtig:</strong> Symmetrie verlangt, dass <b>alle</b> Exponenten von derselben Art sind. Probe: <span class="formel">f(1) = 2</span>, aber <span class="formel">f(−1) = −1 + 1 = 0 ≠ −2</span> — weder achsen- noch punktsymmetrisch.</p></div>
+</section>
+
+<section class="slide">
+  <h2 class="nur-arbeit">Aufgabengenerator: Ganzrationale Funktionen in Produktform</h2>
+  <div class="gen nur-arbeit">
+    <p>Stufe:
+      <select id="genStufe">
+        <option value="1">1 · Nullstellen, Werte und Begriffe</option>
+        <option value="2">2 · doppelte Nullstelle: berühren oder schneiden</option>
+        <option value="3">3 · Leitkoeffizient und Globalverlauf</option>
+        <option value="4">4 · rückwärts: Term und Parameter bestimmen</option>
+      </select>
+      <button id="genNeu">Neue Aufgabe</button>
+      <button id="genLoesung">Lösungsweg ein/aus</button>
+    </p>
+    <div class="genaufgabe" id="genAusgabe"><em>Noch keine Aufgabe erzeugt.</em></div>
+    <div class="loesung" id="genLoesungFeld"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">5 · Aufgaben</span>
+  <h2>Aufgaben</h2>
+  <details class="spiegel nur-arbeit"><summary>Aufgabenspiegel: Typ × Anforderungsbereich</summary>
+    <table class="param"><thead><tr><th></th><th>AFB I</th><th>AFB II</th><th>AFB III</th></tr></thead><tbody><tr><th>Vorwärts</th><td>2</td><td>2</td><td>1</td></tr><tr><th>Rückwärts</th><td>2</td><td>1</td><td>—</td></tr><tr><th>Parameter</th><td>—</td><td>2</td><td>—</td></tr><tr><th>Beurteilen</th><td>—</td><td>1</td><td>1</td></tr></tbody></table>
+    <p class="lead">Verteilung der Bewertungseinheiten: AFB I 32 %; AFB II 47 %; AFB III 21 % (Richtwert 30 / 50 / 20).</p>
+  </details>
+  <details class="stufe" open><summary>Anforderungsbereich I — Reproduzieren <span class="lead">· angeben, berechnen, ablesen</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b03a1">
+    <div class="kopf"><strong>Aufgabe 1</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Faktorisiert <span class="formel">f(x) = x³ − 3x²</span> und gebt die Nullstellen mit ihrer Vielfachheit an.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wie viele verschiedene Nullstellen?</p>
+      <input id="b03a1antwort" inputmode="text" placeholder="z. B. 1" aria-label="Antwort Aufgabe 1">
+      <button id="b03a1pruefen">Prüfen</button>
+      <div class="feedback" id="b03a1feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b03a1l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a1l"><p>Ausklammern: <span class="formel">f(x) = x²(x − 3)</span>. Nullstellen: <span class="formel">x = 0</span> (<b>doppelt</b>, denn der Faktor <span class="formel">x²</span> zählt zweimal) und <span class="formel">x = 3</span> (<b>einfach</b>). Zwei verschiedene Nullstellen; die Vielfachheiten <span class="formel">2 + 1</span> ergeben den Grad 3.</p></div>
+  </div>
+  <div class="aufgabe" id="b03a2">
+    <div class="kopf"><strong>Aufgabe 2</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt Grad, Leitkoeffizient und das Verhalten für <span class="formel">x → ±∞</span> an — für <span class="formel">f(x) = −2x⁵ + 3x² − 1</span> und für <span class="formel">g(x) = 4x⁴ − x</span>.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Grad von f?</p>
+      <input id="b03a2antwort" inputmode="text" placeholder="z. B. 2" aria-label="Antwort Aufgabe 2">
+      <button id="b03a2pruefen">Prüfen</button>
+      <div class="feedback" id="b03a2feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b03a2l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a2l"><p>f: Grad 5 (ungerade), Leitkoeffizient <span class="formel">−2 &lt; 0</span> → für <span class="formel">x → +∞</span> geht <span class="formel">f(x) → −∞</span>, für <span class="formel">x → −∞</span> geht <span class="formel">f(x) → +∞</span>.<br>g: Grad 4 (gerade), Leitkoeffizient <span class="formel">4 &gt; 0</span> → beide Enden nach <span class="formel">+∞</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b03a3">
+    <div class="kopf"><strong>Aufgabe 3</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine ganzrationale Funktion an, deren Graph die x-Achse bei <span class="formel">−1</span> berührt und bei 3 schneidet.</p>
+    <button class="lknopf" data-loesung="b03a3l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a3l"><p>Zum Beispiel <span class="formel">f(x) = (x + 1)²(x − 3)</span>. Berührung verlangt eine <b>gerade</b> Vielfachheit, Schnitt eine <b>ungerade</b>. Jedes Vielfache <span class="formel">c·(x + 1)²(x − 3)</span> mit <span class="formel">c ≠ 0</span> leistet dasselbe.</p></div>
+  </div>
+  <div class="aufgabe" id="b03a4">
+    <div class="kopf"><strong>Aufgabe 4</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine ganzrationale Funktion an, die achsensymmetrisch zur y-Achse ist, genau zwei Nullstellen besitzt und für <span class="formel">x → ±∞</span> gegen <span class="formel">−∞</span> läuft.</p>
+    <button class="lknopf" data-loesung="b03a4l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a4l"><p>Zum Beispiel <span class="formel">f(x) = −x² + 4</span>: nur gerade Exponenten (achsensymmetrisch), Nullstellen <span class="formel">±2</span>, gerader Grad mit negativem Leitkoeffizienten (beide Enden nach unten). Ebenso möglich: <span class="formel">f(x) = −x⁴ + 1</span>.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich II — Zusammenhänge herstellen <span class="lead">· bestimmen, untersuchen, erläutern</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b03a5">
+    <div class="kopf"><strong>Aufgabe 5</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">f(x) = (x + 2)²·(x − 1)</span>. Gebt die Nullstellen von f an, entscheidet jeweils, ob der Graph die x-Achse dort berührt oder schneidet, und begründet am jeweiligen Faktor.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Stelle der doppelten Nullstelle?</p>
+      <input id="b03a5antwort" inputmode="text" placeholder="z. B. 1" aria-label="Antwort Aufgabe 5">
+      <button id="b03a5pruefen">Prüfen</button>
+      <div class="feedback" id="b03a5feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b03a5l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a5l"><p>Nullstellen: <span class="formel">x = −2</span> (doppelt) und <span class="formel">x = 1</span> (einfach).<br>Bei <span class="formel">x = −2</span> steht der Faktor <span class="formel">(x + 2)²</span>: er ist links und rechts positiv, es gibt <b>keinen</b> Vorzeichenwechsel — der Graph <b>berührt</b> die Achse. Bei <span class="formel">x = 1</span> steht der einfache Faktor <span class="formel">(x − 1)</span>: er wechselt das Vorzeichen — der Graph <b>schneidet</b> die Achse.</p></div>
+  </div>
+  <div class="aufgabe" id="b03a6">
+    <div class="kopf"><strong>Aufgabe 6</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">f(x) = x³ − 3x²</span>. Beschreibt das Verhalten des Graphen an den Nullstellen und den Globalverlauf und skizziert ihn <b>ohne Wertetabelle</b>. Untersucht anschließend ohne neue Rechnung, was sich bei <span class="formel">g(x) = −f(x)</span> ändert.</p>
+    <button class="lknopf" data-loesung="b03a6l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a6l"><p><span class="formel">f(x) = x²(x − 3)</span>: bei <span class="formel">x = 0</span> doppelte Nullstelle → Berührung, bei <span class="formel">x = 3</span> einfache → Schnitt. Grad 3, Leitkoeffizient <span class="formel">+1</span>: von links unten nach rechts oben. Zwischen 0 und 3 verläuft der Graph unterhalb der Achse, z. B. <span class="formel">f(1) = −2</span>. Skizze: Berührpunkt im Ursprung, Tal dazwischen, Durchgang bei 3.<br><span class="formel">g = −f</span>: Spiegelung an der x-Achse. Nullstellen und Vielfachheiten bleiben unverändert, nur der Verlauf kippt — von links oben nach rechts unten, mit einem Berg zwischen 0 und 3.</p></div>
+  </div>
+  <div class="aufgabe" id="b03a7">
+    <div class="kopf"><strong>Aufgabe 7</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Eine ganzrationale Funktion f vom Grad 3 hat einen zum Ursprung punktsymmetrischen Graphen und eine Nullstelle bei 2, außerdem gilt <span class="formel">f(1) = −3</span>. Ermittelt eine Funktionsgleichung von f.</p>
+    <button class="lknopf" data-loesung="b03a7l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a7l"><p>Punktsymmetrie zum Ursprung heißt: nur ungerade Exponenten, also <span class="formel">f(x) = ax³ + bx</span>.<br><span class="formel">f(2) = 8a + 2b = 0</span> liefert <span class="formel">b = −4a</span>.<br><span class="formel">f(1) = a + b = a − 4a = −3a = −3</span> liefert <span class="formel">a = 1</span> und damit <span class="formel">b = −4</span>. Also <span class="formel">f(x) = x³ − 4x</span>. Probe: <span class="formel">f(2) = 8 − 8 = 0</span> ✓ und <span class="formel">f(1) = 1 − 4 = −3</span> ✓.</p></div>
+  </div>
+  <div class="aufgabe" id="b03a8">
+    <div class="kopf"><strong>Aufgabe 8</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">f_a(x) = x³ − a²x</span> mit <span class="formel">a &gt; 0</span>. Bestimmt die Nullstellen in Abhängigkeit von a und zeigt, dass jeder Graph punktsymmetrisch zum Ursprung ist. Gebt die Nullstellen für <span class="formel">a = 3</span> an.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Größte Nullstelle für a = 3?</p>
+      <input id="b03a8antwort" inputmode="text" placeholder="z. B. 1" aria-label="Antwort Aufgabe 8">
+      <button id="b03a8pruefen">Prüfen</button>
+      <div class="feedback" id="b03a8feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b03a8l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a8l"><p>Ausklammern: <span class="formel">x(x² − a²) = x(x − a)(x + a)</span>, also <span class="formel">x = 0, a, −a</span>. Symmetrie: der Term enthält nur ungerade Exponenten, daher <span class="formel">f_a(−x) = −x³ + a²x = −f_a(x)</span> — punktsymmetrisch zum Ursprung. Für <span class="formel">a = 3</span>: <span class="formel">x = −3, 0, 3</span> (das ist genau die Funktion aus Aufgabe 7).</p></div>
+  </div>
+  <div class="aufgabe" id="b03a9">
+    <div class="kopf"><strong>Aufgabe 9</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Für welche Werte von c hat <span class="formel">f_c(x) = x⁴ − c·x²</span> genau drei verschiedene Nullstellen? Begründet.</p>
+    <button class="lknopf" data-loesung="b03a9l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a9l"><p>Ausklammern: <span class="formel">f_c(x) = x²(x² − c)</span>. Die Stelle <span class="formel">x = 0</span> ist stets (doppelte) Nullstelle. Für <span class="formel">c &gt; 0</span> kommen <span class="formel">x = ±<span class="wurzel">√<span class="rad">c</span></span></span> dazu — drei verschiedene Nullstellen. Für <span class="formel">c = 0</span> bleibt nur <span class="formel">x = 0</span> (vierfach), für <span class="formel">c &lt; 0</span> hat <span class="formel">x² = c</span> keine reelle Lösung. Antwort: genau für <span class="formel">c &gt; 0</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b03a10">
+    <div class="kopf"><strong>Aufgabe 10</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Beurteilt: „Eine ganzrationale Funktion vom Grad n hat genau n Nullstellen.“</p>
+    <button class="lknopf" data-loesung="b03a10l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a10l"><p><b>Falsch.</b> Gegenbeispiel <span class="formel">f(x) = x² + 1</span>: Grad 2, aber wegen <span class="formel">x² ≥ 0</span> ist <span class="formel">f(x) ≥ 1</span> — keine reelle Nullstelle. Auch <span class="formel">f(x) = x⁴</span> hat nur eine (vierfache). Richtig ist: <b>höchstens</b> n Nullstellen, und die Summe der Vielfachheiten ist höchstens n.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich III — Verallgemeinern und beurteilen <span class="lead">· begründen, beurteilen, entwickeln</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b03a11">
+    <div class="kopf"><strong>Aufgabe 11</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Bestimmt alle Nullstellen von <span class="formel">f(x) = x⁴ − 5x² + 4</span> und begründet, dass es keine weiteren gibt. Untersucht den Graphen außerdem auf Symmetrie und auf sein Verhalten für <span class="formel">x → ±∞</span>.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Größte Nullstelle?</p>
+      <input id="b03a11antwort" inputmode="text" placeholder="z. B. 1" aria-label="Antwort Aufgabe 11">
+      <button id="b03a11pruefen">Prüfen</button>
+      <div class="feedback" id="b03a11feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b03a11l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a11l"><p>Nur gerade Potenzen — Substitution <span class="formel">u = x²</span>: <span class="formel">u² − 5u + 4 = 0</span> ergibt <span class="formel">u = 4</span> und <span class="formel">u = 1</span>. Rücksubstitution: <span class="formel">x = ±2</span> und <span class="formel">x = ±1</span>.<br>Keine weiteren: bei Grad 4 sind höchstens vier Nullstellen möglich, und vier sind gefunden.<br>Symmetrie: nur gerade Exponenten, also <span class="formel">f(−x) = f(x)</span> — achsensymmetrisch zur y-Achse; das passt zu den paarweise entgegengesetzten Nullstellen.<br>Grad 4 (gerade) mit Leitkoeffizient <span class="formel">1 &gt; 0</span>: beide Enden nach <span class="formel">+∞</span>. Zwischendurch <span class="formel">f(0) = 4 &gt; 0</span> und <span class="formel">f(1,5) = 5,0625 − 11,25 + 4 = −2,1875 &lt; 0</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b03a12">
+    <div class="kopf"><strong>Aufgabe 12</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Beurteilt; begründet wahre Aussagen allgemein und widerlegt falsche durch ein konkretes Gegenbeispiel oder eine allgemeine Begründung. <ol class="teile"><li>„Jede ganzrationale Funktion ungeraden Grades hat mindestens eine Nullstelle.“</li><li>„Es gibt eine ganzrationale Funktion vom Grad 3 mit vier verschiedenen Nullstellen.“</li><li>„Berührt der Graph die x-Achse bei <span class="formel">x₀</span>, so ist <span class="formel">x₀</span> eine doppelte Nullstelle.“</li></ol></p>
+    <button class="lknopf" data-loesung="b03a12l">Lösung ein/aus</button>
+    <div class="loesung" id="b03a12l"><p><ol class="teile"><li><b>wahr</b>: bei ungeradem Grad laufen die beiden Enden in entgegengesetzte Richtungen, die Funktion nimmt also positive <b>und</b> negative Werte an. Da sie stetig ist, muss sie die x-Achse dazwischen überqueren (Zwischenwertsatz).</li><li><b>falsch</b>: vier verschiedene Nullstellen erzwingen vier verschiedene Linearfaktoren <span class="formel">(x − x₁)…(x − x₄)</span> und damit mindestens Grad 4.</li><li><b>falsch</b>: <span class="formel">f(x) = (x − 1)⁴</span> berührt die Achse bei 1, die Vielfachheit ist aber 4. Richtig ist nur: die Vielfachheit ist <b>gerade</b>.</li></ol></p></div>
+  </div>
+    </div>
+  </details>
+  
+</section>
+
+<section class="slide">
+  <details class="stufe"><summary>Zum Nachschlagen: Potenz- und ganzrationale Funktionen <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: Was Grad und Vielfachheit verraten</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">Grad der Funktion</td><td class="rform">höchster Exponent</td><td class="rtext">Bei f(x) = 2x⁴ − 3x² + 1 ist der Grad 4. Der Grad sagt, wie viele Nullstellen es <strong>höchstens</strong> geben kann — mehr als vier werden es hier nie.</td></tr>
+        <tr><td class="rname">Leitkoeffizient</td><td class="rform">Zahl vor der höchsten Potenz</td><td class="rtext">Bei 2x⁴ − 3x² + 1 ist das die 2. Zusammen mit dem Grad legt sie fest, wohin der Graph an den Rändern läuft.</td></tr>
+        <tr><td class="rname">Globalverlauf</td><td class="rform">Grad gerade oder ungerade?</td><td class="rtext"><strong>Ungerader Grad:</strong> Die Enden laufen in verschiedene Richtungen (links unten → rechts oben). Deshalb gibt es immer mindestens eine Nullstelle. <strong>Gerader Grad:</strong> Beide Enden laufen in dieselbe Richtung — es kann gar keine Nullstelle geben. Ein negativer Leitkoeffizient spiegelt alles an der x-Achse.</td></tr>
+        <tr><td class="rname">Symmetrie am Exponenten ablesen</td><td class="rform">nur gerade / nur ungerade</td><td class="rtext">Kommen <strong>nur gerade</strong> Exponenten vor (x⁴, x², absolutes Glied), ist der Graph achsensymmetrisch zur y-Achse. Kommen <strong>nur ungerade</strong> vor (x³, x), ist er punktsymmetrisch zum Ursprung. Gemischt: keine dieser beiden Symmetrien.</td></tr>
+        <tr><td class="rname">Vielfachheit einer Nullstelle</td><td class="rform">wie oft steckt (x − x₀) drin?</td><td class="rtext">In f(x) = (x − 2)²(x + 1) hat die 2 die Vielfachheit 2, die −1 die Vielfachheit 1.</td></tr>
+        <tr><td class="rname">Was die Vielfachheit bewirkt</td><td class="rform">gerade → berühren · ungerade → schneiden</td><td class="rtext"><strong>Gerade Vielfachheit</strong> (2, 4, …): Der Graph <strong>berührt</strong> die x-Achse und kehrt um — kein Vorzeichenwechsel. <strong>Ungerade Vielfachheit</strong> (1, 3, …): Der Graph <strong>schneidet</strong> die Achse, das Vorzeichen wechselt. Bei Vielfachheit 3 flacht er dabei sichtbar ab (Sattelpunkt).</td></tr>
+        <tr><td class="rname">Nullstellen — Weg 1: Ausklammern</td><td class="rform">wenn kein absolutes Glied da ist</td><td class="rtext">x³ − 4x = x(x² − 4). Dann der Satz vom Nullprodukt: x = 0 oder x² = 4. <strong>Immer zuerst prüfen, ob sich x ausklammern lässt</strong> — das spart die Formel.</td></tr>
+        <tr><td class="rname">Nullstellen — Weg 2: Substitution</td><td class="rform">wenn nur gerade Exponenten</td><td class="rtext">x⁴ − 5x² + 4 = 0 wird mit u = x² zu u² − 5u + 4 = 0. Erst u bestimmen (u = 1, u = 4), dann <strong>zurücksubstituieren</strong>: x² = 1 → x = ±1, x² = 4 → x = ±2. Das Rücksubstituieren wird am häufigsten vergessen.</td></tr>
+        <tr><td class="rname">Nullstellen — Weg 3: Polynomdivision</td><td class="rform">wenn beides nicht geht</td><td class="rtext">Eine Nullstelle raten — dafür die Teiler des absoluten Glieds durchprobieren (bei … + 6 also ±1, ±2, ±3, ±6). Dann durch (x − x₀) teilen; der Rest hat einen Grad weniger und ist oft mit der kleinen Lösungsformel lösbar.</td></tr>
+        <tr><td class="rname">Faktorisierte Form</td><td class="rform">f(x) = a(x − x₁)(x − x₂)…</td><td class="rtext">Steht die Funktion als Produkt da, lassen sich alle Nullstellen direkt ablesen. Deshalb ist Faktorisieren immer das Ziel.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Zum Nachschlagen: Wurzelfunktionen <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: Wurzeln und ihr Definitionsbereich</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">Definitionsbereich</td><td class="rform">Radikand ≥ 0</td><td class="rtext">Unter der Wurzel darf nichts Negatives stehen. Bei <span class="wurzel">√<span class="rad">2x − 4</span></span> also 2x − 4 ≥ 0, also x ≥ 2. <strong>Immer zuerst bestimmen</strong> — sonst rechnet man mit Lösungen, die gar nicht erlaubt sind.</td></tr>
+        <tr><td class="rname">Wertebereich</td><td class="rform">y ≥ 0</td><td class="rtext">Die Wurzel liefert nie einen negativen Wert. <span class="wurzel">√<span class="rad">9</span></span> ist 3, nicht ±3 — das Vorzeichen kommt erst ins Spiel, wenn man eine <em>Gleichung</em> x² = 9 löst.</td></tr>
+        <tr><td class="rname">Wurzel als Potenz</td><td class="rform"><span class="wurzel">√<span class="rad">x</span></span> = x^(<span class="bruch"><span class="z">1</span><span class="n">2</span></span>), ⁿ<span class="wurzel">√<span class="rad">x</span></span> = x^(<span class="bruch"><span class="z">1</span><span class="n">n</span></span>)</td><td class="rtext">So gelten alle Potenzgesetze auch für Wurzeln — und später lässt sich damit ganz normal ableiten.</td></tr>
+        <tr><td class="rname">Verlauf</td><td class="rform">steigend, immer langsamer</td><td class="rtext">Der Graph startet im Ursprung, steigt zuerst steil und wird dann immer flacher. Er ist die an y = x gespiegelte rechte Hälfte der Normalparabel.</td></tr>
+        <tr><td class="rname">Wurzelgleichung lösen</td><td class="rform">isolieren → quadrieren → Probe</td><td class="rtext">Die Wurzel allein auf eine Seite bringen, dann beide Seiten quadrieren. <strong>Quadrieren ist keine Äquivalenzumformung</strong> — es können Lösungen dazukommen, die gar keine sind.</td></tr>
+        <tr><td class="rname">Scheinlösung</td><td class="rform">Probe ist Pflicht</td><td class="rtext">Aus x = −2 wird durch Quadrieren x² = 4 — und daraus auch x = +2. So entstehen Lösungen, die die <em>ursprüngliche</em> Gleichung nicht erfüllen. Deshalb jede Lösung am Ende einsetzen und prüfen.</td></tr>
+        <tr><td class="rname">Vorsicht beim Kürzen</td><td class="rform"><span class="wurzel">√<span class="rad">x²</span></span> = |x|</td><td class="rtext">Nicht x, sondern der Betrag: Für x = −3 ist <span class="wurzel">√<span class="rad">(−3)²</span></span> = <span class="wurzel">√<span class="rad">9</span></span> = 3, nicht −3.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+</section>
+
+</main>
+<div class="beamer-hinweis">B = Beamer · ◀ ▶ = Navigation · L = Lösungen</div>
+
+<script id="gen-lib">
+"use strict";
+function mulberry(seed){
+  var t = seed >>> 0;
+  return function(){
+    t = (t + 0x6D2B79F5) >>> 0;
+    var r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ganz(rnd, von, bis){ return von + Math.floor(rnd() * (bis - von + 1)); }
+
+function polyFak(r, m){
+  var basis = (r === 0) ? "x" : "(x " + (r > 0 ? "− " + r : "+ " + (-r)) + ")";
+  return (m === 1) ? basis : basis + "^" + m;
+}
+function polyTerm(s, liste){
+  var vorn = (s === 1) ? "" : (s === -1 ? "−" : s + "·");
+  var teile = [];
+  for (var i = 0; i < liste.length; i++) teile.push(polyFak(liste[i][0], liste[i][1]));
+  return vorn + teile.join("·");
+}
+function polyWert(s, liste, x){
+  var w = s;
+  for (var i = 0; i < liste.length; i++) w = w * Math.pow(x - liste[i][0], liste[i][1]);
+  return w;
+}
+function polyKlam(z){ return z < 0 ? "(" + z + ")" : String(z); }
+function polyMake(seed, level){
+  var rnd = mulberry(seed * 4 + level + 300);
+  var r1 = ganz(rnd, -4, 1);
+  var r2 = r1 + ganz(rnd, 2, 3);
+  var r3 = r2 + ganz(rnd, 1, 3);
+  var einfach = [[r1, 1], [r2, 1], [r3, 1]];
+  var mitDoppel = [[r1, 1], [r2, 2]];
+  var wahlS = [-2, -1, 2];
+  var text, schritte;
+  var basis = { typ: "polyProdukt", seed: seed, level: level, r1: r1, r2: r2, r3: r3, doppelt: null, s: 1 };
+  function fertig(v, felder){
+    basis.variante = v; basis.text = text; basis.schritte = schritte;
+    for (var k in felder) basis[k] = felder[k];
+    if (!basis.ergebnis) basis.ergebnis = {};
+    return basis;
+  }
+  if (level === 1){
+    var v1 = ganz(rnd, 0, 2);
+    if (v1 === 0){
+      text = "Gegeben ist f(x) = " + polyTerm(1, einfach) + ". Geben Sie alle Nullstellen von f an und begruenden Sie, warum der Graph die x-Achse an jeder dieser Stellen schneidet.";
+      schritte = [
+        "Ein Produkt ist genau dann 0, wenn ein Faktor 0 ist: x = " + r1 + ", x = " + r2 + ", x = " + r3,
+        "alle drei Faktoren sind einfach → an jeder Nullstelle wechselt f das Vorzeichen → der Graph schneidet"
+      ];
+      return fertig(0, { ergebnis: { nullstellen: [r1, r2, r3], leit: 1, grad: 3 } });
+    }
+    if (v1 === 1){
+      var p = r3 + 1, w = polyWert(1, einfach, p);
+      text = "Gegeben ist f(x) = " + polyTerm(1, einfach) + ". Berechnen Sie f(" + p + ") ohne den Term auszumultiplizieren.";
+      schritte = [
+        "f(" + p + ") = (" + p + " − " + polyKlam(r1) + ")·(" + p + " − " + polyKlam(r2) + ")·(" + p + " − " + polyKlam(r3) + ")",
+        "= " + (p - r1) + "·" + (p - r2) + "·" + (p - r3) + " = " + w
+      ];
+      return fertig(1, { ergebnis: { nullstellen: [r1, r2, r3], leit: 1, grad: 3, punkt: [p, w] } });
+    }
+    text = "Eine ganzrationale Funktion f vom Grad 3 hat genau die einfachen Nullstellen " + r1 + ", " + r2 + " und " + r3 + "; der Leitkoeffizient ist 1. Geben Sie einen Funktionsterm von f in Produktform an.";
+    schritte = [
+      "zu jeder einfachen Nullstelle r gehoert der Linearfaktor (x − r)",
+      "f(x) = " + polyTerm(1, einfach)
+    ];
+    return fertig(2, { ergebnis: { nullstellen: [r1, r2, r3], leit: 1, grad: 3 } });
+  }
+  if (level === 2){
+    var v2 = ganz(rnd, 0, 2);
+    if (v2 === 0){
+      text = "Gegeben ist f(x) = " + polyTerm(1, mitDoppel) + ". Geben Sie die Nullstellen mit ihrer Vielfachheit an und entscheiden Sie jeweils, ob der Graph die x-Achse dort beruehrt oder schneidet.";
+      schritte = [
+        "Nullstellen: x = " + r1 + " (einfach) und x = " + r2 + " (doppelt)",
+        "einfacher Faktor → Vorzeichenwechsel → bei " + r1 + " schneiden",
+        "quadratischer Faktor → kein Vorzeichenwechsel → bei " + r2 + " beruehren"
+      ];
+      return fertig(0, { doppelt: r2, ergebnis: { nullstellen: [r1, r2], leit: 1, grad: 3 } });
+    }
+    if (v2 === 1){
+      var wl = polyWert(1, mitDoppel, r2 - 1), wr = polyWert(1, mitDoppel, r2 + 1);
+      text = "Ein Schueler behauptet: \"Der Graph von f(x) = " + polyTerm(1, mitDoppel) + " schneidet die x-Achse an beiden Nullstellen.\" Pruefen Sie die Aussage mit einer Vorzeichenbetrachtung um x = " + r2 + " und korrigieren Sie sie gegebenenfalls.";
+      schritte = [
+        "f(" + (r2 - 1) + ") = " + wl + " und f(" + (r2 + 1) + ") = " + wr + " — beide Werte sind positiv",
+        "kein Vorzeichenwechsel bei x = " + r2 + ": die Aussage ist falsch, der Graph beruehrt dort nur",
+        "richtig: bei x = " + r1 + " (einfach) schneiden, bei x = " + r2 + " (doppelt) beruehren"
+      ];
+      return fertig(1, { doppelt: r2, ergebnis: { nullstellen: [r1, r2], leit: 1, grad: 3, beruehrt: r2, links: wl, rechts: wr } });
+    }
+    text = "Eine ganzrationale Funktion f vom Grad 3 mit Leitkoeffizient 1 beruehrt die x-Achse bei x = " + r2 + " und schneidet sie bei x = " + r1 + ". Geben Sie einen Funktionsterm von f in Produktform an und begruenden Sie die Exponenten.";
+    schritte = [
+      "beruehren → gerade Vielfachheit, bei Grad 3 also doppelt: Faktor " + polyFak(r2, 2),
+      "schneiden → ungerade Vielfachheit, hier einfach: Faktor " + polyFak(r1, 1),
+      "f(x) = " + polyTerm(1, mitDoppel) + " (Grad 1 + 2 = 3)"
+    ];
+    return fertig(2, { doppelt: r2, ergebnis: { nullstellen: [r1, r2], leit: 1, grad: 3 } });
+  }
+  var s = wahlS[ganz(rnd, 0, 2)];
+  if (level === 3){
+    var v3 = ganz(rnd, 0, 2);
+    if (v3 === 0){
+      text = "Gegeben ist f(x) = " + polyTerm(s, einfach) + ". Geben Sie die Nullstellen an und beschreiben Sie den Globalverlauf des Graphen.";
+      schritte = [
+        "Nullstellen: x = " + r1 + ", x = " + r2 + ", x = " + r3 + " (alle einfach)",
+        "Grad 3 (ungerade), Leitkoeffizient " + s + " " + (s > 0 ? "> 0" : "< 0"),
+        s > 0 ? "Globalverlauf: von links unten nach rechts oben" : "Globalverlauf: von links oben nach rechts unten"
+      ];
+      return fertig(0, { s: s, ergebnis: { nullstellen: [r1, r2, r3], leit: s, grad: 3 } });
+    }
+    if (v3 === 1){
+      var betrag = [1, 2, 3][ganz(rnd, 0, 2)];
+      var s2 = (s > 0) ? -betrag : betrag;
+      text = "Gegeben sind f(x) = " + polyTerm(s, einfach) + " und g(x) = " + polyTerm(s2, einfach) + ". Entscheiden Sie ohne Rechnung, welcher der beiden Graphen fuer sehr kleine x-Werte oberhalb der x-Achse verlaeuft (also \"von links oben\" kommt), und begruenden Sie.";
+      schritte = [
+        "fuer x gegen −unendlich sind alle drei Faktoren negativ, ihr Produkt also negativ",
+        "das Vorzeichen von f bzw. g ist dort somit dem des Leitkoeffizienten entgegengesetzt",
+        "Leitkoeffizienten " + s + " und " + s2 + " → " + (s < 0 ? "f" : "g") + " kommt von links oben"
+      ];
+      return fertig(1, { s: s, s2: s2, ergebnis: { nullstellen: [r1, r2, r3], leit: s, grad: 3, linksOben: (s < 0 ? "f" : "g") } });
+    }
+    var pv = r3 + 1, wv = polyWert(s, einfach, pv), qv = polyWert(1, einfach, pv);
+    text = "Eine ganzrationale Funktion f vom Grad 3 hat genau die einfachen Nullstellen " + r1 + ", " + r2 + " und " + r3 + "; ausserdem gilt f(" + pv + ") = " + wv + ". Bestimmen Sie den Leitkoeffizienten von f und geben Sie f in Produktform an.";
+    schritte = [
+      "Ansatz: f(x) = a·" + polyTerm(1, einfach),
+      "Punktprobe: " + wv + " = a·" + (pv - r1) + "·" + (pv - r2) + "·" + (pv - r3) + " = a·" + qv,
+      "a = " + wv + " : " + qv + " = " + s + " → f(x) = " + polyTerm(s, einfach)
+    ];
+    return fertig(2, { s: s, ergebnis: { nullstellen: [r1, r2, r3], leit: s, grad: 3, punkt: [pv, wv] } });
+  }
+  var v4 = ganz(rnd, 0, 2);
+  if (v4 === 0){
+    text = "Eine ganzrationale Funktion f vom Grad 3 hat die einfache Nullstelle " + r1 + " und die doppelte Nullstelle " + r2 + "; der Leitkoeffizient ist " + s + ". Geben Sie einen Funktionsterm von f in Produktform an.";
+    schritte = [
+      "je Nullstelle ein Linearfaktor, die Vielfachheit wird zum Exponenten",
+      "Leitkoeffizient " + s + " als Vorfaktor: f(x) = " + polyTerm(s, mitDoppel)
+    ];
+    return fertig(0, { s: s, doppelt: r2, ergebnis: { nullstellen: [r1, r2], leit: s, grad: 3 } });
+  }
+  if (v4 === 1){
+    var p4 = r2 + 1, w4 = polyWert(s, mitDoppel, p4), q4 = polyWert(1, mitDoppel, p4);
+    text = "Eine ganzrationale Funktion f vom Grad 3 beruehrt die x-Achse bei x = " + r2 + ", schneidet sie bei x = " + r1 + " und es gilt f(" + p4 + ") = " + w4 + ". Bestimmen Sie den Leitkoeffizienten und geben Sie f in Produktform an.";
+    schritte = [
+      "Ansatz aus Beruehren/Schneiden: f(x) = a·" + polyTerm(1, mitDoppel),
+      "Punktprobe: " + w4 + " = a·" + (p4 - r1) + "·" + (p4 - r2) + "^2 = a·" + q4,
+      "a = " + w4 + " : " + q4 + " = " + s + " → f(x) = " + polyTerm(s, mitDoppel)
+    ];
+    return fertig(1, { s: s, doppelt: r2, ergebnis: { nullstellen: [r1, r2], leit: s, grad: 3, punkt: [p4, w4] } });
+  }
+  var sn = [-1, -2][ganz(rnd, 0, 1)];
+  text = "Beurteilen Sie: Kann es eine ganzrationale Funktion vom Grad 3 geben, deren Graph die x-Achse bei x = " + r2 + " beruehrt, bei x = " + r1 + " schneidet und fuer x gegen +unendlich nach unten faellt? Begruenden Sie und geben Sie gegebenenfalls einen passenden Term an.";
+  schritte = [
+    "Beruehren bei " + r2 + " (doppelt) und Schneiden bei " + r1 + " (einfach) ergeben zusammen genau Grad 3",
+    "\"nach rechts unten\" verlangt einen negativen Leitkoeffizienten — das ist frei waehlbar",
+    "ja, moeglich, z. B. f(x) = " + polyTerm(sn, mitDoppel)
+  ];
+  return fertig(2, { s: sn, doppelt: r2, ergebnis: { nullstellen: [r1, r2], leit: sn, grad: 3, moeglich: true } });
+}
+function polyVerify(t){
+  if (!t.schritte || t.schritte.length < 2) return "Loesungsweg unvollstaendig";
+  for (var i = 0; i < t.schritte.length; i++){
+    if (typeof t.schritte[i] !== "string" || /undefined|NaN|Infinity/.test(t.schritte[i])) return "Schritt defekt";
+  }
+  if (typeof t.text !== "string" || /undefined|NaN|Infinity/.test(t.text)) return "Text defekt";
+  if (t.s === 0) return "Leitkoeffizient 0";
+  if ([t.s, t.r1, t.r2, t.r3].some(function(z){ return typeof z !== "number" || z !== Math.round(z) || Math.abs(z) > 12; })) return "Parameter unsauber";
+  if (!(t.r1 < t.r2 && t.r2 < t.r3)) return "Nullstellen nicht getrennt";
+  function f(x){
+    var w = t.s * (x - t.r1) * (x - t.r2);
+    return w * ((t.doppelt !== null) ? (x - t.r2) : (x - t.r3));
+  }
+  var ns = t.ergebnis.nullstellen;
+  if (!ns || ns.length < 2) return "Nullstellen fehlen";
+  for (var j = 0; j < ns.length; j++){
+    if (f(ns[j]) !== 0) return "Nullstellenprobe verletzt";
+  }
+  if (t.ergebnis.grad !== 3) return "Grad falsch";
+  if (t.doppelt !== null){
+    if (t.doppelt !== t.r2) return "doppelte Nullstelle inkonsistent";
+    if (t.r2 - 1 <= t.r1) return "Nachbarstelle trifft andere Nullstelle";
+    if (f(t.r2 - 1) * f(t.r2 + 1) < 0) return "doppelte Nullstelle wechselt Vorzeichen";
+    if (ns.length !== 2) return "Nullstellenzahl falsch";
+  } else if (ns.length !== 3) return "Nullstellenzahl falsch";
+  if ((f(1000) > 0 ? 1 : -1) !== (t.s > 0 ? 1 : -1)) return "Globalverlauf inkonsistent";
+  if (t.ergebnis.leit !== t.s) return "Leitkoeffizient falsch";
+  if (t.ergebnis.punkt){
+    if (f(t.ergebnis.punkt[0]) !== t.ergebnis.punkt[1]) return "Punktprobe verletzt";
+    if (t.ergebnis.punkt[1] === 0) return "Punkt liegt auf der x-Achse";
+    for (var k = 0; k < ns.length; k++){
+      if (t.ergebnis.punkt[0] === ns[k]) return "Punkt liegt auf Nullstelle";
+    }
+  }
+  if (t.level === 2 && t.variante === 1){
+    if (t.ergebnis.beruehrt !== t.r2) return "Beruehrstelle falsch";
+    if (t.ergebnis.links !== f(t.r2 - 1) || t.ergebnis.rechts !== f(t.r2 + 1)) return "Vorzeichenprobe falsch";
+    if (t.ergebnis.links * t.ergebnis.rechts <= 0) return "Fehlersuche ohne Beruehrung";
+  }
+  if (t.level === 3 && t.variante === 1){
+    if (typeof t.s2 !== "number" || t.s * t.s2 >= 0) return "Vergleich uneindeutig";
+    if (t.ergebnis.linksOben !== (t.s < 0 ? "f" : "g")) return "Vergleich falsch";
+  }
+  if (t.level === 4 && t.variante === 2){
+    if (t.ergebnis.moeglich !== true) return "Beurteilung falsch";
+    if (t.s >= 0) return "Globalverlauf passt nicht zur Beurteilung";
+    if (t.doppelt === null) return "Beruehrung fehlt";
+  }
+  return null;
+}
+var GENERATORS = { polyProdukt: { make: polyMake, verify: polyVerify } };
+
+</script>
+
+<script>
+
+"use strict";
+(function(){
+  var alleOffen = false;
+  document.querySelectorAll("[data-loesung]").forEach(function(knopf){
+    knopf.addEventListener("click", function(){
+      var ziel = document.getElementById(knopf.getAttribute("data-loesung"));
+      if (ziel) ziel.classList.toggle("offen");
+    });
+  });
+  function alleLoesungen(){
+    alleOffen = !alleOffen;
+    document.querySelectorAll(".loesung").forEach(function(el){ el.classList.toggle("offen", alleOffen); });
+  }
+  document.getElementById("alleLoesungenKnopf").addEventListener("click", alleLoesungen);
+
+  var HOCH = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+               "-":"⁻","−":"⁻","+":"⁺","(":"⁽",")":"⁾",".":"˙",",":"˙",
+               "x":"ˣ","n":"ⁿ","k":"ᵏ","a":"ᵃ","b":"ᵇ","i":"ⁱ","j":"ʲ","m":"ᵐ","t":"ᵗ","u":"ᵘ",
+               "h":"ʰ","p":"ᵖ","r":"ʳ","s":"ˢ","v":"ᵛ","w":"ʷ","y":"ʸ","z":"ᶻ",
+               "c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ","l":"ˡ","o":"ᵒ"," ":" ",
+               // schon hochgestellte Zeichen bleiben, wie sie sind: e^(x²) -> eˣ²
+               "⁰":"⁰","¹":"¹","²":"²","³":"³","⁴":"⁴","⁵":"⁵","⁶":"⁶","⁷":"⁷","⁸":"⁸","⁹":"⁹",
+               "⁻":"⁻","⁺":"⁺" };
+  // Tiefgestellte Zeichen fuer Scharen und indizierte Groessen: f_a wird zu fₐ,
+  // x_1 zu x₁. Unicode kennt nur diese Buchstaben tiefgestellt - fehlt einer,
+  // bleibt der Term unveraendert stehen (lieber f_b als ein halb gesetztes fᵇ).
+  var TIEF = { "a":"ₐ","e":"ₑ","h":"ₕ","i":"ᵢ","j":"ⱼ","k":"ₖ",
+               "l":"ₗ","m":"ₘ","n":"ₙ","o":"ₒ","p":"ₚ","r":"ᵣ",
+               "s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","x":"ₓ",
+               "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄",
+               "5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" };
+  function tief(z){
+    var aus = "";
+    for (var i = 0; i < z.length; i++){
+      if (!TIEF[z[i]]) return null;
+      aus += TIEF[z[i]];
+    }
+    return aus;
+  }
+  // Vorzeichen- und Faktornormalisierung. Hier stehen nur Umformungen, die IMMER
+  // richtig sind, unabhaengig vom Kontext - "x − -4" heisst auch in einem zitierten
+  // Schuelerfehler "x + 4". Kontextabhaengiges (1x, + 0) gehoert in die Generatoren.
+  function termNormal(s){
+    var t = String(s), vorher;
+    do {
+      vorher = t;
+      t = t
+        // Vorzeichenketten: "− -4" -> "+ 4", "+ -4" -> "− 4"
+        .replace(/([−-])\s*[−-]\s*(?=[\dxa-z(])/g, "+ ")
+        .replace(/\+\s*[−-]\s*(?=[\dxa-z(])/g, "− ")
+        // nur nach Variablen/Klammern kuerzen: x^1 -> x, aber 2^1 · 2^x bleibt
+        .replace(/([a-zA-Z)])(?:\^1(?![\d,.])|\^\(1\))/g, "$1")
+        .replace(/\s*\/\s*1(?![\d,.])/g, "")
+        .replace(/(^|[^0-9a-zA-Z.,])1\s*[·*]\s*(?=[a-z(])/g, "$1")
+        .replace(/(^|[^0-9a-zA-Z.,])1(?=[a-z])/g, "$1")
+        .replace(/\s*[·*]\s*1(?![\d,.])/g, "")
+        .replace(/\(\s*([a-z])\s*[+−-]\s*0\s*\)/g, "$1")
+        // "+ 0" nur nach einem Term mit Variable streichen. Kein Wort davor
+        // ("wird + 0 −"), keine Hochzahl danach ("p − 0²" ist ein eingesetzter
+        // Wert) und kein Vorzeichen danach (Monotoniefolge "+ 0 −").
+        .replace(/(^|[^a-zA-Z])([a-z][0-9²³]*)\s*[+−-]\s*0(?![\d,.²³⁰¹⁴-⁹^])(?!\s*[+−-])/g, "$1$2");
+    } while (t !== vorher);
+    return t.replace(/[ 	]{2,}/g, " ");
+  }
+  // Setzt einen Exponenten hoch - aber nur, wenn JEDES Zeichen ein Hochzeichen hat.
+  // Sonst bliebe eine Mischung wie "2ˣ⁺?" stehen, die schlechter lesbar ist als 2^(x + ?).
+  function hoch(z){
+    // Das Malzeichen entfaellt im Exponenten: e^(a·x) wird zu eᵃˣ - so schreibt man es
+    // auch von Hand, und ein hochgestellter Malpunkt ist typografisch nicht vorgesehen.
+    // innere Exponenten zuerst aufloesen, sonst scheitert e^(x^2) am "^" im Inneren
+    var t = z.replace(/\^(-?\d+)/g, function(_, d){
+              return d.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+             .replace(/([0-9a-z])\s*[·*]\s*(?=[0-9a-z])/g, "$1");
+    var aus = "";
+    for (var i = 0; i < t.length; i++){
+      if (!HOCH[t[i]]) return null;
+      aus += HOCH[t[i]];
+    }
+    return aus;
+  }
+  function schoenMathe(s){
+    return termNormal(String(s))
+      // geklammerte Exponenten zuerst: 2^(x−1) -> 2ˣ⁻¹, e^(2x) -> e²ˣ
+      .replace(/\^\(([^()]{1,12})\)/g, function(ganz, z){
+        var h = hoch(z);
+        if (h === null) return ganz;
+        // Zusammengesetzte Exponenten bekommen hochgestellte Klammern: sonst liest sich
+        // 2^(x-1) als 2 hoch x hoch -1. Ein blosses Vorzeichen (e^(-x)) ist eindeutig.
+        return /[^-−+].*[-−+]/.test(z) ? "⁽" + h + "⁾" : h;
+      })
+      .replace(/\^(-?\d+)/g, function(_, z){ return z.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+      .replace(/\^([a-z])(?![a-zA-Z0-9])/g, function(ganz, z){ return HOCH[z] || ganz; })
+      .replace(/(\d)\.(\d)/g, "$1,$2");
+  }
+  function maskiere(s){
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  // Was schoenMathe() nicht in Unicode setzen konnte, wird hier echtes <sup>/<sub>:
+  // x^(1/2), e^(v(x)), Integralgrenzen ∫0^√a, und Indizes mit beliebigem Buchstaben.
+  // Dateinamen, Pfade und Adressen sind keine Formeln - dort bedeutet "_" nichts.
+  function istKeineFormel(s){
+    return /\.(?:md|html|py|json|txt)\b|:\/\//.test(s);
+  }
+  function markup(s){
+    if (istKeineFormel(s)) { return maskiere(s); }
+    return maskiere(s)
+      // Exponent mit eigener Klammer zuerst: e^(v(x)), 2^(f(x) + 1)
+      .replace(/\^\(((?:[^()]|\([^()]*\)){1,28})\)/g, "<sup>$1</sup>")
+      .replace(/\^([A-Za-z0-9,.√−α-ωΑ-Ω+-]+)/g, "<sup>$1</sup>")
+      .replace(/([A-Za-z])_\(([^()]{1,24})\)/g, "$1<sub>$2</sub>")
+      .replace(/([A-Za-z])_([A-Za-z0-9]+)/g, "$1<sub>$2</sub>");
+  }
+  // Notation vereinheitlichen: Hochzahlen auch im statischen Folientext (x^2 -> x2 hoch)
+  (function hochAlles(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var knoten = [];
+    while (walker.nextNode()){
+      var t = walker.currentNode, el = t.parentNode;
+      if (el && el.tagName !== "SCRIPT" && el.tagName !== "STYLE" &&
+          (t.nodeValue.indexOf("^") >= 0 || t.nodeValue.indexOf("_") >= 0)) knoten.push(t);
+    }
+    knoten.forEach(function(t){
+      var neu = schoenMathe(t.nodeValue);
+      var mk = markup(neu);
+      if (mk === maskiere(neu)) { t.nodeValue = neu; return; }
+      // Echtes Markup noetig: den Textknoten durch ein <span> ersetzen.
+      var sp = document.createElement("span");
+      sp.innerHTML = mk;
+      if (t.parentNode) { t.parentNode.replaceChild(sp, t); }
+    });
+  })();
+
+  function bindeCheck(feldId, knopfId, ausgabeId, pruefer){
+    var feld = document.getElementById(feldId), knopf = document.getElementById(knopfId),
+        ausgabe = document.getElementById(ausgabeId);
+    if (!feld || !knopf || !ausgabe) return;
+    function lauf(){
+      var r = pruefer((feld.value || "").trim().replace(",", "."));
+      ausgabe.textContent = schoenMathe(r.text); ausgabe.className = "feedback " + (r.ok ? "ok" : "no");
+    }
+    knopf.addEventListener("click", lauf);
+    feld.addEventListener("keydown", function(ev){ if (ev.key === "Enter") lauf(); });
+  }
+
+  // ---- Umschalten zwischen Einstiegs-Varianten ----
+  document.querySelectorAll(".vwahl").forEach(function(w){
+    w.addEventListener("click", function(ev){
+      var k = ev.target.closest(".vknopf"); if (!k) { return; }
+      var sec = w.closest("section") || document;
+      w.querySelectorAll(".vknopf").forEach(function(b){ b.classList.toggle("aktiv", b === k); });
+      var ziel = parseInt(k.getAttribute("data-ziel"), 10);
+      sec.querySelectorAll(".variante").forEach(function(v, j){ v.classList.toggle("aktiv", j === ziel); });
+    });
+  });
+
+  bindeCheck("b03a1antwort", "b03a1pruefen", "b03a1feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 2) return { ok: true, text: "Stimmt: 0 (doppelt) und 3 (einfach) - zwei verschiedene." };
+    return { ok: false, text: "Noch nicht — klammere x^2 aus: x^2 (x - 3)." };
+  });
+  bindeCheck("b03a2antwort", "b03a2pruefen", "b03a2feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 5) return { ok: true, text: "Stimmt: der hoechste Exponent ist 5. Jetzt der Leitkoeffizient." };
+    return { ok: false, text: "Noch nicht — der Grad ist der hoechste vorkommende Exponent." };
+  });
+  bindeCheck("b03a5antwort", "b03a5pruefen", "b03a5feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === -2) return { ok: true, text: "Stimmt: (x + 2)^2 liefert die doppelte Nullstelle -2." };
+    return { ok: false, text: "Noch nicht — welcher Faktor steht im Quadrat?" };
+  });
+  bindeCheck("b03a8antwort", "b03a8pruefen", "b03a8feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 3) return { ok: true, text: "Stimmt: die Nullstellen sind 0, a und -a, fuer a = 3 also -3, 0, 3." };
+    return { ok: false, text: "Noch nicht — klammere x aus: x(x^2 - a^2)." };
+  });
+  bindeCheck("b03a11antwort", "b03a11pruefen", "b03a11feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 2) return { ok: true, text: "Stimmt: aus u = 4 folgt x = 2. Vergiss die drei anderen nicht." };
+    return { ok: false, text: "Noch nicht — substituiere u = x^2 und substituiere danach zurueck." };
+  });
+
+
+  var genZaehler = 1, letzteAufgabe = null;
+  var genWahl = document.getElementById("genStufe");
+  var genTypWahl = document.getElementById("genTyp");
+  // Trainingsbloecke buendeln mehrere Generatoren und bieten eine Typenwahl an.
+  // Fehlt das Auswahlfeld (alle Lernbloecke), bleibt es beim einzigen Generator.
+  function genName(){
+    if (genTypWahl && genTypWahl.value && GENERATORS[genTypWahl.value]) return genTypWahl.value;
+    return Object.keys(GENERATORS)[0];
+  }
+  function genNeu(){
+    var stufe = Number(genWahl.value);
+    var g = GENERATORS[genName()];
+    // verify ist der Qualitaetswaechter: eine beanstandete Aufgabe wird verworfen
+    // und neu gewuerfelt (Gate A fuzzt dieselbe Pruefung offline).
+    var versuch = 0;
+    do {
+      letzteAufgabe = g.make(Date.now() % 100000 + genZaehler++, stufe);
+      versuch++;
+    } while (versuch < 20 && g.verify(letzteAufgabe));
+    document.getElementById("genAusgabe").textContent = schoenMathe(letzteAufgabe.text);
+    var feld = document.getElementById("genLoesungFeld");
+    feld.classList.remove("offen");
+    feld.innerHTML = "<ol><li>" + letzteAufgabe.schritte.map(schoenMathe).join("</li><li>") + "</li></ol>";
+  }
+  if (document.getElementById("genNeu")){
+    document.getElementById("genNeu").addEventListener("click", genNeu);
+    document.getElementById("genLoesung").addEventListener("click", function(){
+      if (letzteAufgabe) document.getElementById("genLoesungFeld").classList.toggle("offen");
+    });
+  }
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll("section.slide"));
+  var slideIdx = 0;
+  function zeigeSlide(i){
+    slideIdx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, j){ s.classList.toggle("aktiv", j === slideIdx); });
+  }
+  function beamerUmschalten(){
+    document.body.classList.toggle("beamer");
+    if (document.body.classList.contains("beamer")) zeigeSlide(slideIdx);
+    else slides.forEach(function(s){ s.classList.add("aktiv"); });
+  }
+  document.getElementById("beamerKnopf").addEventListener("click", beamerUmschalten);
+  document.addEventListener("keydown", function(ev){
+    if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA" || ev.target.tagName === "SELECT")) return;
+    var k = ev.key.toLowerCase();
+    if (k === "b") beamerUmschalten();
+    else if (k === "l") alleLoesungen();
+    else if (document.body.classList.contains("beamer")){
+      if (ev.key === "ArrowRight" || ev.key === "PageDown") zeigeSlide(slideIdx + 1);
+      if (ev.key === "ArrowLeft" || ev.key === "PageUp") zeigeSlide(slideIdx - 1);
+    }
+  });
+  slides.forEach(function(s){ s.classList.add("aktiv"); });
+})();
+
+</script>
+</body>
+</html>

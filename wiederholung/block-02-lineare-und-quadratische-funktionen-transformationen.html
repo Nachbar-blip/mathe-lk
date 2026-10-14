@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block 02 · Lineare und quadratische Funktionen, Transformationen</title>
+<!--
+  analysis-lk Block 02 (Mathematik LK, eA). MasterMind-Aufbau, neutrales Design.
+  Single-File, keine externen Abhaengigkeiten, ASCII-only JS-Bezeichner, kein Browser-Storage.
+  Tasten: B Beamer, Pfeile Abschnitt (Beamer), L alle Loesungen.
+  Erzeugt aus _skelett.py - Aenderungen am Rahmen dort vornehmen, Inhalt in _inhalt_bXX.py.
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --accent-soft:#eaf1f7; --ok:#2e7d5a; --warn:#b06a2e;
+    --maxw:920px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  main{max-width:var(--maxw);margin:0 auto;padding:28px 18px 64px;}
+  h1{font-size:1.5rem;margin:.2em 0 .1em}
+  h2{font-size:1.2rem;margin:1.5em 0 .4em;border-bottom:2px solid var(--line);padding-bottom:.2em}
+  p{margin:.5em 0}
+  .lead{color:var(--muted)}
+  .formel{white-space:nowrap}
+  sub,sup{font-size:.72em;line-height:0}
+  .spvek{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.08;font-size:.94em;padding:0 .12em;margin:0 .1em;position:relative}
+  .spvek::before,.spvek::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;
+    border:1.5px solid currentColor}
+  .spvek::before{left:-.22em;border-right:none;border-radius:.5em 0 0 .5em}
+  .spvek::after{right:-.22em;border-left:none;border-radius:0 .5em .5em 0}
+  .spvek span{display:block;padding:0 .18em}
+  .phase{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:.18em .6em;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid #cfe0ee;margin:.2em .3em .2em 0;}
+  .badge-kern{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .badge-vert{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .bluete{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;overflow:hidden;background:#fff;}
+  .bluete>summary{cursor:pointer;padding:.7em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;}
+  .bluete>summary::-webkit-details-marker{display:none}
+  .lvl{font-size:.74rem;font-weight:600;padding:.1em .5em;border-radius:6px}
+  .lvl.l1{background:#eef6f0;color:var(--ok)}
+  .lvl.l2{background:#eef2f8;color:var(--accent)}
+  .lvl.l3{background:#f7efe6;color:var(--warn)}
+  .bluete[open]>summary{border-bottom:1px solid var(--line)}
+  .bluete .body{padding:.3em .9em .9em}
+  .iqb{margin:.45em 0 0;font-size:.82rem}
+  .iqb>summary{cursor:pointer;color:var(--muted);list-style:none;display:inline-flex;
+    align-items:center;gap:.4em;padding:.12em .6em;border:1px solid var(--line);
+    border-radius:999px;background:#fbfbf9}
+  .iqb>summary::-webkit-details-marker{display:none}
+  .iqb>summary::before{content:"IQB";font-weight:700;font-size:.72rem;letter-spacing:.03em;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:.05em .35em}
+  .iqb>summary:hover{border-color:var(--accent);color:var(--accent)}
+  .iqb .iqb-text{margin:.4em 0 0;padding:.5em .7em;background:#fbfbf9;border-left:3px solid var(--line);
+    border-radius:0 6px 6px 0;color:var(--muted);line-height:1.5}
+  .iqb .iqb-text .iqb-fund{display:block;margin-top:.3em;font-size:.95em;opacity:.85}
+  .hinfuehrung{border:1px solid #ecd9c2;border-left:4px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;
+    background:#fffdf5;padding:.85em 1em;margin:.4em 0 1em}
+  .hinfuehrung h3{margin:0 0 .4em;font-size:1rem;color:var(--warn)}
+  .hinfuehrung p{margin:.35em 0}
+  .hinfuehrung .frage{font-weight:600;font-size:1.02rem}
+  .hinfuehrung .aufloesung{margin-top:.6em;padding-top:.5em;border-top:1px dashed #ecd9c2;
+    font-size:.94rem;color:var(--muted)}
+  table.wertereihe{border-collapse:collapse;margin:.3em 0 .4em;font-size:.9rem;background:#fff}
+  table.wertereihe th,table.wertereihe td{border:1px solid var(--line);padding:.25em .6em;text-align:center}
+  table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .hinfuehrung table.wertereihe{border-collapse:collapse;margin:.5em 0;font-size:.92rem;background:#fff}
+  .hinfuehrung table.wertereihe th,.hinfuehrung table.wertereihe td{border:1px solid var(--line);
+    padding:.3em .7em;text-align:center}
+  .hinfuehrung table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .tafel{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;margin:.8em 0;overflow:hidden}
+  .tafel>h3{margin:0;padding:.6em .9em;background:var(--accent);color:#fff;font-size:1rem}
+  .tafel .tafel-koerper{padding:.85em .9em}
+  .tafel-form{text-align:center;font-size:1.15rem;margin:.2em 0 .9em;padding:.5em;
+    background:var(--accent-soft);border-radius:6px;color:var(--accent);font-weight:600}
+  .tafel-form .zeiger{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:.25em}
+  table.param{border-collapse:collapse;width:100%;margin:.3em 0}
+  table.param th,table.param td{border:1px solid var(--line);padding:.5em .65em;text-align:left;vertical-align:top}
+  table.param thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  table.param .pz{font-weight:700;color:var(--accent);font-size:1.05rem;text-align:center;width:2.4em}
+  table.param .pbsp{font-size:.9rem;color:var(--muted)}
+  table.param .pbsp code{background:#fbfbf9;padding:.05em .3em;border-radius:3px;color:var(--fg)}
+  .tafel-merk{margin:.5em 0 0;padding:.45em .7em;background:#fffdf5;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.93rem}
+  .tafel-merk::before{content:"Merke: ";font-weight:700;color:var(--warn)}
+  ol.schritte{counter-reset:s;list-style:none;padding:0;margin:.4em 0 0}
+  ol.schritte li{counter-increment:s;position:relative;padding:.5em .7em .5em 2.6em;margin:.4em 0;
+    background:#fafaf7;border-radius:6px}
+  ol.schritte li::before{content:counter(s);position:absolute;left:.7em;top:.5em;width:1.5em;height:1.5em;
+    background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:.82rem;font-weight:700}
+  ol.schritte .frage{font-weight:600;display:block}
+  ol.schritte .ergebnis{display:block;margin-top:.25em;font-size:.9rem;color:var(--ok);font-weight:600}
+  table.reihen{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.93rem}
+  table.reihen th,table.reihen td{border:1px solid var(--line);padding:.45em .65em;text-align:left}
+  table.reihen thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .stufe{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;background:#fff;overflow:hidden}
+  .stufe>summary{cursor:pointer;padding:.6em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em;background:#fbfbf9}
+  .stufe>summary::-webkit-details-marker{display:none}
+  .stufe>summary::before{content:"\25b8";color:var(--accent);font-weight:400}
+  .stufe[open]>summary::before{content:"\25be"}
+  .stufe .stufe-koerper{padding:.7em .9em}
+  .tauf{margin:0 0 .9em;padding-bottom:.7em;border-bottom:1px dashed var(--line)}
+  .tauf:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+  .tauf .tfrage{margin:0 0 .4em}
+  .tauf .tfrage strong.nr{color:var(--accent);margin-right:.3em}
+  .ueberblick{border:1px solid #cfe0ee;border-radius:var(--radius);background:#fff;margin:.2em 0 1.1em}
+  .ueberblick>summary{cursor:pointer;padding:.7em .9em;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);list-style:none;border-radius:var(--radius);
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .ueberblick>summary::-webkit-details-marker{display:none}
+  .ueberblick>summary::before{content:"\25b8";font-weight:400;margin-right:.15em}
+  .ueberblick[open]>summary::before{content:"\25be"}
+  .ueberblick[open]>summary{border-radius:var(--radius) var(--radius) 0 0}
+  .ueberblick .ub-zusatz{font-weight:400;font-size:.85rem;color:var(--muted)}
+  .ueberblick .ub-koerper{padding:.8em .9em}
+  .ub-huelle{overflow-x:auto}
+  table.ub{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+  table.ub th,table.ub td{border:1px solid var(--line);padding:.42em .6em;text-align:left;vertical-align:top}
+  table.ub thead th{background:#fbfbf9;font-size:.82rem;color:var(--muted);font-weight:600}
+  table.ub tbody th{white-space:nowrap;font-weight:600}
+  table.ub .ub-bsp{white-space:nowrap;color:var(--accent);font-size:.88rem}
+  .ub-detail{margin:.9em 0 0;padding:.6em .8em;border-left:3px solid var(--line);background:#fafaf7;border-radius:0 6px 6px 0}
+  .ub-detail h4{margin:0 0 .25em;font-size:.93rem;color:var(--accent)}
+  .ub-detail p{margin:.2em 0;font-size:.93rem}
+  .ub-detail .ub-fehler{color:var(--warn)}
+  .ub-detail ol{margin:.3em 0 0;padding-left:1.4em;font-size:.93rem}
+  .ub-detail ol li{margin:.25em 0}
+  .ub-link{margin:.9em 0 0;font-size:.92rem}
+  .ub-link a{color:var(--accent);font-weight:600}
+  .grundtafel table.regeln{border-collapse:collapse;width:100%;margin:.3em 0}
+  .grundtafel table.regeln th,.grundtafel table.regeln td{border:1px solid var(--line);
+    padding:.5em .65em;text-align:left;vertical-align:top}
+  .grundtafel table.regeln thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .grundtafel table.regeln td.rname{font-weight:600;white-space:nowrap;width:11em}
+  .grundtafel table.regeln td.rform{color:var(--accent);font-weight:600;white-space:nowrap}
+  .grundtafel table.regeln td.rtext{font-size:.93rem}
+  .aufgabe{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+    background:#fff;padding:.8em 1em;margin:1em 0}
+  .aufgabe .kopf{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-bottom:.3em}
+  .loesung{display:none;margin-top:.7em;padding:.7em .9em;background:#f2f7f3;border:1px solid #cbe4d4;border-radius:8px}
+  .loesung.offen{display:block}
+  .lknopf{font:inherit;font-size:.85rem;padding:.3em .7em;border:1px solid var(--line);
+    border-radius:6px;background:#fff;cursor:pointer;color:var(--accent)}
+  .check{margin:.8em 0;padding:.8em .9em;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .check input,.check select{font:inherit;padding:.35em .5em;border:1px solid var(--line);border-radius:6px}
+  .check button,.gen button{font:inherit;padding:.4em .8em;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-left:.4em}
+  .feedback{margin-top:.5em;font-size:.95rem;min-height:1.4em}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--warn)}
+  textarea{width:100%;min-height:4.5em;font:inherit;padding:.5em;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .gen{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.8em 1em;margin:1em 0}
+  .gen .genaufgabe{margin:.6em 0;padding:.6em .8em;background:#fafaf7;border-radius:8px}
+  table.sortier{border-collapse:collapse;margin:.6em 0}
+  table.sortier td,table.sortier th{border:1px solid var(--line);padding:.35em .7em}
+  #toolbar{position:fixed;top:0;left:0;right:0;background:#20242b;color:#f3f4f6;
+    display:flex;gap:1em;align-items:center;justify-content:flex-end;padding:.35em 1em;font-size:.95rem;z-index:50}
+  #toolbar button{font:inherit;font-size:.8rem;background:#3a4150;color:#fff;border:0;border-radius:5px;padding:.15em .6em;cursor:pointer}
+  body{padding-top:2.4em}
+  body.beamer{font-size:26px;background:#fff}
+  body.beamer main{max-width:1180px}
+  body.beamer .nur-arbeit{display:none}
+  body.beamer section.slide{display:none;min-height:60vh}
+  body.beamer section.slide.aktiv{display:block}
+  body.beamer h2{font-size:1.5em}
+  /* ---- neue Bausteinfolge: Problem, Klaerung, Beispiel, Merksatz, Aufgaben ---- */
+  .vwahl{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .vknopf{font:inherit;font-size:.88rem;padding:.25em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .vknopf.aktiv{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .variante{display:none}
+  .variante.aktiv{display:block}
+  .problemkasten{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;
+    padding:.9em 1em;margin:.3em 0 1em;text-align:center;font-size:1.2rem;line-height:1.5}
+  .pfrage{font-weight:600;margin:.9em 0 .15em}
+  .pantwort{color:var(--ok);margin:.1em 0 .8em}
+  .bsp{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.5em .95em;margin:.7em 0}
+  .bsp h3{margin:.25em 0 .45em;color:var(--accent);font-size:1rem}
+  ol.bzeilen{list-style:none;margin:.2em 0;padding:0}
+  ol.bzeilen li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:.2em 1.2em;
+    align-items:baseline;padding:.3em 0;border-top:1px solid var(--line)}
+  ol.bzeilen li:first-child{border-top:0}
+  .brechnung{font-size:1.05em}
+  .bhinweis{color:var(--muted);font-size:.93em}
+  @media (max-width:800px){ol.bzeilen li{grid-template-columns:1fr}}
+  .merk{border:2px solid var(--accent);border-left-width:5px;border-radius:var(--radius);
+    background:#fff;padding:.6em 1em .7em;margin:.5em 0}
+  .merk ul{margin:.2em 0;padding-left:1.1em}
+  .merk li{margin:.5em 0}
+  .merk .regel{font-weight:600;display:block}
+  .merk .kurz{display:block;margin-top:.2em;color:var(--accent)}
+  .fehler{border:1px solid #e9cfcf;border-left:4px solid #b04a4a;border-radius:0 6px 6px 0;
+    background:#fdf6f6;padding:.55em .85em;margin:.5em 0}
+  .fehler p{margin:.2em 0;font-size:.95rem}
+  .typ,.afb{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;
+    padding:.14em .55em;border-radius:6px;margin:.2em .3em .2em 0;border:1px solid transparent}
+  .t-vor{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .t-rueck{background:#eef2f8;color:var(--accent);border-color:#cfe0ee}
+  .t-par{background:#f4eef8;color:#6b4a95;border-color:#ddd0ea}
+  .t-beur{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .afb1{background:#fbfbf9;color:var(--muted);border-color:var(--line)}
+  .afb2{background:#fbfbf9;color:var(--accent);border-color:#cfe0ee}
+  .afb3{background:#fbfbf9;color:var(--warn);border-color:#ecd9c2}
+  .spiegel{border:1px dashed var(--line);border-radius:var(--radius);background:#fbfbf9;margin:.5em 0 1em}
+  .spiegel>summary{cursor:pointer;padding:.5em .9em;font-size:.9rem;color:var(--muted);list-style:none}
+  .spiegel>summary::-webkit-details-marker{display:none}
+  .spiegel>summary::before{content:"\25b8 ";color:var(--accent)}
+  .spiegel[open]>summary::before{content:"\25be "}
+  .spiegel table.param,.spiegel p{margin:.2em .9em .7em}
+  .spiegel table.param th,.spiegel table.param td{text-align:center;padding:.35em .6em}
+  .bruch{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.15;margin:0 .12em;font-size:.92em;text-align:center}
+  .bruch .z{padding:0 .25em .05em;border-bottom:1.5px solid currentColor}
+  .bruch .n{padding:.05em .25em 0}
+  ol.bzeilen details.klapp{display:inline-block;margin:0}
+  ol.bzeilen details.klapp>summary{cursor:pointer;list-style:none;display:inline-block;font-size:.85rem;
+    padding:.1em .6em;border:1px solid var(--line);border-radius:999px;color:var(--accent);background:#fff}
+  ol.bzeilen details.klapp>summary::-webkit-details-marker{display:none}
+  ol.bzeilen details.klapp[open]>summary{background:var(--accent-soft)}
+  ol.bzeilen details.klapp .erg{margin-left:.6em;color:var(--ok);font-weight:600}
+  ol.bzeilen details.klapp:not([open]) .erg{display:none}
+  svg.plot{display:block;max-width:100%;height:auto;margin:.4em 0;background:#fff;border:1px solid var(--line);border-radius:6px}
+  svg.plot .gitter{stroke:#eceae4;stroke-width:1}
+  svg.plot .achse{stroke:#555;stroke-width:1.3}
+  svg.plot .tick{font-size:10px;fill:var(--muted)}
+  svg.plot .beschriftung{font-size:11px}
+  ol.bzeilen li:has(svg.plot){grid-template-columns:1fr}
+  .doppelbild .loesung{background:transparent;border:0;padding:0;margin-top:.3em}
+  .doppelbild .lknopf{margin:.2em 0}
+  .plots{display:flex;flex-wrap:wrap;gap:.6em;align-items:flex-start}
+  .plots svg.plot{margin:0}
+  body.beamer svg.plot{width:auto;height:auto}
+  .wurzel{display:inline-block;white-space:nowrap;vertical-align:baseline;line-height:1.15}
+  .wurzel .rad{display:inline-block;border-top:1.5px solid currentColor;padding:.04em .12em 0 .08em;
+    vertical-align:baseline;line-height:1.15}
+  ol.teile{margin:.4em 0 .2em;padding-left:1.6em}
+  ol.teile li{margin:.3em 0}
+  ol.teile li::marker{color:var(--accent);font-weight:700}
+  .limes{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.05;margin:0 .25em 0 .1em}
+  .limes .unter{font-size:.68em;color:var(--muted);white-space:nowrap}
+  body.beamer .problemkasten{font-size:1.15em}
+  .beamer-hinweis{position:fixed;bottom:.5em;right:1em;color:var(--muted);font-size:.75rem}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <a href="./" style="margin-right:auto;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:4px 6px">← Übersicht</a>
+  <button id="beamerKnopf">Beamer (B)</button>
+  <button id="alleLoesungenKnopf">Lösungen (L)</button>
+</div>
+
+<main>
+
+<section class="slide aktiv">
+  <h1>Block 02 · Lineare und quadratische Funktionen, Transformationen</h1>
+  <p class="lead">Mathematik LK (eA) · <strong>Ziel:</strong> Lineare und quadratische Funktionen wiederholen, Transformationen aus Termen ablesen, auf Punkte anwenden und rückwärts Terme konstruieren.</p>
+  <p class="nur-arbeit"><em>Tasten: B Beamer · Pfeile Abschnitt · L Lösungen</em></p>
+</section>
+
+<section class="slide">
+  <h2>Überblick <span class="phase">vor dem Einstieg</span></h2>
+  <p class="lead">Die beiden Klassen, mit denen jede Kurvendiskussion anfängt.</p>
+  <details class="ueberblick" open>
+    <summary><span>Das musst du über diese Funktionsklassen wissen</span>
+             <span class="ub-zusatz">2 Funktionsklassen</span></summary>
+    <div class="ub-koerper">
+      <div class="ub-huelle">
+      <table class="ub">
+        <thead>
+          <tr><th>Funktionsklasse</th><th>Beispiel</th><th>Was einsetzen?</th><th>Was kommt heraus?</th>
+              <th>Steigt oder fällt?</th><th>Symmetrie</th><th>Nullstellen</th></tr>
+        </thead>
+        <tbody>
+        <tr><th>Lineare Funktionen</th><td class="ub-bsp">f(x) = 2x − 1</td><td>alle Zahlen</td><td>alle Zahlen</td><td>steigend (m &gt; 0)<br>fallend (m &lt; 0)</td><td>punktsymmetrisch</td><td>genau eine</td></tr>
+        <tr><th>Quadratische Funktionen</th><td class="ub-bsp">f(x) = x²</td><td>alle Zahlen</td><td>ab Scheitel nach oben</td><td>erst fallend, dann steigend</td><td>achsensymmetrisch</td><td>keine, eine oder zwei</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="ub-detail"><h4>Lineare Funktionen</h4><p>m ist die Steigung (Höhenunterschied je Schritt nach rechts), n der y-Achsenabschnitt.</p><p class="ub-fehler"><strong>Typischer Fehler:</strong> Steigung aus zwei Punkten: m = <span class="bruch"><span class="z">y₂−y₁</span><span class="n">x₂−x₁</span></span> — die Differenzen nicht vertauschen und <span class="bruch"><span class="z">x</span><span class="n">y</span></span> nicht verwechseln.</p><p><strong>Geradengleichung aus zwei Punkten</strong></p><ol><li>Gegeben A(1|1) und B(3|5). Steigung zuerst: m = <span class="bruch"><span class="z">y₂ − y₁</span><span class="n">x₂ − x₁</span></span> = <span class="bruch"><span class="z">5 − 1</span><span class="n">3 − 1</span></span> = <span class="bruch"><span class="z">4</span><span class="n">2</span></span> = 2.</li><li>Einen Punkt in y = mx + n einsetzen: 1 = 2·1 + n → n = −1.</li><li>Ergebnis: y = 2x − 1. Probe mit dem zweiten Punkt: 2·3 − 1 = 5 ✓.</li></ol></div>      <div class="ub-detail"><h4>Quadratische Funktionen</h4><p>Scheitelform f(x) = a(x − d)² + e liest Scheitel und Wertebereich direkt ab.</p><p class="ub-fehler"><strong>Typischer Fehler:</strong> Erst das Vorzeichen der Diskriminante prüfen, dann die Wurzel ziehen — aus einem negativen Term unter der Wurzel wird keine Lösung, nicht etwa null. Zweiter Klassiker: in der Scheitelform ist das Vorzeichen von d gespiegelt, a(x − 3)² hat den Scheitel bei x = +3.</p><p><strong>pq-Formel — braucht die Normalform x² + px + q = 0</strong></p><ol><li>Durch a teilen, bis vor dem x² eine 1 steht. Aus 2x² − 4x − 6 = 0 wird x² − 2x − 3 = 0.</li><li>Ablesen: p = −2, q = −3.</li><li><strong>Zuerst die Diskriminante</strong>, also den Term unter der Wurzel: (<span class="bruch"><span class="z">p</span><span class="n">2</span></span>)² − q = (−1)² − (−3) = 1 + 3 = 4.</li><li>Vorzeichen prüfen: 4 &gt; 0, also gibt es zwei Lösungen. Erst jetzt die Wurzel ziehen: <span class="wurzel">√<span class="rad">4</span></span> = 2.</li><li>Einsetzen: x₁,₂ = <span class="bruch"><span class="z">−p</span><span class="n">2</span></span> ± 2 = 1 ± 2, also x₁ = 3 und x₂ = −1.</li></ol></div>
+      <p class="ub-link">Alle neun Funktionsklassen mit Graph, Wertetabelle und Rechenwegen:
+         <a href="funktionsklassen-uebersicht.html" target="_blank" rel="noopener">Funktionsklassen im Überblick</a></p>
+    </div>
+  </details>
+</section>
+
+<section class="slide">
+  <span class="phase">1 · Problem</span>
+  <h2>Wohin wandert der Scheitel? <span class="phase badge-kern">Einstieg</span></h2>
+  <div class="vwahl" role="group" aria-label="Einstieg wählen"><button type="button" class="vknopf aktiv" data-ziel="0">Anknüpfend</button><button type="button" class="vknopf" data-ziel="1">Streitgespräch</button></div>
+  <div class="variante aktiv">
+    <div class="problemkasten">Der Graph von <span class="formel">f(x) = x²</span> wird um 3 nach rechts und um 2 nach unten verschoben. Gebt den Term der neuen Funktion an.</div>
+    <p class="pfrage">Schreibt ihn hin.</p>
+    <p class="pantwort"><span class="formel">g(x) = (x − 3)² − 2</span>. Der Scheitel wandert von <span class="formel">(0 | 0)</span> nach <span class="formel">(3 | −2)</span>.</p>
+    <p class="pfrage">Warum steht bei einer Verschiebung nach <b>rechts</b> ein <b>Minus</b>?</p>
+    <p class="pantwort">Weil <span class="formel">x − 3</span> erst bei <span class="formel">x = 3</span> den Wert 0 annimmt. Die Stelle, an der vorher der Scheitel lag, wandert dorthin. Alles, was <b>innen</b> am x steht, wirkt <b>gegenläufig</b>.</p>
+    <p class="pfrage">Und wenn man zusätzlich streckt — spielt die Reihenfolge eine Rolle?</p>
+    <p class="pantwort">Ja, und zwar genau dann, wenn beide Schritte dieselbe Richtung betreffen. Erst <span class="formel">+1</span>, dann mal 2 ergibt <span class="formel">2x² + 2</span>; umgekehrt <span class="formel">2x² + 1</span>. Diese Grammatik klären wir jetzt vollständig.</p>
+  </div>
+  <div class="variante">
+    <div class="problemkasten">„<span class="formel">g(x) = (2x − 6)²</span> entsteht aus <span class="formel">f(x) = x²</span>, indem man um 6 nach rechts verschiebt und dann in x-Richtung halbiert.“</div>
+    <p class="pfrage">Prüft am Scheitel nach.</p>
+    <p class="pantwort"><span class="formel">g(x) = 0</span> gilt für <span class="formel">2x − 6 = 0</span>, also <span class="formel">x = 3</span>. Der Scheitel liegt bei 3, nicht bei 6 — die Behauptung stimmt nicht.</p>
+    <p class="pfrage">Wo steckt der Fehler?</p>
+    <p class="pantwort">Der Faktor vor dem x wurde nicht ausgeklammert: <span class="formel">2x − 6 = 2(x − 3)</span>, also <span class="formel">g(x) = 4(x − 3)²</span>. Verschoben wird um <b>3</b>, und in y-Richtung mit dem Faktor <b>4</b> gestreckt.</p>
+    <p class="pfrage">Was folgt daraus als Arbeitsregel?</p>
+    <p class="pantwort">Vor jedem Ablesen muss der Faktor vor dem x ausgeklammert sein. Erst in der Form <span class="formel">a·(x − c)² + d</span> stimmen die abgelesenen Zahlen.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">2 · Klärung</span>
+  <h2>Klärung — Scheitelform und die Transformations-Grammatik</h2>
+  <p class="lead">Am Term schrauben heißt, den Graphen zu bewegen. Vier Schritte, und die Reihenfolge ist Teil der Regel.</p>
+  <ol class="schritte">
+    <li><span class="frage">Scheitelform herstellen</span><span class="ergebnis">Quadratische Ergänzung: den Faktor vor <span class="formel">x²</span> ausklammern, die halbe x-Zahl quadrieren, addieren und wieder abziehen. Ergebnis <span class="formel">f(x) = a(x − d)² + e</span> mit Scheitel <span class="formel">S(d | e)</span>.</span></li>
+    <li><span class="frage">Innen ausklammern</span><span class="ergebnis">Steht <span class="formel">bx − k</span> im Argument, so schreibt man <span class="formel">b(x − <span class="bruch"><span class="z">k</span><span class="n">b</span></span>)</span>. Ohne diesen Schritt liest man die Verschiebung falsch ab — das ist die häufigste Fehlerquelle.</span></li>
+    <li><span class="frage">Parameter deuten</span><span class="ergebnis"><span class="formel">a</span> streckt in y-Richtung (<span class="formel">|a| &gt; 1</span> schmaler, <span class="formel">a &lt; 0</span> gespiegelt), <span class="formel">b</span> staucht in x-Richtung mit dem Faktor <span class="formel"><span class="bruch"><span class="z">1</span><span class="n">b</span></span></span> (gegenläufig!), <span class="formel">c</span> verschiebt waagerecht, <span class="formel">d</span> senkrecht.</span></li>
+    <li><span class="frage">Reihenfolge prüfen</span><span class="ergebnis">Zwei Schritte in <b>derselben</b> Richtung sind nicht vertauschbar, zwei Schritte in <b>verschiedenen</b> Richtungen schon.</span></li>
+  </ol>
+  <p class="tafel-merk">Innen wirkt alles <b>gegenläufig</b> und muss ausgeklammert werden — außen wirkt alles, wie es dasteht.</p>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Beispiel — vollständig vorgerechnet</h2>
+  <div class="bsp"><h3>Scheitelform: <span class="formel">f(x) = 2x² − 12x + 13</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">f(x) = 2(x² − 6x) + 13</span></span><span class="bhinweis">den Faktor 2 aus den x-Termen ausklammern</span></li><li><span class="brechnung"><span class="formel">x² − 6x = (x − 3)² − 9</span></span><span class="bhinweis">quadratische Ergänzung: halbe 6 ist 3, <span class="formel">3² = 9</span></span></li><li><span class="brechnung"><span class="formel">f(x) = 2((x − 3)² − 9) + 13 = 2(x − 3)² − 5</span></span><span class="bhinweis">Klammer auflösen: <span class="formel">−18 + 13 = −5</span></span></li><li><span class="brechnung"><span class="formel">S(3 | −5)</span>, <span class="formel">a = 2 &gt; 0</span>, also <span class="formel">W = [−5; ∞)</span></span><span class="bhinweis">Probe: <span class="formel">f(0) = 2·9 − 5 = 13</span> ✓</span></li><li><span class="brechnung"><span class="formel">2(x − 3)² = 5 ⟹ x = 3 ± <span class="bruch"><span class="z"><span class="wurzel">√<span class="rad">10</span></span></span><span class="n">2</span></span></span></span><span class="bhinweis">Nullstellen exakt, ohne Rundung</span></li></ol>
+  </div>
+  <div class="bsp"><h3>Gerade und Parabel: <span class="formel">A(1 | 1)</span>, <span class="formel">B(3 | 5)</span> und <span class="formel">p(x) = x²</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">m = <span class="bruch"><span class="z">5 − 1</span><span class="n">3 − 1</span></span> = 2</span></span><span class="bhinweis">Steigung aus den beiden Punkten</span></li><li><span class="brechnung"><span class="formel">1 = 2·1 + n ⟹ n = −1</span></span><span class="bhinweis">Punkt A einsetzen, also <span class="formel">g(x) = 2x − 1</span></span></li><li><span class="brechnung"><span class="formel">x² = 2x − 1 ⟺ x² − 2x + 1 = 0</span></span><span class="bhinweis">gleichsetzen und ordnen</span></li><li><span class="brechnung"><span class="formel">(x − 1)² = 0 ⟹ x = 1</span> (doppelt)</span><span class="bhinweis">Diskriminante <span class="formel">4 − 4 = 0</span></span></li><li><span class="brechnung">Genau ein gemeinsamer Punkt <span class="formel">(1 | 1)</span></span><span class="bhinweis">die Gerade <b>berührt</b> die Parabel</span></li></ol>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">4 · Merksatz</span>
+  <h2>Merksatz — lineare und quadratische Funktionen, Transformationen</h2>
+  <div class="merk"><ul><li><span class="regel">Die Scheitelform <span class="formel">f(x) = a(x − d)² + e</span> liefert Scheitel und Wertebereich sofort.</span><span class="kurz"><span class="formel">2(x − 3)² − 5</span>: <span class="formel">S(3 | −5)</span>, <span class="formel">W = [−5; ∞)</span></span></li><li><span class="regel">Innen wirkt alles gegenläufig — <b>erst ausklammern, dann ablesen</b>.</span><span class="kurz"><span class="formel">(2x − 6)² = 4(x − 3)²</span>, Verschiebung um 3 (nicht 6)</span></li><li><span class="regel">Außen wirkt alles, wie es dasteht: <span class="formel">a·f(x) + d</span> streckt und verschiebt in y-Richtung.</span><span class="kurz"><span class="formel">−2x² + 3</span>: gespiegelt, gestreckt, um 3 nach oben</span></li><li><span class="regel">Gerade und Parabel: die Diskriminante entscheidet über 2, 1 oder 0 Schnittpunkte.</span><span class="kurz">genau ein (doppelter) Schnittpunkt heißt <b>berühren</b></span></li></ul></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „<span class="formel">(2x − 6)²</span> ist um 6 nach rechts verschoben.“</p><p><strong>Richtig:</strong> Erst ausklammern: <span class="formel">4(x − 3)²</span>. Verschiebung um 3, zusätzlich Streckung mit 4.</p></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „Der Faktor a ändert den Wertebereich nicht.“</p><p><strong>Richtig:</strong> Doch — und sogar dessen Richtung. <span class="formel">x²</span> hat <span class="formel">W = [0; ∞)</span>, aber <span class="formel">−2x² + 3</span> hat <span class="formel">W = (−∞; 3]</span>.</p></div>
+</section>
+
+<section class="slide">
+  <h2 class="nur-arbeit">Aufgabengenerator: Scheitelform und Transformationen</h2>
+  <div class="gen nur-arbeit">
+    <p>Stufe:
+      <select id="genStufe">
+        <option value="1">1 · nur Verschiebung</option>
+        <option value="2">2 · mit Streckung/Spiegelung</option>
+        <option value="3">3 · rückwärts (Term aus Scheitel + Punkt)</option>
+        <option value="4">4 · + Spiegelung und Verschiebung kombiniert</option>
+      </select>
+      <button id="genNeu">Neue Aufgabe</button>
+      <button id="genLoesung">Lösungsweg ein/aus</button>
+    </p>
+    <div class="genaufgabe" id="genAusgabe"><em>Noch keine Aufgabe erzeugt.</em></div>
+    <div class="loesung" id="genLoesungFeld"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">5 · Aufgaben</span>
+  <h2>Aufgaben</h2>
+  <details class="spiegel nur-arbeit"><summary>Aufgabenspiegel: Typ × Anforderungsbereich</summary>
+    <table class="param"><thead><tr><th></th><th>AFB I</th><th>AFB II</th><th>AFB III</th></tr></thead><tbody><tr><th>Vorwärts</th><td>2</td><td>2</td><td>1</td></tr><tr><th>Rückwärts</th><td>2</td><td>1</td><td>—</td></tr><tr><th>Parameter</th><td>—</td><td>2</td><td>—</td></tr><tr><th>Beurteilen</th><td>—</td><td>1</td><td>1</td></tr></tbody></table>
+    <p class="lead">Verteilung der Bewertungseinheiten: AFB I 32 %; AFB II 47 %; AFB III 21 % (Richtwert 30 / 50 / 20).</p>
+  </details>
+  <details class="stufe" open><summary>Anforderungsbereich I — Reproduzieren <span class="lead">· angeben, berechnen, ablesen</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b02a1">
+    <div class="kopf"><strong>Aufgabe 1</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">g(x) = 2(x − 3)² − 5</span>. Beschreibt, durch welche Transformationen der Graph von g aus der Normalparabel hervorgeht, und gebt Scheitelpunkt und y-Achsenabschnitt an.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> y-Achsenabschnitt g(0)?</p>
+      <input id="b02a1antwort" inputmode="text" placeholder="z. B. 5" aria-label="Antwort Aufgabe 1">
+      <button id="b02a1pruefen">Prüfen</button>
+      <div class="feedback" id="b02a1feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b02a1l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a1l"><p>Drei Schritte: Streckung in y-Richtung mit dem Faktor 2, Verschiebung um 3 nach rechts, Verschiebung um 5 nach unten. Scheitel <span class="formel">S(3 | −5)</span> (Tiefpunkt, da <span class="formel">a = 2 &gt; 0</span>). y-Achsenabschnitt: <span class="formel">g(0) = 2·(−3)² − 5 = 18 − 5 = 13</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b02a2">
+    <div class="kopf"><strong>Aufgabe 2</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Bestimmt die Gleichung der Geraden durch <span class="formel">A(−1 | 4)</span> und <span class="formel">B(3 | −4)</span> sowie ihre Nullstelle.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Steigung m?</p>
+      <input id="b02a2antwort" inputmode="text" placeholder="z. B. 4" aria-label="Antwort Aufgabe 2">
+      <button id="b02a2pruefen">Prüfen</button>
+      <div class="feedback" id="b02a2feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b02a2l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a2l"><p><span class="formel">m = <span class="bruch"><span class="z">−4 − 4</span><span class="n">3 − (−1)</span></span> = <span class="bruch"><span class="z">−8</span><span class="n">4</span></span> = −2</span>. Punkt A einsetzen: <span class="formel">4 = −2·(−1) + n</span>, also <span class="formel">n = 2</span> und <span class="formel">g(x) = −2x + 2</span>. Nullstelle: <span class="formel">−2x + 2 = 0 ⟹ x = 1</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b02a3">
+    <div class="kopf"><strong>Aufgabe 3</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Der Graph einer Funktion h entsteht aus der Normalparabel durch die folgenden Schritte <b>in dieser Reihenfolge</b>: Spiegelung an der x-Achse, Verschiebung um 1 nach links, Verschiebung um 4 nach oben. Gebt einen Term von h an und prüft ihn mit einer Punktprobe.</p>
+    <button class="lknopf" data-loesung="b02a3l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a3l"><p>Spiegeln: <span class="formel">−x²</span>. Um 1 nach links: <span class="formel">−(x + 1)²</span>. Um 4 nach oben: <span class="formel">h(x) = −(x + 1)² + 4</span>. Punktprobe: der Scheitel muss bei <span class="formel">(−1 | 4)</span> liegen — <span class="formel">h(−1) = 0 + 4 = 4</span> ✓; außerdem <span class="formel">h(0) = −1 + 4 = 3</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b02a4">
+    <div class="kopf"><strong>Aufgabe 4</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine quadratische Funktion mit den Nullstellen <span class="formel">−1</span> und 5 an, deren Graph nach unten geöffnet ist, und bestimmt ihren Scheitelpunkt.</p>
+    <button class="lknopf" data-loesung="b02a4l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a4l"><p>Nullstellenform mit negativem Faktor: <span class="formel">f(x) = −(x + 1)(x − 5) = −x² + 4x + 5</span>. Der Scheitel liegt aus Symmetriegründen mittig zwischen den Nullstellen: <span class="formel">x = <span class="bruch"><span class="z">−1 + 5</span><span class="n">2</span></span> = 2</span> und <span class="formel">f(2) = −4 + 8 + 5 = 9</span>, also <span class="formel">S(2 | 9)</span>.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich II — Zusammenhänge herstellen <span class="lead">· bestimmen, untersuchen, erläutern</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b02a5">
+    <div class="kopf"><strong>Aufgabe 5</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Der Graph einer Funktion f hat den Tiefpunkt <span class="formel">(1 | 2)</span>. Bestimmt den Hochpunkt des Graphen von g mit <span class="formel">g(x) = −f(x + 2) − 1</span> und gebt die drei Transformationsschritte in der richtigen Reihenfolge an.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> x-Koordinate des Hochpunkts?</p>
+      <input id="b02a5antwort" inputmode="text" placeholder="z. B. 2" aria-label="Antwort Aufgabe 5">
+      <button id="b02a5pruefen">Prüfen</button>
+      <div class="feedback" id="b02a5feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b02a5l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a5l"><p>Schritt 1 — <span class="formel">f(x + 2)</span>: Verschiebung um 2 nach <b>links</b> (innen wirkt gegenläufig), <span class="formel">(1 | 2) → (−1 | 2)</span>. Schritt 2 — das Minus davor: Spiegelung an der x-Achse, aus dem Tiefpunkt wird ein Hochpunkt, <span class="formel">(−1 | 2) → (−1 | −2)</span>. Schritt 3 — <span class="formel">− 1</span>: Verschiebung um 1 nach unten, <span class="formel">(−1 | −2) → (−1 | −3)</span>. Der Hochpunkt von g ist <span class="formel">(−1 | −3)</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b02a6">
+    <div class="kopf"><strong>Aufgabe 6</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">f(x) = (x − 1)² − 2</span>. Beschreibt zunächst, wie der Graph von f aus der Normalparabel hervorgeht. Die Gerade g verläuft durch <span class="formel">(0 | 1)</span> und <span class="formel">(2 | 5)</span>. Ermittelt eine Gleichung von g und die Schnittpunkte von g mit dem Graphen von f; gebt die Schnittpunkte <b>exakt</b> an.</p>
+    <button class="lknopf" data-loesung="b02a6l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a6l"><p>f: Normalparabel, um 1 nach rechts und 2 nach unten verschoben.<br>Gerade: <span class="formel">m = <span class="bruch"><span class="z">5 − 1</span><span class="n">2 − 0</span></span> = 2</span>, y-Achsenabschnitt 1, also <span class="formel">g: y = 2x + 1</span>.<br>Gleichsetzen: <span class="formel">(x − 1)² − 2 = 2x + 1</span>, also <span class="formel">x² − 2x + 1 − 2 = 2x + 1</span> und damit <span class="formel">x² − 4x − 2 = 0</span>. Lösungsformel: <span class="formel">x = 2 ± <span class="wurzel">√<span class="rad">4 + 2</span></span> = 2 ± <span class="wurzel">√<span class="rad">6</span></span></span>. Eingesetzt in <span class="formel">y = 2x + 1</span>: Schnittpunkte <span class="formel">(2 − <span class="wurzel">√<span class="rad">6</span></span> | 5 − 2<span class="wurzel">√<span class="rad">6</span></span>)</span> und <span class="formel">(2 + <span class="wurzel">√<span class="rad">6</span></span> | 5 + 2<span class="wurzel">√<span class="rad">6</span></span>)</span> — exakt, nicht gerundet.</p></div>
+  </div>
+  <div class="aufgabe" id="b02a7">
+    <div class="kopf"><strong>Aufgabe 7</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Der Graph einer quadratischen Funktion hat den Scheitel <span class="formel">S(2 | −3)</span> und verläuft durch <span class="formel">P(0 | 5)</span>. Bestimmt den Term in Scheitel- und in Normalform.</p>
+    <button class="lknopf" data-loesung="b02a7l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a7l"><p>Ansatz <span class="formel">f(x) = a(x − 2)² − 3</span>. Punkt P einsetzen: <span class="formel">5 = a·4 − 3</span>, also <span class="formel">a = 2</span>. Scheitelform <span class="formel">f(x) = 2(x − 2)² − 3</span>, ausmultipliziert <span class="formel">f(x) = 2x² − 8x + 5</span>. Probe: <span class="formel">f(0) = 5</span> ✓.</p></div>
+  </div>
+  <div class="aufgabe" id="b02a8">
+    <div class="kopf"><strong>Aufgabe 8</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">f_a(x) = a(x − 1)² + 2</span> mit <span class="formel">a ≠ 0</span>. <ol class="teile"><li>Für welche a schneidet der Graph die x-Achse?</li><li>Für welches a verläuft er durch <span class="formel">(3 | −6)</span>?</li></ol></p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert von a in Teil (b)?</p>
+      <input id="b02a8antwort" inputmode="text" placeholder="z. B. 3" aria-label="Antwort Aufgabe 8">
+      <button id="b02a8pruefen">Prüfen</button>
+      <div class="feedback" id="b02a8feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b02a8l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a8l"><p><ol class="teile"><li><span class="formel">a(x − 1)² = −2</span>, also <span class="formel">(x − 1)² = <span class="bruch"><span class="z">−2</span><span class="n">a</span></span></span>. Eine Lösung gibt es nur, wenn <span class="formel"><span class="bruch"><span class="z">−2</span><span class="n">a</span></span> &gt; 0</span> ist, also für <span class="formel">a &lt; 0</span> (dann zwei Nullstellen). Für <span class="formel">a &gt; 0</span> liegt der Scheitel <span class="formel">(1 | 2)</span> über der x-Achse, der Graph schneidet sie nicht.</li><li><span class="formel">a·(3 − 1)² + 2 = −6</span> ergibt <span class="formel">4a = −8</span>, also <span class="formel">a = −2</span>.</li></ol></p></div>
+  </div>
+  <div class="aufgabe" id="b02a9">
+    <div class="kopf"><strong>Aufgabe 9</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist die Schar <span class="formel">g_c(x) = (x − c)² − c²</span>. Zeigt, dass jeder Graph durch den Ursprung verläuft, und gebt die zweite Nullstelle sowie den Scheitel in Abhängigkeit von c an.</p>
+    <button class="lknopf" data-loesung="b02a9l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a9l"><p><span class="formel">g_c(0) = (0 − c)² − c² = c² − c² = 0</span> für jedes c — alle Graphen gehen durch <span class="formel">(0 | 0)</span>. Nullstellen: <span class="formel">(x − c)² = c²</span>, also <span class="formel">x − c = ±c</span> und damit <span class="formel">x = 0</span> oder <span class="formel">x = 2c</span>. Der Scheitel ist <span class="formel">S(c | −c²)</span>; alle Scheitel liegen auf der Parabel <span class="formel">y = −x²</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b02a10">
+    <div class="kopf"><strong>Aufgabe 10</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Beurteilt: „Jede Parabel mit der Gleichung <span class="formel">y = ax² + bx + c</span> (<span class="formel">a ≠ 0</span>) entsteht aus der Normalparabel durch Strecken bzw. Spiegeln in y-Richtung und Verschieben.“</p>
+    <button class="lknopf" data-loesung="b02a10l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a10l"><p><b>Wahr.</b> Die quadratische Ergänzung liefert für jedes solche Polynom die Scheitelform <span class="formel">y = a(x + <span class="bruch"><span class="z">b</span><span class="n">2a</span></span>)² + c − <span class="bruch"><span class="z">b²</span><span class="n">4a</span></span></span>. Daran liest man genau die behaupteten Schritte ab: Streckung (bzw. für <span class="formel">a &lt; 0</span> zusätzlich Spiegelung) mit dem Faktor a und anschließende Verschiebung um <span class="formel"><span class="bruch"><span class="z">−b</span><span class="n">2a</span></span></span> waagerecht und <span class="formel">c − <span class="bruch"><span class="z">b²</span><span class="n">4a</span></span></span> senkrecht. Beispiel: <span class="formel">2x² − 12x + 13 = 2(x − 3)² − 5</span>.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich III — Verallgemeinern und beurteilen <span class="lead">· begründen, beurteilen, entwickeln</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b02a11">
+    <div class="kopf"><strong>Aufgabe 11</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Der Graph von <span class="formel">f(x) = x²</span> wird mit dem Faktor 3 in y-Richtung gestreckt, dann um 2 nach rechts und um 1 nach unten verschoben. Bestimmt den Term. Begründet außerdem, dass man die Streckung mit 3 bei der Normalparabel auch als Stauchung in x-Richtung beschreiben kann, und gebt deren Faktor an.</p>
+    <button class="lknopf" data-loesung="b02a11l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a11l"><p>Term: <span class="formel">g(x) = 3(x − 2)² − 1</span>.<br>Für die zweite Frage ohne Verschiebung rechnen: <span class="formel">f(bx) = (bx)² = b²x²</span>. Aus <span class="formel">b² = 3</span> folgt <span class="formel">b = <span class="wurzel">√<span class="rad">3</span></span></span>, also entspricht die y-Streckung mit 3 einer Stauchung in x-Richtung um den Faktor <span class="formel"><span class="bruch"><span class="z">1</span><span class="n"><span class="wurzel">√<span class="rad">3</span></span></span></span></span>. Das funktioniert nur, weil <span class="formel">x²</span> den Faktor als <span class="formel">b²</span> nach außen zieht; bei <span class="formel">f(x) = eˣ</span> oder bei bereits verschobenen Parabeln gilt es nicht.</p></div>
+  </div>
+  <div class="aufgabe" id="b02a12">
+    <div class="kopf"><strong>Aufgabe 12</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>f ist eine beliebige auf <span class="formel">ℝ</span> definierte Funktion. Beurteilt; wahre Aussagen begründet allgemein, falsche widerlegt durch ein konkretes Gegenbeispiel. <ol class="teile"><li>„Erst um 3 nach rechts verschieben, dann mit dem Faktor 2 in y-Richtung strecken“ liefert stets denselben Graphen wie die umgekehrte Reihenfolge.</li><li>„Erst an der x-Achse spiegeln, dann um 2 nach oben verschieben“ liefert stets denselben Graphen wie die umgekehrte Reihenfolge.</li><li>„Eine Gerade und eine Parabel haben immer mindestens einen gemeinsamen Punkt.“</li></ol></p>
+    <button class="lknopf" data-loesung="b02a12l">Lösung ein/aus</button>
+    <div class="loesung" id="b02a12l"><p><ol class="teile"><li><b>wahr</b>: beide Reihenfolgen führen auf <span class="formel">2·f(x − 3)</span> — die Verschiebung wirkt in x-Richtung, die Streckung in y-Richtung; sie stören einander nicht.</li><li><b>falsch</b>: die eine Reihenfolge ergibt <span class="formel">−f(x) + 2</span>, die andere <span class="formel">−(f(x) + 2) = −f(x) − 2</span>. Gegenbeispiel <span class="formel">f(x) = x²</span> an der Stelle 0: einmal 2, einmal <span class="formel">−2</span>. Beide Schritte betreffen dieselbe Richtung.</li><li><b>falsch</b>: <span class="formel">p(x) = x² + 1</span> und die x-Achse <span class="formel">g(x) = 0</span> führen auf <span class="formel">x² = −1</span> — keine reelle Lösung.</li></ol></p></div>
+  </div>
+    </div>
+  </details>
+  
+</section>
+
+<section class="slide">
+  <details class="stufe"><summary>Zum Nachschlagen: Lineare Funktionen und Geraden <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: Geraden y = m·x + n</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">m — die Steigung</td><td class="rform">m = Δy / Δx</td><td class="rtext">Wie viel geht es nach oben, wenn man <strong>einen</strong> Schritt nach rechts geht? m = 2 heißt: ein Schritt rechts, zwei hoch. m = −0,5 heißt: ein Schritt rechts, einen halben runter. Am Graphen abzulesen über das <strong>Steigungsdreieck</strong>: vom Schnittpunkt mit der y-Achse aus 1 nach rechts, dann senkrecht zum Graphen messen.</td></tr>
+        <tr><td class="rname">Was m verrät</td><td class="rform">m &gt; 0 · m &lt; 0 · m = 0</td><td class="rtext">m &gt; 0 steigt von links unten nach rechts oben, m &lt; 0 fällt, m = 0 ist waagrecht (eine konstante Funktion y = n). Je größer |m|, desto steiler.</td></tr>
+        <tr><td class="rname">n — der y-Achsenabschnitt</td><td class="rform">Punkt (0|n)</td><td class="rtext">Wo schneidet die Gerade die y-Achse? Man bekommt n, indem man x = 0 einsetzt: f(0) = m·0 + n = n. Am Graphen einfach ablesen, wo er die senkrechte Achse kreuzt.</td></tr>
+        <tr><td class="rname">Steigung aus zwei Punkten</td><td class="rform">m = (y₂ − y₁) / (x₂ − x₁)</td><td class="rtext">Höhenunterschied geteilt durch waagrechten Abstand. <strong>Wichtig:</strong> In Zähler und Nenner dieselbe Reihenfolge einhalten — erst beide Male Punkt 2, dann beide Male Punkt 1. Dreht man nur oben um, kommt das falsche Vorzeichen heraus.</td></tr>
+        <tr><td class="rname">Geradengleichung aufstellen</td><td class="rform">erst m, dann n</td><td class="rtext">Zuerst m aus zwei Punkten berechnen, dann <strong>einen</strong> der Punkte in y = mx + n einsetzen und nach n auflösen. Zum Schluss mit dem <em>anderen</em> Punkt die Probe machen — dann merkt man einen Rechenfehler sofort.</td></tr>
+        <tr><td class="rname">Punktprobe</td><td class="rform">Punkt einsetzen, vergleichen</td><td class="rtext">Liegt P(x₀|y₀) auf der Geraden? x₀ einsetzen und schauen, ob y₀ herauskommt. Stimmt es, liegt der Punkt darauf; stimmt es nicht, liegt er darüber oder darunter.</td></tr>
+        <tr><td class="rname">Nullstelle</td><td class="rform">x = <span class="bruch"><span class="z">−n</span><span class="n">m</span></span></td><td class="rtext">Der Schnittpunkt mit der x-Achse. Man setzt y = 0 und löst nach x auf. Gibt es genau einmal, solange m ≠ 0 — eine waagrechte Gerade hat entweder keine Nullstelle oder besteht ganz aus Nullstellen (y = 0).</td></tr>
+        <tr><td class="rname">Schnittpunkt zweier Geraden</td><td class="rform">gleichsetzen</td><td class="rtext">Beide Terme gleichsetzen und nach x auflösen — das ist die Stelle, an der beide denselben y-Wert haben. Das x dann in <em>eine</em> der Gleichungen einsetzen, um y zu bekommen.</td></tr>
+        <tr><td class="rname">Parallel</td><td class="rform">m₁ = m₂  (und n₁ ≠ n₂)</td><td class="rtext">Gleiche Steigung heißt gleiche Richtung — die Geraden treffen sich nie. Beim Gleichsetzen fällt das x weg und es bleibt eine falsche Aussage übrig. Wären auch die n gleich, wäre es dieselbe Gerade.</td></tr>
+        <tr><td class="rname">Orthogonal (senkrecht)</td><td class="rform">m₁ · m₂ = −1,  also m₂ = <span class="bruch"><span class="z">−1</span><span class="n">m₁</span></span></td><td class="rtext">Kehrwert bilden <strong>und</strong> Vorzeichen umdrehen: aus m = 2 wird −0,5, aus m = <span class="bruch"><span class="z">−3</span><span class="n">4</span></span> wird <span class="bruch"><span class="z">4</span><span class="n">3</span></span>. Merkhilfe: Das Produkt der beiden Steigungen muss −1 ergeben — damit kann man auch schnell prüfen, ob zwei gegebene Geraden senkrecht stehen.</td></tr>
+        <tr><td class="rname">Sonderfall: senkrechte Gerade</td><td class="rform">x = c</td><td class="rtext">Eine senkrechte Gerade ist <strong>keine Funktion</strong> — zu einem x gehören unendlich viele y. Sie lässt sich deshalb nicht als y = mx + n schreiben. Das ist auch der Grund, warum eine waagrechte Gerade (m = 0) keine orthogonale Partnerin in dieser Form hat.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Zum Nachschlagen: Quadratische Gleichungen <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: Die beiden Lösungsformeln</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">Allgemeine Form</td><td class="rform">ax² + bx + c = 0</td><td class="rtext">So steht es meistens da. Dafür gibt es die <strong>große Lösungsformel</strong>.</td></tr>
+        <tr><td class="rname">Normierte Form</td><td class="rform">x² + px + q = 0</td><td class="rtext">Vor dem x² steht eine 1. Man kommt dahin, indem man durch a teilt. Dafür gibt es die <strong>kleine Lösungsformel</strong>.</td></tr>
+        <tr><td class="rname">Große Lösungsformel (abc)</td><td class="rform">x₁,₂ = (−b ± <span class="wurzel">√<span class="rad">b² − 4ac</span></span>) / (2a)</td><td class="rtext">Funktioniert immer, auch ohne Umformen. Dafür mehr Zahlen im Kopf.</td></tr>
+        <tr><td class="rname">Kleine Lösungsformel (pq)</td><td class="rform">x₁,₂ = <span class="bruch"><span class="z">−p</span><span class="n">2</span></span> ± <span class="wurzel">√<span class="rad">(<span class="bruch"><span class="z">p</span><span class="n">2</span></span>)² − q</span></span></td><td class="rtext">Kürzer, verlangt aber die normierte Form.</td></tr>
+        <tr><td class="rname">Diskriminante</td><td class="rform">D = b² − 4ac  bzw.  D = (<span class="bruch"><span class="z">p</span><span class="n">2</span></span>)² − q</td><td class="rtext">Das ist der Term <strong>unter der Wurzel</strong>. Er entscheidet über die Anzahl der Lösungen — immer <strong>zuerst</strong> ausrechnen und das Vorzeichen prüfen.</td></tr>
+        <tr><td class="rname">Was die Diskriminante verrät</td><td class="rform">D &gt; 0 → zwei Lösungen; D = 0 → eine (doppelte); D &lt; 0 → keine</td><td class="rtext">Bei D &lt; 0 ist Schluss: Aus einer negativen Zahl lässt sich keine Wurzel ziehen. Das Ergebnis ist dann nicht etwa null, sondern es gibt <strong>keine</strong> Lösung.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Zum Nachschlagen: Transformationen <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel">
+    <h3>Tafelbild: Was Transformationen bewirken</h3>
+    <div class="tafel-koerper">
+      <p class="tafel-form">g(x) = <strong>a</strong> · f( <strong>b</strong>; (x − <strong>c</strong>) ) + <strong>d</strong>
+        <span class="zeiger">a und d stehen außen (wirken senkrecht) · b und c stehen innen (wirken waagrecht)</span></p>
+      <table class="param">
+        <thead><tr><th></th><th>Was macht der Parameter?</th><th>Regel</th><th>Beispiele</th></tr></thead>
+        <tbody>
+        <tr><td class="pz">d</td><td><strong>Verschiebung nach oben oder unten</strong><br><span class="pbsp">außen, am Ende · wirkt senkrecht</span></td><td>d &gt; 0 nach <strong>oben</strong>, d &lt; 0 nach <strong>unten</strong> — so, wie das Vorzeichen es sagt.<div class="tafel-merk">Außen heißt gleichläufig: Plus geht hoch, Minus geht runter.</div></td><td class="pbsp"><code>f(x) + 3</code> → 3 nach oben<br><code>f(x) − 5</code> → 5 nach unten</td></tr>
+        <tr><td class="pz">c</td><td><strong>Verschiebung nach rechts oder links</strong><br><span class="pbsp">innen, in der Klammer · wirkt waagrecht</span></td><td>In der Klammer steht ein <strong>Minus</strong> → nach <strong>rechts</strong>. Steht dort ein <strong>Plus</strong> → nach <strong>links</strong>.<div class="tafel-merk">Innen heißt gegenläufig — genau andersherum, als man zuerst denkt. Warum? Damit f(x−2) an der Stelle x = 2 denselben Wert hat wie f an der Stelle 0.</div></td><td class="pbsp"><code>f(x − 2)</code> → 2 nach rechts<br><code>f(x + 3)</code> → 3 nach links</td></tr>
+        <tr><td class="pz">a</td><td><strong>Strecken, Stauchen oder Spiegeln</strong><br><span class="pbsp">außen, als Faktor · wirkt senkrecht</span></td><td>|a| &gt; 1 <strong>gestreckt</strong> (steiler), |a| &lt; 1 <strong>gestaucht</strong> (flacher), a &lt; 0 zusätzlich <strong>gespiegelt an der x-Achse</strong>.<div class="tafel-merk">a wirkt auf die Höhe: Jeder y-Wert wird mit a multipliziert. Die Nullstellen bleiben, wo sie sind — null mal a ist wieder null.</div></td><td class="pbsp"><code>3 · f(x)</code> → dreifach gestreckt, steiler<br><code>0,5 · f(x)</code> → auf die Hälfte gestaucht, flacher<br><code>−f(x)</code> → an der x-Achse gespiegelt</td></tr>
+        <tr><td class="pz">b</td><td><strong>Strecken, Stauchen oder Spiegeln</strong><br><span class="pbsp">innen, als Faktor · wirkt waagrecht</span></td><td>|b| &gt; 1 <strong>gestaucht</strong> (schmaler), |b| &lt; 1 <strong>gestreckt</strong> (breiter), b &lt; 0 zusätzlich <strong>gespiegelt an der y-Achse</strong>.<div class="tafel-merk">Auch hier innen gegenläufig: Der Faktor 2 macht den Graphen nicht breiter, sondern <strong>schmaler</strong> — gestaucht um den Faktor <span class="bruch"><span class="z">1</span><span class="n">2</span></span>.</div></td><td class="pbsp"><code>f(2x)</code> → auf die Hälfte gestaucht, alles läuft doppelt so schnell<br><code>f(0,5x)</code> → doppelt so breit gestreckt<br><code>f(−x)</code> → an der y-Achse gespiegelt</td></tr>
+        </tbody>
+      </table>
+      <p class="tafel-merk">Die eine Regel, die alles zusammenhält: <strong>Außen gleichläufig,
+         innen gegenläufig.</strong> Alles, was in der Klammer am x steht, wirkt genau andersherum,
+         als das Vorzeichen vermuten lässt.</p>
+    </div>
+  </div>
+
+  <div class="tafel">
+    <h3>Schritt für Schritt: g(x) = −2·(x − 3)² + 4</h3>
+    <div class="tafel-koerper">
+      <ol class="schritte">
+      <li><span class="frage">Womit fange ich an?</span>Immer mit der Grundfunktion. Bei g(x) = −2·(x − 3)² + 4 ist das die Normalparabel f(x) = x².<span class="ergebnis">→ f(x) = x², Scheitel bei (0|0)</span></li>
+      <li><span class="frage">Innen zuerst: wohin wird verschoben?</span>In der Klammer steht (x − 3), also ein Minus → 3 Einheiten nach rechts.<span class="ergebnis">→ Scheitel wandert nach (3|0)</span></li>
+      <li><span class="frage">Der Faktor davor: strecken, stauchen, spiegeln?</span>a = −2. Das Minus spiegelt an der x-Achse, die 2 streckt auf die doppelte Höhe.<span class="ergebnis">→ Parabel ist nach unten offen und steiler</span></li>
+      <li><span class="frage">Außen zuletzt: wohin geht es hoch oder runter?</span>+ 4 am Ende → 4 Einheiten nach oben.<span class="ergebnis">→ Scheitel liegt endgültig bei (3|4)</span></li>
+      <li><span class="frage">Probe: stimmt das?</span>Scheitel aus der Form ablesen: g(x) = a(x − m)² + n hat S(m|n). Hier m = 3, n = 4 ✓. Und g(3) = −2·0 + 4 = 4 ✓.<span class="ergebnis">→ S(3|4), nach unten offen</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="tafel">
+    <h3>Darf man die Reihenfolge vertauschen?</h3>
+    <div class="tafel-koerper">
+      <table class="reihen">
+        <thead><tr><th>Kombination</th><th>vertauschbar?</th><th>Warum</th></tr></thead>
+        <tbody>
+        <tr><td><strong>Verschieben und verschieben</strong></td><td>vertauschbar</td><td>Erst 2 nach rechts, dann 3 nach oben — oder umgekehrt: dasselbe Ergebnis.</td></tr>
+        <tr><td><strong>Strecken und spiegeln</strong></td><td>vertauschbar</td><td>−2·f(x) ist dasselbe wie −(2·f(x)). Beides sind Faktoren, Multiplikation ist vertauschbar.</td></tr>
+        <tr><td><strong>Strecken und verschieben</strong></td><td><strong>nicht</strong> vertauschbar</td><td>2·f(x) + 3 ist etwas anderes als 2·(f(x) + 3) = 2f(x) + 6. Erst strecken, dann verschieben — sonst wird die Verschiebung mitgestreckt.</td></tr>
+        <tr><td><strong>Innen und außen</strong></td><td>unabhängig voneinander</td><td>Was in der Klammer steht, wirkt waagrecht; was davor oder dahinter steht, wirkt senkrecht. Die beiden stören sich nicht.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+</section>
+
+</main>
+<div class="beamer-hinweis">B = Beamer · ◀ ▶ = Navigation · L = Lösungen</div>
+
+<script id="gen-lib">
+"use strict";
+function mulberry(seed){
+  var t = seed >>> 0;
+  return function(){
+    t = (t + 0x6D2B79F5) >>> 0;
+    var r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ganz(rnd, von, bis){ return von + Math.floor(rnd() * (bis - von + 1)); }
+
+function scheitelTerm(a, d, e){
+  var kern = (d === 0) ? "x²" : "(x " + (d > 0 ? "− " + d : "+ " + (-d)) + ")²";
+  var vorn = (a === 1) ? "" : (a === -1 ? "−" : a + "·");
+  var hinten = (e === 0) ? "" : (e > 0 ? " + " + e : " − " + (-e));
+  return vorn + kern + hinten;
+}
+function vzText(w, plusWort, minusWort){
+  return Math.abs(w) + " " + (w > 0 ? plusWort : minusWort);
+}
+function schfMake(seed, level){
+  var rnd = mulberry(seed * 4 + level + 700);
+  var text, schritte;
+  var d = ganz(rnd, -4, 4), e = ganz(rnd, -5, 5);
+  if (d === 0) d = 3;
+  if (e === 0) e = 2;
+  var basis = { typ: "scheitelform", seed: seed, level: level };
+  function fertig(v, felder){
+    basis.variante = v; basis.text = text; basis.schritte = schritte;
+    for (var k in felder) basis[k] = felder[k];
+    if (!basis.ergebnis) basis.ergebnis = {};
+    return basis;
+  }
+  if (level === 1){
+    var v1 = ganz(rnd, 0, 2);
+    if (v1 === 0){
+      text = "Gegeben ist g(x) = " + scheitelTerm(1, d, e) + ". Geben Sie Scheitelpunkt, Art des Scheitels (Hoch-/Tiefpunkt) und den y-Achsenabschnitt an.";
+      schritte = [
+        "Scheitelform ablesen: S(" + d + "|" + e + "), nach oben geoeffnet: Tiefpunkt",
+        "g(0) = (" + (-d) + ")² " + (e > 0 ? "+ " + e : "− " + (-e)) + " = " + (d * d + e)
+      ];
+      return fertig(0, { a: 1, d: d, e: e, ergebnis: { scheitel: [d, e], yAbschnitt: d * d + e } });
+    }
+    if (v1 === 1){
+      text = "Die Normalparabel wird so verschoben, dass ihr Scheitel im Punkt S(" + d + "|" + e + ") liegt. Geben Sie den Funktionsterm in Scheitelform an.";
+      schritte = [
+        "Verschiebung um " + vzText(d, "nach rechts", "nach links") + " und " + vzText(e, "nach oben", "nach unten"),
+        "g(x) = " + scheitelTerm(1, d, e)
+      ];
+      return fertig(1, { a: 1, d: d, e: e, ergebnis: { scheitel: [d, e] } });
+    }
+    var m = [-3, -2, -1, 1, 2, 3][ganz(rnd, 0, 5)], n = ganz(rnd, -5, 5);
+    var x1 = ganz(rnd, -3, 1), x2 = x1 + ganz(rnd, 1, 3);
+    var y1 = m * x1 + n, y2 = m * x2 + n;
+    text = "Eine Gerade verlaeuft durch die Punkte P(" + x1 + "|" + y1 + ") und Q(" + x2 + "|" + y2 + "). Ermitteln Sie eine Geradengleichung y = mx + n.";
+    schritte = [
+      "m = (" + y2 + " − " + (y1 < 0 ? "(" + y1 + ")" : y1) + ")/(" + x2 + " − " + (x1 < 0 ? "(" + x1 + ")" : x1) + ") = " + m,
+      "P einsetzen: " + y1 + " = " + m + "·" + (x1 < 0 ? "(" + x1 + ")" : x1) + " + n → n = " + n,
+      "y = " + (m === 1 ? "" : (m === -1 ? "−" : m)) + "x" + (n === 0 ? "" : (n > 0 ? " + " + n : " − " + (-n)))
+    ];
+    return fertig(2, { m: m, n: n, x1: x1, x2: x2, y1: y1, y2: y2, ergebnis: { m: m, n: n } });
+  }
+  var wahlA = [-2, -1, 2, 3];
+  var a = wahlA[ganz(rnd, 0, 3)];
+  if (level === 2){
+    var v2 = ganz(rnd, 0, 2);
+    if (v2 === 0){
+      var yAb = a * d * d + e;
+      text = "Gegeben ist g(x) = " + scheitelTerm(a, d, e) + ". Geben Sie Scheitelpunkt, Art des Scheitels, Wertebereich und y-Achsenabschnitt an.";
+      schritte = [
+        "Scheitelform ablesen: Scheitel S(" + d + "|" + e + ")",
+        (a > 0 ? "a = " + a + " > 0: nach oben geoeffnet, Tiefpunkt; W = [" + e + "; ∞)" : "a = " + a + " < 0: nach unten geoeffnet, Hochpunkt; W = (−∞; " + e + "]"),
+        "y-Achsenabschnitt: g(0) = " + a + "·(" + (-d) + ")² " + (e > 0 ? "+ " + e : "− " + (-e)) + " = " + yAb
+      ];
+      return fertig(0, { a: a, d: d, e: e, ergebnis: { scheitel: [d, e], yAbschnitt: yAb, tiefpunkt: a > 0 } });
+    }
+    if (v2 === 1){
+      text = "Beschreiben Sie, wie der Graph von g(x) = " + scheitelTerm(a, d, e) + " aus der Normalparabel y = x² hervorgeht (Reihenfolge angeben).";
+      schritte = [
+        "Streckung in y-Richtung mit Faktor " + Math.abs(a) + (a < 0 ? " und Spiegelung an der x-Achse" : ""),
+        "dann Verschiebung um " + vzText(d, "nach rechts", "nach links") + " und " + vzText(e, "nach oben", "nach unten"),
+        "Kontrolle am Scheitel: (0|0) → S(" + d + "|" + e + ")"
+      ];
+      return fertig(1, { a: a, d: d, e: e, ergebnis: { scheitel: [d, e] } });
+    }
+    text = "Fehlersuche: Zu g(x) = " + scheitelTerm(a, d, e) + " notiert ein Schueler den Scheitel S(" + (-d) + "|" + e + "). Pruefen Sie die Angabe und korrigieren Sie sie gegebenenfalls mit Begruendung.";
+    schritte = [
+      "Probe: g(" + (-d) + ") = " + a + "·(" + (-2 * d) + ")² " + (e > 0 ? "+ " + e : "− " + (-e)) + " = " + (a * 4 * d * d + e) + " ≠ " + e + " — die Angabe ist falsch",
+      "innen wirkt gegenlaeufig: x − d = 0 bei x = " + d,
+      "richtig: S(" + d + "|" + e + ")"
+    ];
+    return fertig(2, { a: a, d: d, e: e, ergebnis: { scheitel: [d, e], falschX: -d } });
+  }
+  if (level === 3){
+    var v3 = ganz(rnd, 0, 2);
+    if (v3 === 0){
+      var px = d + 1, py = a + e;
+      text = "Eine Parabel hat den Scheitelpunkt S(" + d + "|" + e + ") und verlaeuft durch den Punkt P(" + px + "|" + py + "). Ermitteln Sie einen Funktionsterm in Scheitelform.";
+      schritte = [
+        "Ansatz: g(x) = a·(x − " + d + ")² " + (e > 0 ? "+ " + e : "− " + (-e)),
+        "P einsetzen: " + py + " = a·(" + px + " − " + d + ")² " + (e > 0 ? "+ " + e : "− " + (-e)) + " = a " + (e > 0 ? "+ " + e : "− " + (-e)),
+        "a = " + a + " → g(x) = " + scheitelTerm(a, d, e)
+      ];
+      return fertig(0, { a: a, d: d, e: e, ergebnis: { scheitel: [d, e], punkt: [px, py] } });
+    }
+    if (v3 === 1){
+      var an = [-2, -1, 1, 2][ganz(rnd, 0, 3)];
+      var kk = ganz(rnd, 1, Math.abs(an) === 1 ? 3 : 2), dn = ganz(rnd, -3, 3);
+      var en = -an * kk * kk;
+      text = "Berechnen Sie die Nullstellen von g(x) = " + scheitelTerm(an, dn, en) + " exakt.";
+      schritte = [
+        "Ansatz: " + an + "·(x − " + dn + ")² = " + (-en),
+        "(x − " + dn + ")² = " + (kk * kk) + " → x − " + dn + " = ±" + kk,
+        "Nullstellen: x = " + (dn - kk) + " und x = " + (dn + kk)
+      ];
+      return fertig(1, { a: an, d: dn, e: en, k: kk, ergebnis: { nullstellen: [dn - kk, dn + kk] } });
+    }
+    var a2 = wahlA[ganz(rnd, 0, 3)];
+    while (Math.abs(a2) === Math.abs(a)) a2 = wahlA[ganz(rnd, 0, 3)];
+    var e2 = e + [-3, -2, 2, 3][ganz(rnd, 0, 3)];
+    var d2 = ganz(rnd, -4, 4);
+    text = "Vergleichen Sie f(x) = " + scheitelTerm(a, d, e) + " und g(x) = " + scheitelTerm(a2, d2, e2) + ": Welcher Graph ist schmaler, und welcher Scheitel liegt hoeher?";
+    schritte = [
+      "|" + a + "| " + (Math.abs(a) > Math.abs(a2) ? ">" : "<") + " |" + a2 + "| → " + (Math.abs(a) > Math.abs(a2) ? "f" : "g") + " ist schmaler",
+      "Scheitelhoehen " + e + " und " + e2 + " vergleichen → " + (e > e2 ? "f" : "g") + " hat den hoeheren Scheitel"
+    ];
+    return fertig(2, { a: a, d: d, e: e, a2: a2, d2: d2, e2: e2,
+      ergebnis: { schmaler: (Math.abs(a) > Math.abs(a2) ? "f" : "g"), hoeher: (e > e2 ? "f" : "g") } });
+  }
+  var v4 = ganz(rnd, 0, 2);
+  if (v4 === 0){
+    text = "Der Graph von g(x) = " + scheitelTerm(a, d, e) + " wird an der x-Achse gespiegelt und um 2 nach oben verschoben. Bestimmen Sie den Scheitelpunkt des neuen Graphen und seine Art.";
+    schritte = [
+      "Spiegelung an der x-Achse: S(" + d + "|" + e + ") → (" + d + "|" + (-e) + "); Oeffnung klappt um",
+      "Verschiebung um 2 nach oben: (" + d + "|" + (-e) + ") → (" + d + "|" + (-e + 2) + ")",
+      (a > 0 ? "aus Tiefpunkt wird Hochpunkt" : "aus Hochpunkt wird Tiefpunkt") + ": Scheitel (" + d + "|" + (-e + 2) + ")"
+    ];
+    return fertig(0, { a: a, d: d, e: e, ergebnis: { scheitel: [d, e], neuScheitel: [d, -e + 2], tiefpunkt: a > 0 } });
+  }
+  if (v4 === 1){
+    var h = [-3, -2, -1, 1, 2, 3][ganz(rnd, 0, 5)], vv = [-3, -2, -1, 1, 2, 3][ganz(rnd, 0, 5)];
+    text = "Der Graph von g(x) = " + scheitelTerm(a, d, e) + " wird nur verschoben; danach liegt der Scheitel in S'(" + (d + h) + "|" + (e + vv) + "). Geben Sie die Verschiebung und den neuen Funktionsterm an.";
+    schritte = [
+      "Scheitelvergleich: S(" + d + "|" + e + ") → S'(" + (d + h) + "|" + (e + vv) + ")",
+      "Verschiebung um " + vzText(h, "nach rechts", "nach links") + " und " + vzText(vv, "nach oben", "nach unten"),
+      "neuer Term: " + scheitelTerm(a, d + h, e + vv)
+    ];
+    return fertig(1, { a: a, d: d, e: e, h: h, v: vv, ergebnis: { neuScheitel: [d + h, e + vv] } });
+  }
+  var az = [-2, -1, 1, 2][ganz(rnd, 0, 3)];
+  var ez = ganz(rnd, -4, 4);
+  var anz = (ez === 0) ? 1 : (az * ez < 0 ? 2 : 0);
+  text = "Entscheiden Sie ohne vollstaendige Rechnung, wie viele Nullstellen g(x) = " + scheitelTerm(az, d, ez) + " hat. Begruenden Sie mit Scheitel und Oeffnungsrichtung.";
+  schritte = [
+    "Scheitel S(" + d + "|" + ez + "), " + (az > 0 ? "nach oben" : "nach unten") + " geoeffnet",
+    (anz === 1 ? "Scheitel liegt AUF der x-Achse → genau 1 Nullstelle"
+      : (anz === 2 ? "Scheitel auf der " + (ez < 0 ? "negativen" : "positiven") + " Seite, Oeffnung dagegen → 2 Nullstellen"
+        : "Graph bleibt komplett " + (ez > 0 ? "oberhalb" : "unterhalb") + " der x-Achse → keine Nullstelle"))
+  ];
+  return fertig(2, { a: az, d: d, e: ez, ergebnis: { anzahl: anz } });
+}
+function schfVerify(t){
+  if (!t.schritte || t.schritte.length < 2) return "Loesungsweg unvollstaendig";
+  for (var i = 0; i < t.schritte.length; i++){
+    if (typeof t.schritte[i] !== "string" || /undefined|NaN|Infinity/.test(t.schritte[i])) return "Schritt defekt";
+  }
+  if (typeof t.text !== "string" || /undefined|NaN|Infinity/.test(t.text)) return "Text defekt";
+  if (t.level === 1 && t.variante === 2){
+    if (t.m === 0) return "Steigung 0";
+    if (t.y1 !== t.m * t.x1 + t.n || t.y2 !== t.m * t.x2 + t.n) return "Punktprobe Gerade verletzt";
+    if (t.x1 === t.x2) return "Punkte uebereinander";
+    if ((t.y2 - t.y1) / (t.x2 - t.x1) !== t.m) return "Steigung inkonsistent";
+    return null;
+  }
+  if (t.a === 0) return "a = 0";
+  if ([t.a, t.d, t.e].some(function(z){ return z !== Math.round(z) || Math.abs(z) > 10; })) return "Parameter unsauber";
+  function g(xq){ return t.a * (xq - t.d) * (xq - t.d) + t.e; }
+  if (t.ergebnis.scheitel){
+    if (t.ergebnis.scheitel[0] !== t.d || g(t.d) !== t.ergebnis.scheitel[1]) return "Scheitel falsch";
+    if (g(t.d + 1) - g(t.d) !== t.a) return "Oeffnungsfaktor inkonsistent";
+  }
+  if (t.ergebnis.yAbschnitt !== undefined && g(0) !== t.ergebnis.yAbschnitt) return "y-Abschnitt falsch";
+  if (t.ergebnis.tiefpunkt !== undefined && (t.a > 0) !== t.ergebnis.tiefpunkt) return "Scheitelart falsch";
+  if (t.ergebnis.punkt && g(t.ergebnis.punkt[0]) !== t.ergebnis.punkt[1]) return "Punktprobe verletzt";
+  if (t.ergebnis.nullstellen){
+    for (var j = 0; j < t.ergebnis.nullstellen.length; j++){
+      if (g(t.ergebnis.nullstellen[j]) !== 0) return "Nullstellenprobe verletzt";
+    }
+    if (t.ergebnis.nullstellen[0] >= t.ergebnis.nullstellen[1]) return "Nullstellen unsortiert";
+  }
+  if (t.level === 2 && t.variante === 2 && g(-t.d) === t.e && t.d !== 0) return "Fehlersuche ohne Fehler";
+  if (t.level === 3 && t.variante === 2){
+    if (Math.abs(t.a) === Math.abs(t.a2)) return "gleiche Oeffnungsweite - Vergleich uneindeutig";
+    if (t.e === t.e2) return "gleiche Scheitelhoehe - Vergleich uneindeutig";
+    if (t.ergebnis.schmaler !== (Math.abs(t.a) > Math.abs(t.a2) ? "f" : "g")) return "Vergleich schmaler falsch";
+    if (t.ergebnis.hoeher !== (t.e > t.e2 ? "f" : "g")) return "Vergleich hoeher falsch";
+  }
+  if (t.level === 4 && t.variante === 0 && t.ergebnis.neuScheitel[1] !== -g(t.d) + 2) return "transformierter Scheitel falsch";
+  if (t.level === 4 && t.variante === 1){
+    if (t.h === 0 || t.v === 0) return "triviale Verschiebung";
+    if (t.ergebnis.neuScheitel[0] !== t.d + t.h || t.ergebnis.neuScheitel[1] !== t.e + t.v) return "neuer Scheitel falsch";
+  }
+  if (t.level === 4 && t.variante === 2){
+    var disk = -t.e / t.a; // (x-d)^2 = -e/a
+    var anz = (disk > 0) ? 2 : (disk === 0 ? 1 : 0);
+    if (anz !== t.ergebnis.anzahl) return "Nullstellenanzahl falsch";
+  }
+  return null;
+}
+var GENERATORS = { scheitelform: { make: schfMake, verify: schfVerify } };
+
+</script>
+
+<script>
+
+"use strict";
+(function(){
+  var alleOffen = false;
+  document.querySelectorAll("[data-loesung]").forEach(function(knopf){
+    knopf.addEventListener("click", function(){
+      var ziel = document.getElementById(knopf.getAttribute("data-loesung"));
+      if (ziel) ziel.classList.toggle("offen");
+    });
+  });
+  function alleLoesungen(){
+    alleOffen = !alleOffen;
+    document.querySelectorAll(".loesung").forEach(function(el){ el.classList.toggle("offen", alleOffen); });
+  }
+  document.getElementById("alleLoesungenKnopf").addEventListener("click", alleLoesungen);
+
+  var HOCH = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+               "-":"⁻","−":"⁻","+":"⁺","(":"⁽",")":"⁾",".":"˙",",":"˙",
+               "x":"ˣ","n":"ⁿ","k":"ᵏ","a":"ᵃ","b":"ᵇ","i":"ⁱ","j":"ʲ","m":"ᵐ","t":"ᵗ","u":"ᵘ",
+               "h":"ʰ","p":"ᵖ","r":"ʳ","s":"ˢ","v":"ᵛ","w":"ʷ","y":"ʸ","z":"ᶻ",
+               "c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ","l":"ˡ","o":"ᵒ"," ":" ",
+               // schon hochgestellte Zeichen bleiben, wie sie sind: e^(x²) -> eˣ²
+               "⁰":"⁰","¹":"¹","²":"²","³":"³","⁴":"⁴","⁵":"⁵","⁶":"⁶","⁷":"⁷","⁸":"⁸","⁹":"⁹",
+               "⁻":"⁻","⁺":"⁺" };
+  // Tiefgestellte Zeichen fuer Scharen und indizierte Groessen: f_a wird zu fₐ,
+  // x_1 zu x₁. Unicode kennt nur diese Buchstaben tiefgestellt - fehlt einer,
+  // bleibt der Term unveraendert stehen (lieber f_b als ein halb gesetztes fᵇ).
+  var TIEF = { "a":"ₐ","e":"ₑ","h":"ₕ","i":"ᵢ","j":"ⱼ","k":"ₖ",
+               "l":"ₗ","m":"ₘ","n":"ₙ","o":"ₒ","p":"ₚ","r":"ᵣ",
+               "s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","x":"ₓ",
+               "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄",
+               "5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" };
+  function tief(z){
+    var aus = "";
+    for (var i = 0; i < z.length; i++){
+      if (!TIEF[z[i]]) return null;
+      aus += TIEF[z[i]];
+    }
+    return aus;
+  }
+  // Vorzeichen- und Faktornormalisierung. Hier stehen nur Umformungen, die IMMER
+  // richtig sind, unabhaengig vom Kontext - "x − -4" heisst auch in einem zitierten
+  // Schuelerfehler "x + 4". Kontextabhaengiges (1x, + 0) gehoert in die Generatoren.
+  function termNormal(s){
+    var t = String(s), vorher;
+    do {
+      vorher = t;
+      t = t
+        // Vorzeichenketten: "− -4" -> "+ 4", "+ -4" -> "− 4"
+        .replace(/([−-])\s*[−-]\s*(?=[\dxa-z(])/g, "+ ")
+        .replace(/\+\s*[−-]\s*(?=[\dxa-z(])/g, "− ")
+        // nur nach Variablen/Klammern kuerzen: x^1 -> x, aber 2^1 · 2^x bleibt
+        .replace(/([a-zA-Z)])(?:\^1(?![\d,.])|\^\(1\))/g, "$1")
+        .replace(/\s*\/\s*1(?![\d,.])/g, "")
+        .replace(/(^|[^0-9a-zA-Z.,])1\s*[·*]\s*(?=[a-z(])/g, "$1")
+        .replace(/(^|[^0-9a-zA-Z.,])1(?=[a-z])/g, "$1")
+        .replace(/\s*[·*]\s*1(?![\d,.])/g, "")
+        .replace(/\(\s*([a-z])\s*[+−-]\s*0\s*\)/g, "$1")
+        // "+ 0" nur nach einem Term mit Variable streichen. Kein Wort davor
+        // ("wird + 0 −"), keine Hochzahl danach ("p − 0²" ist ein eingesetzter
+        // Wert) und kein Vorzeichen danach (Monotoniefolge "+ 0 −").
+        .replace(/(^|[^a-zA-Z])([a-z][0-9²³]*)\s*[+−-]\s*0(?![\d,.²³⁰¹⁴-⁹^])(?!\s*[+−-])/g, "$1$2");
+    } while (t !== vorher);
+    return t.replace(/[ 	]{2,}/g, " ");
+  }
+  // Setzt einen Exponenten hoch - aber nur, wenn JEDES Zeichen ein Hochzeichen hat.
+  // Sonst bliebe eine Mischung wie "2ˣ⁺?" stehen, die schlechter lesbar ist als 2^(x + ?).
+  function hoch(z){
+    // Das Malzeichen entfaellt im Exponenten: e^(a·x) wird zu eᵃˣ - so schreibt man es
+    // auch von Hand, und ein hochgestellter Malpunkt ist typografisch nicht vorgesehen.
+    // innere Exponenten zuerst aufloesen, sonst scheitert e^(x^2) am "^" im Inneren
+    var t = z.replace(/\^(-?\d+)/g, function(_, d){
+              return d.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+             .replace(/([0-9a-z])\s*[·*]\s*(?=[0-9a-z])/g, "$1");
+    var aus = "";
+    for (var i = 0; i < t.length; i++){
+      if (!HOCH[t[i]]) return null;
+      aus += HOCH[t[i]];
+    }
+    return aus;
+  }
+  function schoenMathe(s){
+    return termNormal(String(s))
+      // geklammerte Exponenten zuerst: 2^(x−1) -> 2ˣ⁻¹, e^(2x) -> e²ˣ
+      .replace(/\^\(([^()]{1,12})\)/g, function(ganz, z){
+        var h = hoch(z);
+        if (h === null) return ganz;
+        // Zusammengesetzte Exponenten bekommen hochgestellte Klammern: sonst liest sich
+        // 2^(x-1) als 2 hoch x hoch -1. Ein blosses Vorzeichen (e^(-x)) ist eindeutig.
+        return /[^-−+].*[-−+]/.test(z) ? "⁽" + h + "⁾" : h;
+      })
+      .replace(/\^(-?\d+)/g, function(_, z){ return z.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+      .replace(/\^([a-z])(?![a-zA-Z0-9])/g, function(ganz, z){ return HOCH[z] || ganz; })
+      .replace(/(\d)\.(\d)/g, "$1,$2");
+  }
+  function maskiere(s){
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  // Was schoenMathe() nicht in Unicode setzen konnte, wird hier echtes <sup>/<sub>:
+  // x^(1/2), e^(v(x)), Integralgrenzen ∫0^√a, und Indizes mit beliebigem Buchstaben.
+  // Dateinamen, Pfade und Adressen sind keine Formeln - dort bedeutet "_" nichts.
+  function istKeineFormel(s){
+    return /\.(?:md|html|py|json|txt)\b|:\/\//.test(s);
+  }
+  function markup(s){
+    if (istKeineFormel(s)) { return maskiere(s); }
+    return maskiere(s)
+      // Exponent mit eigener Klammer zuerst: e^(v(x)), 2^(f(x) + 1)
+      .replace(/\^\(((?:[^()]|\([^()]*\)){1,28})\)/g, "<sup>$1</sup>")
+      .replace(/\^([A-Za-z0-9,.√−α-ωΑ-Ω+-]+)/g, "<sup>$1</sup>")
+      .replace(/([A-Za-z])_\(([^()]{1,24})\)/g, "$1<sub>$2</sub>")
+      .replace(/([A-Za-z])_([A-Za-z0-9]+)/g, "$1<sub>$2</sub>");
+  }
+  // Notation vereinheitlichen: Hochzahlen auch im statischen Folientext (x^2 -> x2 hoch)
+  (function hochAlles(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var knoten = [];
+    while (walker.nextNode()){
+      var t = walker.currentNode, el = t.parentNode;
+      if (el && el.tagName !== "SCRIPT" && el.tagName !== "STYLE" &&
+          (t.nodeValue.indexOf("^") >= 0 || t.nodeValue.indexOf("_") >= 0)) knoten.push(t);
+    }
+    knoten.forEach(function(t){
+      var neu = schoenMathe(t.nodeValue);
+      var mk = markup(neu);
+      if (mk === maskiere(neu)) { t.nodeValue = neu; return; }
+      // Echtes Markup noetig: den Textknoten durch ein <span> ersetzen.
+      var sp = document.createElement("span");
+      sp.innerHTML = mk;
+      if (t.parentNode) { t.parentNode.replaceChild(sp, t); }
+    });
+  })();
+
+  function bindeCheck(feldId, knopfId, ausgabeId, pruefer){
+    var feld = document.getElementById(feldId), knopf = document.getElementById(knopfId),
+        ausgabe = document.getElementById(ausgabeId);
+    if (!feld || !knopf || !ausgabe) return;
+    function lauf(){
+      var r = pruefer((feld.value || "").trim().replace(",", "."));
+      ausgabe.textContent = schoenMathe(r.text); ausgabe.className = "feedback " + (r.ok ? "ok" : "no");
+    }
+    knopf.addEventListener("click", lauf);
+    feld.addEventListener("keydown", function(ev){ if (ev.key === "Enter") lauf(); });
+  }
+
+  // ---- Umschalten zwischen Einstiegs-Varianten ----
+  document.querySelectorAll(".vwahl").forEach(function(w){
+    w.addEventListener("click", function(ev){
+      var k = ev.target.closest(".vknopf"); if (!k) { return; }
+      var sec = w.closest("section") || document;
+      w.querySelectorAll(".vknopf").forEach(function(b){ b.classList.toggle("aktiv", b === k); });
+      var ziel = parseInt(k.getAttribute("data-ziel"), 10);
+      sec.querySelectorAll(".variante").forEach(function(v, j){ v.classList.toggle("aktiv", j === ziel); });
+    });
+  });
+
+  bindeCheck("b02a1antwort", "b02a1pruefen", "b02a1feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 13) return { ok: true, text: "Stimmt: g(0) = 2*9 - 5 = 13." };
+    return { ok: false, text: "Noch nicht — setze x = 0 in 2(x-3)^2 - 5 ein, Klammer zuerst." };
+  });
+  bindeCheck("b02a2antwort", "b02a2pruefen", "b02a2feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === -2) return { ok: true, text: "Stimmt: m = -8/4 = -2. Jetzt n ueber Punkt A." };
+    return { ok: false, text: "Noch nicht — m = (y_B - y_A)/(x_B - x_A)." };
+  });
+  bindeCheck("b02a5antwort", "b02a5pruefen", "b02a5feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === -1) return { ok: true, text: "Stimmt: f(x+2) schiebt nach links, aus 1 wird -1." };
+    return { ok: false, text: "Noch nicht — innen wirkt gegenlaeufig: x + 2 schiebt nach links." };
+  });
+  bindeCheck("b02a8antwort", "b02a8pruefen", "b02a8feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === -2) return { ok: true, text: "Stimmt: 4a + 2 = -6 ergibt a = -2." };
+    return { ok: false, text: "Noch nicht — setze x = 3 und f(3) = -6 in den Scharterm ein." };
+  });
+
+
+  var genZaehler = 1, letzteAufgabe = null;
+  var genWahl = document.getElementById("genStufe");
+  var genTypWahl = document.getElementById("genTyp");
+  // Trainingsbloecke buendeln mehrere Generatoren und bieten eine Typenwahl an.
+  // Fehlt das Auswahlfeld (alle Lernbloecke), bleibt es beim einzigen Generator.
+  function genName(){
+    if (genTypWahl && genTypWahl.value && GENERATORS[genTypWahl.value]) return genTypWahl.value;
+    return Object.keys(GENERATORS)[0];
+  }
+  function genNeu(){
+    var stufe = Number(genWahl.value);
+    var g = GENERATORS[genName()];
+    // verify ist der Qualitaetswaechter: eine beanstandete Aufgabe wird verworfen
+    // und neu gewuerfelt (Gate A fuzzt dieselbe Pruefung offline).
+    var versuch = 0;
+    do {
+      letzteAufgabe = g.make(Date.now() % 100000 + genZaehler++, stufe);
+      versuch++;
+    } while (versuch < 20 && g.verify(letzteAufgabe));
+    document.getElementById("genAusgabe").textContent = schoenMathe(letzteAufgabe.text);
+    var feld = document.getElementById("genLoesungFeld");
+    feld.classList.remove("offen");
+    feld.innerHTML = "<ol><li>" + letzteAufgabe.schritte.map(schoenMathe).join("</li><li>") + "</li></ol>";
+  }
+  if (document.getElementById("genNeu")){
+    document.getElementById("genNeu").addEventListener("click", genNeu);
+    document.getElementById("genLoesung").addEventListener("click", function(){
+      if (letzteAufgabe) document.getElementById("genLoesungFeld").classList.toggle("offen");
+    });
+  }
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll("section.slide"));
+  var slideIdx = 0;
+  function zeigeSlide(i){
+    slideIdx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, j){ s.classList.toggle("aktiv", j === slideIdx); });
+  }
+  function beamerUmschalten(){
+    document.body.classList.toggle("beamer");
+    if (document.body.classList.contains("beamer")) zeigeSlide(slideIdx);
+    else slides.forEach(function(s){ s.classList.add("aktiv"); });
+  }
+  document.getElementById("beamerKnopf").addEventListener("click", beamerUmschalten);
+  document.addEventListener("keydown", function(ev){
+    if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA" || ev.target.tagName === "SELECT")) return;
+    var k = ev.key.toLowerCase();
+    if (k === "b") beamerUmschalten();
+    else if (k === "l") alleLoesungen();
+    else if (document.body.classList.contains("beamer")){
+      if (ev.key === "ArrowRight" || ev.key === "PageDown") zeigeSlide(slideIdx + 1);
+      if (ev.key === "ArrowLeft" || ev.key === "PageUp") zeigeSlide(slideIdx - 1);
+    }
+  });
+  slides.forEach(function(s){ s.classList.add("aktiv"); });
+})();
+
+</script>
+</body>
+</html>

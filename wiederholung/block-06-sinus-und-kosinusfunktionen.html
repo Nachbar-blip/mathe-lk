@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block 06 · Sinus- und Kosinusfunktionen</title>
+<!--
+  analysis-lk Block 06 (Mathematik LK, eA). MasterMind-Aufbau, neutrales Design.
+  Single-File, keine externen Abhaengigkeiten, ASCII-only JS-Bezeichner, kein Browser-Storage.
+  Tasten: B Beamer, Pfeile Abschnitt (Beamer), L alle Loesungen.
+  Erzeugt aus _skelett.py - Aenderungen am Rahmen dort vornehmen, Inhalt in _inhalt_bXX.py.
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --accent-soft:#eaf1f7; --ok:#2e7d5a; --warn:#b06a2e;
+    --maxw:920px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  main{max-width:var(--maxw);margin:0 auto;padding:28px 18px 64px;}
+  h1{font-size:1.5rem;margin:.2em 0 .1em}
+  h2{font-size:1.2rem;margin:1.5em 0 .4em;border-bottom:2px solid var(--line);padding-bottom:.2em}
+  p{margin:.5em 0}
+  .lead{color:var(--muted)}
+  .formel{white-space:nowrap}
+  sub,sup{font-size:.72em;line-height:0}
+  .spvek{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.08;font-size:.94em;padding:0 .12em;margin:0 .1em;position:relative}
+  .spvek::before,.spvek::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;
+    border:1.5px solid currentColor}
+  .spvek::before{left:-.22em;border-right:none;border-radius:.5em 0 0 .5em}
+  .spvek::after{right:-.22em;border-left:none;border-radius:0 .5em .5em 0}
+  .spvek span{display:block;padding:0 .18em}
+  .phase{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:.18em .6em;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid #cfe0ee;margin:.2em .3em .2em 0;}
+  .badge-kern{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .badge-vert{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .bluete{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;overflow:hidden;background:#fff;}
+  .bluete>summary{cursor:pointer;padding:.7em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;}
+  .bluete>summary::-webkit-details-marker{display:none}
+  .lvl{font-size:.74rem;font-weight:600;padding:.1em .5em;border-radius:6px}
+  .lvl.l1{background:#eef6f0;color:var(--ok)}
+  .lvl.l2{background:#eef2f8;color:var(--accent)}
+  .lvl.l3{background:#f7efe6;color:var(--warn)}
+  .bluete[open]>summary{border-bottom:1px solid var(--line)}
+  .bluete .body{padding:.3em .9em .9em}
+  .iqb{margin:.45em 0 0;font-size:.82rem}
+  .iqb>summary{cursor:pointer;color:var(--muted);list-style:none;display:inline-flex;
+    align-items:center;gap:.4em;padding:.12em .6em;border:1px solid var(--line);
+    border-radius:999px;background:#fbfbf9}
+  .iqb>summary::-webkit-details-marker{display:none}
+  .iqb>summary::before{content:"IQB";font-weight:700;font-size:.72rem;letter-spacing:.03em;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:.05em .35em}
+  .iqb>summary:hover{border-color:var(--accent);color:var(--accent)}
+  .iqb .iqb-text{margin:.4em 0 0;padding:.5em .7em;background:#fbfbf9;border-left:3px solid var(--line);
+    border-radius:0 6px 6px 0;color:var(--muted);line-height:1.5}
+  .iqb .iqb-text .iqb-fund{display:block;margin-top:.3em;font-size:.95em;opacity:.85}
+  .hinfuehrung{border:1px solid #ecd9c2;border-left:4px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;
+    background:#fffdf5;padding:.85em 1em;margin:.4em 0 1em}
+  .hinfuehrung h3{margin:0 0 .4em;font-size:1rem;color:var(--warn)}
+  .hinfuehrung p{margin:.35em 0}
+  .hinfuehrung .frage{font-weight:600;font-size:1.02rem}
+  .hinfuehrung .aufloesung{margin-top:.6em;padding-top:.5em;border-top:1px dashed #ecd9c2;
+    font-size:.94rem;color:var(--muted)}
+  table.wertereihe{border-collapse:collapse;margin:.3em 0 .4em;font-size:.9rem;background:#fff}
+  table.wertereihe th,table.wertereihe td{border:1px solid var(--line);padding:.25em .6em;text-align:center}
+  table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .hinfuehrung table.wertereihe{border-collapse:collapse;margin:.5em 0;font-size:.92rem;background:#fff}
+  .hinfuehrung table.wertereihe th,.hinfuehrung table.wertereihe td{border:1px solid var(--line);
+    padding:.3em .7em;text-align:center}
+  .hinfuehrung table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .tafel{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;margin:.8em 0;overflow:hidden}
+  .tafel>h3{margin:0;padding:.6em .9em;background:var(--accent);color:#fff;font-size:1rem}
+  .tafel .tafel-koerper{padding:.85em .9em}
+  .tafel-form{text-align:center;font-size:1.15rem;margin:.2em 0 .9em;padding:.5em;
+    background:var(--accent-soft);border-radius:6px;color:var(--accent);font-weight:600}
+  .tafel-form .zeiger{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:.25em}
+  table.param{border-collapse:collapse;width:100%;margin:.3em 0}
+  table.param th,table.param td{border:1px solid var(--line);padding:.5em .65em;text-align:left;vertical-align:top}
+  table.param thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  table.param .pz{font-weight:700;color:var(--accent);font-size:1.05rem;text-align:center;width:2.4em}
+  table.param .pbsp{font-size:.9rem;color:var(--muted)}
+  table.param .pbsp code{background:#fbfbf9;padding:.05em .3em;border-radius:3px;color:var(--fg)}
+  .tafel-merk{margin:.5em 0 0;padding:.45em .7em;background:#fffdf5;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.93rem}
+  .tafel-merk::before{content:"Merke: ";font-weight:700;color:var(--warn)}
+  ol.schritte{counter-reset:s;list-style:none;padding:0;margin:.4em 0 0}
+  ol.schritte li{counter-increment:s;position:relative;padding:.5em .7em .5em 2.6em;margin:.4em 0;
+    background:#fafaf7;border-radius:6px}
+  ol.schritte li::before{content:counter(s);position:absolute;left:.7em;top:.5em;width:1.5em;height:1.5em;
+    background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:.82rem;font-weight:700}
+  ol.schritte .frage{font-weight:600;display:block}
+  ol.schritte .ergebnis{display:block;margin-top:.25em;font-size:.9rem;color:var(--ok);font-weight:600}
+  table.reihen{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.93rem}
+  table.reihen th,table.reihen td{border:1px solid var(--line);padding:.45em .65em;text-align:left}
+  table.reihen thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .stufe{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;background:#fff;overflow:hidden}
+  .stufe>summary{cursor:pointer;padding:.6em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em;background:#fbfbf9}
+  .stufe>summary::-webkit-details-marker{display:none}
+  .stufe>summary::before{content:"\25b8";color:var(--accent);font-weight:400}
+  .stufe[open]>summary::before{content:"\25be"}
+  .stufe .stufe-koerper{padding:.7em .9em}
+  .tauf{margin:0 0 .9em;padding-bottom:.7em;border-bottom:1px dashed var(--line)}
+  .tauf:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+  .tauf .tfrage{margin:0 0 .4em}
+  .tauf .tfrage strong.nr{color:var(--accent);margin-right:.3em}
+  .ueberblick{border:1px solid #cfe0ee;border-radius:var(--radius);background:#fff;margin:.2em 0 1.1em}
+  .ueberblick>summary{cursor:pointer;padding:.7em .9em;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);list-style:none;border-radius:var(--radius);
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .ueberblick>summary::-webkit-details-marker{display:none}
+  .ueberblick>summary::before{content:"\25b8";font-weight:400;margin-right:.15em}
+  .ueberblick[open]>summary::before{content:"\25be"}
+  .ueberblick[open]>summary{border-radius:var(--radius) var(--radius) 0 0}
+  .ueberblick .ub-zusatz{font-weight:400;font-size:.85rem;color:var(--muted)}
+  .ueberblick .ub-koerper{padding:.8em .9em}
+  .ub-huelle{overflow-x:auto}
+  table.ub{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+  table.ub th,table.ub td{border:1px solid var(--line);padding:.42em .6em;text-align:left;vertical-align:top}
+  table.ub thead th{background:#fbfbf9;font-size:.82rem;color:var(--muted);font-weight:600}
+  table.ub tbody th{white-space:nowrap;font-weight:600}
+  table.ub .ub-bsp{white-space:nowrap;color:var(--accent);font-size:.88rem}
+  .ub-detail{margin:.9em 0 0;padding:.6em .8em;border-left:3px solid var(--line);background:#fafaf7;border-radius:0 6px 6px 0}
+  .ub-detail h4{margin:0 0 .25em;font-size:.93rem;color:var(--accent)}
+  .ub-detail p{margin:.2em 0;font-size:.93rem}
+  .ub-detail .ub-fehler{color:var(--warn)}
+  .ub-detail ol{margin:.3em 0 0;padding-left:1.4em;font-size:.93rem}
+  .ub-detail ol li{margin:.25em 0}
+  .ub-link{margin:.9em 0 0;font-size:.92rem}
+  .ub-link a{color:var(--accent);font-weight:600}
+  .grundtafel table.regeln{border-collapse:collapse;width:100%;margin:.3em 0}
+  .grundtafel table.regeln th,.grundtafel table.regeln td{border:1px solid var(--line);
+    padding:.5em .65em;text-align:left;vertical-align:top}
+  .grundtafel table.regeln thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .grundtafel table.regeln td.rname{font-weight:600;white-space:nowrap;width:11em}
+  .grundtafel table.regeln td.rform{color:var(--accent);font-weight:600;white-space:nowrap}
+  .grundtafel table.regeln td.rtext{font-size:.93rem}
+  .aufgabe{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+    background:#fff;padding:.8em 1em;margin:1em 0}
+  .aufgabe .kopf{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-bottom:.3em}
+  .loesung{display:none;margin-top:.7em;padding:.7em .9em;background:#f2f7f3;border:1px solid #cbe4d4;border-radius:8px}
+  .loesung.offen{display:block}
+  .lknopf{font:inherit;font-size:.85rem;padding:.3em .7em;border:1px solid var(--line);
+    border-radius:6px;background:#fff;cursor:pointer;color:var(--accent)}
+  .check{margin:.8em 0;padding:.8em .9em;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .check input,.check select{font:inherit;padding:.35em .5em;border:1px solid var(--line);border-radius:6px}
+  .check button,.gen button{font:inherit;padding:.4em .8em;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-left:.4em}
+  .feedback{margin-top:.5em;font-size:.95rem;min-height:1.4em}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--warn)}
+  textarea{width:100%;min-height:4.5em;font:inherit;padding:.5em;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .gen{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.8em 1em;margin:1em 0}
+  .gen .genaufgabe{margin:.6em 0;padding:.6em .8em;background:#fafaf7;border-radius:8px}
+  table.sortier{border-collapse:collapse;margin:.6em 0}
+  table.sortier td,table.sortier th{border:1px solid var(--line);padding:.35em .7em}
+  #toolbar{position:fixed;top:0;left:0;right:0;background:#20242b;color:#f3f4f6;
+    display:flex;gap:1em;align-items:center;justify-content:flex-end;padding:.35em 1em;font-size:.95rem;z-index:50}
+  #toolbar button{font:inherit;font-size:.8rem;background:#3a4150;color:#fff;border:0;border-radius:5px;padding:.15em .6em;cursor:pointer}
+  body{padding-top:2.4em}
+  body.beamer{font-size:26px;background:#fff}
+  body.beamer main{max-width:1180px}
+  body.beamer .nur-arbeit{display:none}
+  body.beamer section.slide{display:none;min-height:60vh}
+  body.beamer section.slide.aktiv{display:block}
+  body.beamer h2{font-size:1.5em}
+  /* ---- neue Bausteinfolge: Problem, Klaerung, Beispiel, Merksatz, Aufgaben ---- */
+  .vwahl{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .vknopf{font:inherit;font-size:.88rem;padding:.25em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .vknopf.aktiv{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .variante{display:none}
+  .variante.aktiv{display:block}
+  .problemkasten{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;
+    padding:.9em 1em;margin:.3em 0 1em;text-align:center;font-size:1.2rem;line-height:1.5}
+  .pfrage{font-weight:600;margin:.9em 0 .15em}
+  .pantwort{color:var(--ok);margin:.1em 0 .8em}
+  .bsp{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.5em .95em;margin:.7em 0}
+  .bsp h3{margin:.25em 0 .45em;color:var(--accent);font-size:1rem}
+  ol.bzeilen{list-style:none;margin:.2em 0;padding:0}
+  ol.bzeilen li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:.2em 1.2em;
+    align-items:baseline;padding:.3em 0;border-top:1px solid var(--line)}
+  ol.bzeilen li:first-child{border-top:0}
+  .brechnung{font-size:1.05em}
+  .bhinweis{color:var(--muted);font-size:.93em}
+  @media (max-width:800px){ol.bzeilen li{grid-template-columns:1fr}}
+  .merk{border:2px solid var(--accent);border-left-width:5px;border-radius:var(--radius);
+    background:#fff;padding:.6em 1em .7em;margin:.5em 0}
+  .merk ul{margin:.2em 0;padding-left:1.1em}
+  .merk li{margin:.5em 0}
+  .merk .regel{font-weight:600;display:block}
+  .merk .kurz{display:block;margin-top:.2em;color:var(--accent)}
+  .fehler{border:1px solid #e9cfcf;border-left:4px solid #b04a4a;border-radius:0 6px 6px 0;
+    background:#fdf6f6;padding:.55em .85em;margin:.5em 0}
+  .fehler p{margin:.2em 0;font-size:.95rem}
+  .typ,.afb{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;
+    padding:.14em .55em;border-radius:6px;margin:.2em .3em .2em 0;border:1px solid transparent}
+  .t-vor{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .t-rueck{background:#eef2f8;color:var(--accent);border-color:#cfe0ee}
+  .t-par{background:#f4eef8;color:#6b4a95;border-color:#ddd0ea}
+  .t-beur{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .afb1{background:#fbfbf9;color:var(--muted);border-color:var(--line)}
+  .afb2{background:#fbfbf9;color:var(--accent);border-color:#cfe0ee}
+  .afb3{background:#fbfbf9;color:var(--warn);border-color:#ecd9c2}
+  .spiegel{border:1px dashed var(--line);border-radius:var(--radius);background:#fbfbf9;margin:.5em 0 1em}
+  .spiegel>summary{cursor:pointer;padding:.5em .9em;font-size:.9rem;color:var(--muted);list-style:none}
+  .spiegel>summary::-webkit-details-marker{display:none}
+  .spiegel>summary::before{content:"\25b8 ";color:var(--accent)}
+  .spiegel[open]>summary::before{content:"\25be "}
+  .spiegel table.param,.spiegel p{margin:.2em .9em .7em}
+  .spiegel table.param th,.spiegel table.param td{text-align:center;padding:.35em .6em}
+  .bruch{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.15;margin:0 .12em;font-size:.92em;text-align:center}
+  .bruch .z{padding:0 .25em .05em;border-bottom:1.5px solid currentColor}
+  .bruch .n{padding:.05em .25em 0}
+  ol.bzeilen details.klapp{display:inline-block;margin:0}
+  ol.bzeilen details.klapp>summary{cursor:pointer;list-style:none;display:inline-block;font-size:.85rem;
+    padding:.1em .6em;border:1px solid var(--line);border-radius:999px;color:var(--accent);background:#fff}
+  ol.bzeilen details.klapp>summary::-webkit-details-marker{display:none}
+  ol.bzeilen details.klapp[open]>summary{background:var(--accent-soft)}
+  ol.bzeilen details.klapp .erg{margin-left:.6em;color:var(--ok);font-weight:600}
+  ol.bzeilen details.klapp:not([open]) .erg{display:none}
+  svg.plot{display:block;max-width:100%;height:auto;margin:.4em 0;background:#fff;border:1px solid var(--line);border-radius:6px}
+  svg.plot .gitter{stroke:#eceae4;stroke-width:1}
+  svg.plot .achse{stroke:#555;stroke-width:1.3}
+  svg.plot .tick{font-size:10px;fill:var(--muted)}
+  svg.plot .beschriftung{font-size:11px}
+  ol.bzeilen li:has(svg.plot){grid-template-columns:1fr}
+  .doppelbild .loesung{background:transparent;border:0;padding:0;margin-top:.3em}
+  .doppelbild .lknopf{margin:.2em 0}
+  .plots{display:flex;flex-wrap:wrap;gap:.6em;align-items:flex-start}
+  .plots svg.plot{margin:0}
+  body.beamer svg.plot{width:auto;height:auto}
+  .wurzel{display:inline-block;white-space:nowrap;vertical-align:baseline;line-height:1.15}
+  .wurzel .rad{display:inline-block;border-top:1.5px solid currentColor;padding:.04em .12em 0 .08em;
+    vertical-align:baseline;line-height:1.15}
+  ol.teile{margin:.4em 0 .2em;padding-left:1.6em}
+  ol.teile li{margin:.3em 0}
+  ol.teile li::marker{color:var(--accent);font-weight:700}
+  .limes{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.05;margin:0 .25em 0 .1em}
+  .limes .unter{font-size:.68em;color:var(--muted);white-space:nowrap}
+  body.beamer .problemkasten{font-size:1.15em}
+  .beamer-hinweis{position:fixed;bottom:.5em;right:1em;color:var(--muted);font-size:.75rem}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <a href="./" style="margin-right:auto;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:4px 6px">← Übersicht</a>
+  <button id="beamerKnopf">Beamer (B)</button>
+  <button id="alleLoesungenKnopf">Lösungen (L)</button>
+</div>
+
+<main>
+
+<section class="slide aktiv">
+  <h1>Block 06 · Sinus- und Kosinusfunktionen</h1>
+  <p class="lead">Mathematik LK (eA) · <strong>Ziel:</strong> Parameter der allgemeinen Sinusfunktion deuten und ablesen, Wertebereich und Periode bestimmen, periodische Vorgänge modellieren.</p>
+  <p class="nur-arbeit"><em>Tasten: B Beamer · Pfeile Abschnitt · L Lösungen</em></p>
+</section>
+
+<section class="slide">
+  <h2>Überblick <span class="phase">vor dem Einstieg</span></h2>
+  <p class="lead">Die periodische Klasse: alles wiederholt sich nach einer festen Länge.</p>
+  <details class="ueberblick" open>
+    <summary><span>Das musst du über diese Funktionsklassen wissen</span>
+             <span class="ub-zusatz">1 Funktionsklasse</span></summary>
+    <div class="ub-koerper">
+      <div class="ub-huelle">
+      <table class="ub">
+        <thead>
+          <tr><th>Funktionsklasse</th><th>Beispiel</th><th>Was einsetzen?</th><th>Was kommt heraus?</th>
+              <th>Steigt oder fällt?</th><th>Symmetrie</th><th>Nullstellen</th></tr>
+        </thead>
+        <tbody>
+        <tr><th>Sinus & Kosinus</th><td class="ub-bsp">f(x) = sin x</td><td>alle Zahlen</td><td>zwischen −1 und 1</td><td>immer auf und ab</td><td>sin: punktsym.<br>cos: achsensym.</td><td>unendlich viele</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="ub-detail"><h4>Sinus & Kosinus</h4><p>a Amplitude; Periode <span class="bruch"><span class="z">2π</span><span class="n">b</span></span> · c Verschiebung nach rechts · d Mittellinie.</p><p class="ub-fehler"><strong>Typischer Fehler:</strong> b streckt nicht die Amplitude, sondern staucht die Periode: sin(2x) schwingt doppelt so schnell, nicht doppelt so hoch.</p><p><strong>Alle Lösungen von sin x = c finden</strong></p><ol><li>Eine Lösung mit dem Taschenrechner: sin x = 0,5 → x₁ = arcsin(0,5) = <span class="bruch"><span class="z">π</span><span class="n">6</span></span>.</li><li>Die zweite Lösung im Periodenfenster liegt symmetrisch: x₂ = π − <span class="bruch"><span class="z">π</span><span class="n">6</span></span> = <span class="bruch"><span class="z">5π</span><span class="n">6</span></span>.</li><li>Alle weiteren durch Anhängen der Periode: x = <span class="bruch"><span class="z">π</span><span class="n">6</span></span> + k·2π und x = <span class="bruch"><span class="z">5π</span><span class="n">6</span></span> + k·2π, k ∈ ℤ.</li><li>Bei cos x = c ist die zweite Lösung x₂ = −x₁, ebenfalls + k·2π.</li><li>Der Rechner liefert immer nur EINE Lösung — die anderen muss man selbst ergänzen.</li></ol></div>
+      <p class="ub-link">Alle neun Funktionsklassen mit Graph, Wertetabelle und Rechenwegen:
+         <a href="funktionsklassen-uebersicht.html" target="_blank" rel="noopener">Funktionsklassen im Überblick</a></p>
+    </div>
+  </details>
+</section>
+
+<section class="slide">
+  <span class="phase">1 · Problem</span>
+  <h2>Die Schwingung lesen <span class="phase badge-kern">Einstieg</span></h2>
+  <div class="vwahl" role="group" aria-label="Einstieg wählen"><button type="button" class="vknopf aktiv" data-ziel="0">Problemorientiert</button><button type="button" class="vknopf" data-ziel="1">Anknüpfend</button></div>
+  <div class="variante aktiv">
+    <div class="problemkasten">Welche Werte nimmt <span class="formel">g(x) = 2·sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) + 1</span> an — und wann zum ersten Mal den größten?</div>
+    <p class="pfrage">Wie groß ist der größte Wert überhaupt?</p>
+    <p class="pantwort"><span class="formel">sin</span> liefert höchstens 1. Also <span class="formel">2·1 + 1 = 3</span> — und mindestens <span class="formel">2·(−1) + 1 = −1</span>. Der Wertebereich ist <span class="formel">[−1; 3]</span>.</p>
+    <p class="pfrage">An welcher Stelle wird die 3 erreicht?</p>
+    <p class="pantwort">Wenn <span class="formel">sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = 1</span> ist, also <span class="formel">x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span> = <span class="bruch"><span class="z">π</span><span class="n">2</span></span></span> — bei <span class="formel">x = π</span>. Der Rechner nennt nur diese eine von unendlich vielen Lösungen.</p>
+    <p class="pfrage">Woher kommen die Zahlen 2, 1 und <span class="bruch"><span class="z">π</span><span class="n">2</span></span> im Term?</p>
+    <p class="pantwort">Sie sind keine Rechenschritte, sondern <b>Bauteile</b>: Amplitude, Mittellinie, Verschiebung. Genau diese Grammatik klären wir jetzt.</p>
+  </div>
+  <div class="variante">
+    <div class="problemkasten">Bei Parabeln hieß es <span class="formel">a·f(b(x − c)) + d</span>. Gilt dieselbe Grammatik auch für <span class="formel">sin</span>?</div>
+    <p class="pfrage">Was bewirkte jeder Parameter bei der Parabel?</p>
+    <p class="pantwort"><span class="formel">a</span> streckt in y-Richtung, <span class="formel">b</span> staucht in x-Richtung, <span class="formel">c</span> verschiebt waagerecht, <span class="formel">d</span> senkrecht — und <span class="formel">b</span> wirkte <b>gegenläufig</b>.</p>
+    <p class="pfrage">Prüft das an <span class="formel">sin(2x)</span>.</p>
+    <p class="pantwort">Die Periode wird nicht doppelt so lang, sondern <b>halb</b> so lang: <span class="formel">π</span> statt <span class="formel">2π</span>. Die Gegenläufigkeit gilt genauso.</p>
+    <p class="pfrage">Was ist bei <span class="formel">sin</span> dann überhaupt neu?</p>
+    <p class="pantwort">Nur die Namen: <span class="formel">|a|</span> heißt Amplitude, <span class="formel">d</span> Mittellinie, und aus <span class="formel">b</span> wird die Periode <span class="formel"><span class="bruch"><span class="z">2π</span><span class="n">b</span></span></span>. Die Transformations-Grammatik trägt vollständig.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">2 · Klärung</span>
+  <h2>Klärung — die vier Bauteile einer Schwingung</h2>
+  <p class="lead">Vier Parameter, vier Wirkungen — in dieser Reihenfolge abgelesen, geht nichts durcheinander.</p>
+  <ol class="schritte">
+    <li><span class="frage">Mittellinie <span class="formel">d</span> ablesen</span><span class="ergebnis">Der Summand ganz außen. Um ihn schwingt alles; er ist der Mittelwert aus Hoch- und Tiefpunkt.</span></li>
+    <li><span class="frage">Amplitude <span class="formel">|a|</span> ablesen</span><span class="ergebnis">Der Faktor vor <span class="formel">sin</span>, <b>ohne Vorzeichen</b>. Ein negatives <span class="formel">a</span> spiegelt nur, es verkleinert den Ausschlag nicht.</span></li>
+    <li><span class="frage">Periode aus <span class="formel">b</span> berechnen</span><span class="ergebnis"><span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">b</span></span></span> — innen wirkt alles gegenläufig: großes <span class="formel">b</span> heißt kurze Periode.</span></li>
+    <li><span class="frage">Verschiebung <span class="formel">c</span> ablesen</span><span class="ergebnis">Nur ablesbar, wenn <span class="formel">b</span> ausgeklammert ist: <span class="formel">sin(b(x − c))</span>. Sonst verwechselt man Verschiebung und Stauchung.</span></li>
+    <li><span class="frage">Wertebereich zusammensetzen</span><span class="ergebnis"><span class="formel">W = [d − |a|; d + |a|]</span> — Mittellinie plus/minus Amplitude.</span></li>
+  </ol>
+  <p class="tafel-merk">Alles, was <b>innen</b> in der Klammer steht, wirkt gegenläufig; alles <b>außen</b> wirkt direkt.</p>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Beispiel — vollständig vorgerechnet</h2>
+  <div class="bsp"><h3>Kennwerte von <span class="formel">g(x) = 2·sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) + 1</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">d = 1</span></span><span class="bhinweis">Mittellinie — der Summand außen</span></li><li><span class="brechnung"><span class="formel">|a| = 2</span></span><span class="bhinweis">Amplitude</span></li><li><span class="brechnung"><span class="formel">b = 1 ⇒ p = <span class="bruch"><span class="z">2π</span><span class="n">1</span></span> = 2π</span></span><span class="bhinweis">Periode</span></li><li><span class="brechnung"><span class="formel">c = <span class="bruch"><span class="z">π</span><span class="n">2</span></span></span></span><span class="bhinweis">um <span class="bruch"><span class="z">π</span><span class="n">2</span></span> nach rechts verschoben</span></li><li><span class="brechnung"><span class="formel">W = [1 − 2; 1 + 2] = [−1; 3]</span></span><span class="bhinweis">Wertebereich</span></li><li><span class="brechnung"><span class="formel">2·sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) + 1 = −2·cos(x) + 1</span></span><span class="bhinweis">Doppelgesicht: <span class="formel">sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = −cos x</span></span></li></ol>
+  </div>
+  <div class="bsp"><h3>Modell: Riesenrad <span class="formel">h(t) = 15·sin(<span class="bruch"><span class="z">π</span><span class="n">4</span></span>·(t − 2)) + 18</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">p = 2π ÷ (<span class="bruch"><span class="z">π</span><span class="n">4</span></span>) = 8</span></span><span class="bhinweis">eine Umdrehung dauert 8 Minuten</span></li><li><span class="brechnung"><span class="formel">|a| = 15</span>, <span class="formel">d = 18</span></span><span class="bhinweis">Radradius 15 m, Nabe in 18 m Höhe</span></li><li><span class="brechnung"><span class="formel">W = [3; 33]</span></span><span class="bhinweis">tiefster und höchster Punkt der Gondel</span></li><li><span class="brechnung"><span class="formel"><span class="bruch"><span class="z">π</span><span class="n">4</span></span>·(t − 2) = <span class="bruch"><span class="z">π</span><span class="n">2</span></span> ⇒ t = 4</span></span><span class="bhinweis">oben nach 4 Minuten</span></li><li><span class="brechnung"><span class="formel">t = 0</span> bzw. <span class="formel">t = 8</span></span><span class="bhinweis">unten am Anfang und nach einer vollen Umdrehung</span></li></ol>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">4 · Merksatz</span>
+  <h2>Merksatz — die allgemeine Sinusfunktion</h2>
+  <div class="merk"><ul><li><span class="regel">In <span class="formel">f(x) = a·sin(b(x − c)) + d</span> hat jeder Parameter genau eine Aufgabe.</span><span class="kurz"><span class="formel">|a|</span> Amplitude · <span class="formel">b</span> Periode · <span class="formel">c</span> waagerecht · <span class="formel">d</span> Mittellinie</span></li><li><span class="regel">Die Periode ist <span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">b</span></span></span> — innen wirkt alles gegenläufig.</span><span class="kurz"><span class="formel">sin(2x)</span> hat die Periode <span class="formel">π</span>, nicht <span class="formel">4π</span></span></li><li><span class="regel">Der Wertebereich ist Mittellinie plus/minus Amplitude.</span><span class="kurz"><span class="formel">W = [d − |a|; d + |a|]</span></span></li><li><span class="regel">Sinus und Kosinus sind derselbe Graph, um <span class="formel"><span class="bruch"><span class="z">π</span><span class="n">2</span></span></span> verschoben.</span><span class="kurz"><span class="formel">sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = −cos x</span> · <span class="formel">cos(x) = sin(x + <span class="bruch"><span class="z">π</span><span class="n">2</span></span>)</span></span></li></ul></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> Bei <span class="formel">a = −2</span> den Wertebereich <span class="formel">[d − 2; d − 2]</span> oder <span class="formel">[d + a; d − a]</span> bilden.</p><p><strong>Richtig:</strong> Die Amplitude ist <span class="formel">|a|</span>. Für <span class="formel">a = −2</span> und <span class="formel">d = 1</span> bleibt <span class="formel">W = [−1; 3]</span> — das Minus spiegelt nur, es verschiebt nichts.</p></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> Die Periode von <span class="formel">sin(2x)</span> mit <span class="formel">2·2π = 4π</span> angeben.</p><p><strong>Richtig:</strong> Innen wirkt es <b>gegenläufig</b>: <span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">2</span></span> = π</span>. Doppelt so schnell heißt halb so lang.</p></div>
+</section>
+
+<section class="slide">
+  <h2 class="nur-arbeit">Aufgabengenerator: Allgemeine Sinusfunktion</h2>
+  <div class="gen nur-arbeit">
+    <p>Stufe:
+      <select id="genStufe">
+        <option value="1">1 · Amplitude und Mittellinie</option>
+        <option value="2">2 · mit Periode</option>
+        <option value="3">3 · alle Kennwerte + Hochpunkt</option>
+        <option value="4">4 · rückwärts (Term aus Kennwerten)</option>
+      </select>
+      <button id="genNeu">Neue Aufgabe</button>
+      <button id="genLoesung">Lösungsweg ein/aus</button>
+    </p>
+    <div class="genaufgabe" id="genAusgabe"><em>Noch keine Aufgabe erzeugt.</em></div>
+    <div class="loesung" id="genLoesungFeld"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">5 · Aufgaben</span>
+  <h2>Aufgaben</h2>
+  <details class="spiegel nur-arbeit"><summary>Aufgabenspiegel: Typ × Anforderungsbereich</summary>
+    <table class="param"><thead><tr><th></th><th>AFB I</th><th>AFB II</th><th>AFB III</th></tr></thead><tbody><tr><th>Vorwärts</th><td>2</td><td>2</td><td>1</td></tr><tr><th>Rückwärts</th><td>2</td><td>1</td><td>—</td></tr><tr><th>Parameter</th><td>—</td><td>2</td><td>—</td></tr><tr><th>Beurteilen</th><td>—</td><td>1</td><td>1</td></tr></tbody></table>
+    <p class="lead">Verteilung der Bewertungseinheiten: AFB I 32 %; AFB II 47 %; AFB III 21 % (Richtwert 30 / 50 / 20).</p>
+  </details>
+  <details class="stufe" open><summary>Anforderungsbereich I — Reproduzieren <span class="lead">· angeben, berechnen, ablesen</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b06a1">
+    <div class="kopf"><strong>Aufgabe 1</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt Amplitude und Periode an: <ol class="teile"><li><span class="formel">f(x) = −2·sin(x)</span></li><li><span class="formel">f(x) = sin(2πx)</span></li><li><span class="formel">f(x) = 4·sin(0,2x)</span>.</li></ol></p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Amplitude bei (a)?</p>
+      <input id="b06a1antwort" inputmode="text" placeholder="z. B. 2" aria-label="Antwort Aufgabe 1">
+      <button id="b06a1pruefen">Prüfen</button>
+      <div class="feedback" id="b06a1feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b06a1l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a1l"><p><ol class="teile"><li><span class="formel">|a| = 2</span>, <span class="formel">p = 2π</span></li><li><span class="formel">|a| = 1</span>, <span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">2π</span></span> = 1</span></li><li><span class="formel">|a| = 4</span>, <span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">0,2</span></span> = 10π</span>. Das Minus in (a) spiegelt, es ändert die Amplitude nicht.</li></ol></p></div>
+  </div>
+  <div class="aufgabe" id="b06a2">
+    <div class="kopf"><strong>Aufgabe 2</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Bestimmt für <span class="formel">f(x) = 3·sin(x) + 4</span> den Wertebereich sowie den größten und kleinsten Funktionswert.</p>
+    <button class="lknopf" data-loesung="b06a2l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a2l"><p>Mittellinie <span class="formel">d = 4</span>, Amplitude 3, also <span class="formel">W = [4 − 3; 4 + 3] = [1; 7]</span>. Größter Wert 7, kleinster Wert 1.</p></div>
+  </div>
+  <div class="aufgabe" id="b06a3">
+    <div class="kopf"><strong>Aufgabe 3</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine Sinusfunktion an mit <ol class="teile"><li><span class="formel">|a| = 3</span> und <span class="formel">p = π</span> sowie</li><li><span class="formel">|a| = 0,5</span> und <span class="formel">p = 4</span>.</li></ol></p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert von b bei (a)?</p>
+      <input id="b06a3antwort" inputmode="text" placeholder="z. B. 4" aria-label="Antwort Aufgabe 3">
+      <button id="b06a3pruefen">Prüfen</button>
+      <div class="feedback" id="b06a3feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b06a3l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a3l"><p>Aus <span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">b</span></span></span> folgt <span class="formel">b = <span class="bruch"><span class="z">2π</span><span class="n">p</span></span></span>. <ol class="teile"><li><span class="formel">b = <span class="bruch"><span class="z">2π</span><span class="n">π</span></span> = 2</span>, also <span class="formel">f(x) = 3·sin(2x)</span></li><li><span class="formel">b = <span class="bruch"><span class="z">2π</span><span class="n">4</span></span> = <span class="bruch"><span class="z">π</span><span class="n">2</span></span></span>, also <span class="formel">f(x) = 0,5·sin(<span class="bruch"><span class="z">π</span><span class="n">2</span></span>·x)</span>.</li></ol></p></div>
+  </div>
+  <div class="aufgabe" id="b06a4">
+    <div class="kopf"><strong>Aufgabe 4</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine Sinusfunktion an, deren Wertebereich <span class="formel">[2; 8]</span> ist.</p>
+    <button class="lknopf" data-loesung="b06a4l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a4l"><p>Mittellinie <span class="formel">d = <span class="bruch"><span class="z">2 + 8</span><span class="n">2</span></span> = 5</span>, Amplitude <span class="formel">|a| = <span class="bruch"><span class="z">8 − 2</span><span class="n">2</span></span> = 3</span>, also z. B. <span class="formel">f(x) = 3·sin(x) + 5</span>. Die Periode ist frei wählbar — sie steht im Wertebereich nicht drin.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich II — Zusammenhänge herstellen <span class="lead">· bestimmen, untersuchen, erläutern</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b06a5">
+    <div class="kopf"><strong>Aufgabe 5</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Die Temperatur eines Tages wird durch <span class="formel">T(t) = 5·sin(<span class="bruch"><span class="z">π</span><span class="n">12</span></span>·(t − 9)) + 20</span> beschrieben (<span class="formel">t</span> Uhrzeit in Stunden). Gebt Periode, Höchst- und Tiefsttemperatur an, ermittelt die Uhrzeit der Höchsttemperatur und beurteilt, ob die Periode zum Sachkontext passt.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Periode in Stunden?</p>
+      <input id="b06a5antwort" inputmode="text" placeholder="z. B. 12" aria-label="Antwort Aufgabe 5">
+      <button id="b06a5pruefen">Prüfen</button>
+      <div class="feedback" id="b06a5feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b06a5l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a5l"><p><span class="formel">p = 2π ÷ (<span class="bruch"><span class="z">π</span><span class="n">12</span></span>) = 24</span> — und das <b>passt</b>: ein Temperaturverlauf wiederholt sich täglich. · <span class="formel">|a| = 5</span>, <span class="formel">d = 20</span>, also Höchsttemperatur 25 °C und Tiefsttemperatur 15 °C.<br>Das Maximum liegt bei <span class="formel"><span class="bruch"><span class="z">π</span><span class="n">12</span></span>·(t − 9) = <span class="bruch"><span class="z">π</span><span class="n">2</span></span></span>, also <span class="formel">t − 9 = 6</span> und <span class="formel">t = 15</span> — um 15 Uhr. Das Minimum zwölf Stunden früher, um 3 Uhr.</p></div>
+  </div>
+  <div class="aufgabe" id="b06a6">
+    <div class="kopf"><strong>Aufgabe 6</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Eine Messreihe liefert <span class="formel">f(0) = 0</span>, <span class="formel">f(0,5) = 1,41</span>, <span class="formel">f(1) = 2</span>, <span class="formel">f(1,5) = 1,41</span>, <span class="formel">f(2) = 0</span>, <span class="formel">f(3) = −2</span>. Bestimmt Amplitude, Periode und eine passende Funktionsgleichung.</p>
+    <button class="lknopf" data-loesung="b06a6l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a6l"><p>Größter Wert 2, kleinster <span class="formel">−2</span>, Mittellinie 0 — also <span class="formel">|a| = 2</span>. Von Nullstelle (0) über Hoch <ol class="teile"><li>und Null</li><li>bis Tief (3): eine volle Periode dauert <span class="formel">p = 4</span>, also <span class="formel">b = <span class="bruch"><span class="z">2π</span><span class="n">4</span></span> = <span class="bruch"><span class="z">π</span><span class="n">2</span></span></span> und <span class="formel">f(x) = 2·sin(<span class="bruch"><span class="z">π</span><span class="n">2</span></span>·x)</span>. Probe: <span class="formel">2·sin(<span class="bruch"><span class="z">π</span><span class="n">4</span></span>) ≈ 1,41</span> — passt.</li></ol></p></div>
+  </div>
+  <div class="aufgabe" id="b06a7">
+    <div class="kopf"><strong>Aufgabe 7</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Der Graph von <span class="formel">f(x) = a·sin(b·x)</span> mit <span class="formel">a, b &gt; 0</span> schwingt zwischen <span class="formel">−2</span> und 2 und hat die Periode <span class="formel">π</span>. Bestimmt a und b und begründet kurz.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert von a?</p>
+      <input id="b06a7antwort" inputmode="text" placeholder="z. B. 3" aria-label="Antwort Aufgabe 7">
+      <button id="b06a7pruefen">Prüfen</button>
+      <div class="feedback" id="b06a7feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b06a7l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a7l"><p>Die Mittellinie ist 0, der Ausschlag geht bis 2 — also <span class="formel">a = 2</span>. Aus <span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">b</span></span> = π</span> folgt <span class="formel">b = 2</span>. Die Funktion ist <span class="formel">f(x) = 2·sin(2x)</span>. Probe: <span class="formel">f(<span class="bruch"><span class="z">π</span><span class="n">4</span></span>) = 2·sin(<span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = 2</span> — der Höchstwert wird bereits nach einer Viertelperiode erreicht.</p></div>
+  </div>
+  <div class="aufgabe" id="b06a8">
+    <div class="kopf"><strong>Aufgabe 8</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Für welches <span class="formel">b &gt; 0</span> hat <span class="formel">f(x) = sin(b(x − 3))</span> die Periode 8? Welche Periode gehört zu <span class="formel">b = <span class="bruch"><span class="z">π</span><span class="n">4</span></span></span>?</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert von b für p = 8?</p>
+      <input id="b06a8antwort" inputmode="text" placeholder="z. B. 2" aria-label="Antwort Aufgabe 8">
+      <button id="b06a8pruefen">Prüfen</button>
+      <div class="feedback" id="b06a8feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b06a8l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a8l"><p>Aus <span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">b</span></span> = 8</span> folgt <span class="formel">b = <span class="bruch"><span class="z">2π</span><span class="n">8</span></span> = <span class="bruch"><span class="z">π</span><span class="n">4</span></span></span>. Umgekehrt gehört zu <span class="formel">b = <span class="bruch"><span class="z">π</span><span class="n">4</span></span></span> genau <span class="formel">p = 2π ÷ (<span class="bruch"><span class="z">π</span><span class="n">4</span></span>) = 8</span> — es ist dieselbe Funktion. Die Verschiebung um 3 ändert die Periode nicht.</p></div>
+  </div>
+  <div class="aufgabe" id="b06a9">
+    <div class="kopf"><strong>Aufgabe 9</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist <span class="formel">f_a(x) = a·sin(x) + 4</span> mit <span class="formel">a ≠ 0</span>. Bestimmt den Wertebereich in Abhängigkeit von a und gebt an, für welche a die Funktion keine Nullstelle besitzt.</p>
+    <button class="lknopf" data-loesung="b06a9l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a9l"><p><span class="formel">W = [4 − |a|; 4 + |a|]</span> — das Vorzeichen von a spielt keine Rolle. Eine Nullstelle gibt es genau dann, wenn die 0 in W liegt, also wenn <span class="formel">|a| ≥ 4</span>. Für <span class="formel">|a| &lt; 4</span>, also <span class="formel">−4 &lt; a &lt; 4</span> (mit <span class="formel">a ≠ 0</span>), verläuft der Graph vollständig oberhalb der x-Achse.</p></div>
+  </div>
+  <div class="aufgabe" id="b06a10">
+    <div class="kopf"><strong>Aufgabe 10</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Beurteilt: „Der Graph von <span class="formel">f(x) = 3·sin(x)</span> und der von <span class="formel">g(x) = −3·sin(x)</span> haben verschiedene Wertebereiche, weil das Vorzeichen von a verschieden ist.“</p>
+    <button class="lknopf" data-loesung="b06a10l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a10l"><p><b>Falsch.</b> Beide haben <span class="formel">W = [−3; 3]</span>. Die Amplitude ist <span class="formel">|a| = 3</span> in beiden Fällen; das Minus spiegelt den Graphen an der x-Achse, verschiebt aber weder Hoch- noch Tiefpunkt. Verschieden sind die <b>Stellen</b>, an denen die Extremwerte auftreten.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich III — Verallgemeinern und beurteilen <span class="lead">· begründen, beurteilen, entwickeln</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b06a11">
+    <div class="kopf"><strong>Aufgabe 11</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Zeigt, dass sich <span class="formel">g(x) = 2·sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) + 1</span> auch als Kosinusfunktion schreiben lässt, und gebt diese Form an. Erläutert, warum es überhaupt zwei Schreibweisen gibt.</p>
+    <button class="lknopf" data-loesung="b06a11l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a11l"><p>Es gilt <span class="formel">sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = −cos(x)</span>, also <span class="formel">g(x) = −2·cos(x) + 1</span>. Probe bei <span class="formel">x = π</span>: <span class="formel">−2·(−1) + 1 = 3</span> — derselbe Hochpunkt. Grund: Sinus und Kosinus sind <b>derselbe</b> Graph, gegeneinander um <span class="formel"><span class="bruch"><span class="z">π</span><span class="n">2</span></span></span> verschoben. Jede Schwingung lässt sich daher mit beiden Funktionen beschreiben; man wählt die, bei der die Verschiebung einfacher wird.</p></div>
+  </div>
+  <div class="aufgabe" id="b06a12">
+    <div class="kopf"><strong>Aufgabe 12</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Beurteilt; begründet wahre Aussagen allgemein und widerlegt falsche durch ein Gegenbeispiel. <ol class="teile"><li><span class="formel">sin(2x)</span> hat die halbe Periode von <span class="formel">sin(x)</span>.</li><li>Der Graph von <span class="formel">cos(x)</span> entsteht aus dem von <span class="formel">sin(x)</span> durch Verschiebung um <span class="formel"><span class="bruch"><span class="z">π</span><span class="n">2</span></span></span> nach links.</li><li>Für alle reellen a hat <span class="formel">a·sin(x)</span> den Wertebereich <span class="formel">[−a; a]</span>.</li></ol></p>
+    <button class="lknopf" data-loesung="b06a12l">Lösung ein/aus</button>
+    <div class="loesung" id="b06a12l"><p><ol class="teile"><li><b>wahr</b>: <span class="formel">p = <span class="bruch"><span class="z">2π</span><span class="n">2</span></span> = π</span>, und <span class="formel">π</span> ist die Hälfte von <span class="formel">2π</span>. Allgemein <span class="formel">sin(2(x + π)) = sin(2x + 2π) = sin(2x)</span>.</li><li><b>wahr</b>: <span class="formel">sin(x + <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = cos(x)</span> — das Argument wird vergrößert, der Graph wandert nach links.</li><li><b>falsch</b>: für <span class="formel">a = −2</span> wäre <span class="formel">[−a; a] = [2; −2]</span> — ein leeres Intervall, denn die Grenzen stehen verkehrt herum. Der Wertebereich ist auch dort <span class="formel">[−2; 2]</span>. Richtig heißt die Formel <span class="formel">[−|a|; |a|]</span>.</li></ol></p></div>
+  </div>
+    </div>
+  </details>
+  
+</section>
+
+<section class="slide">
+  <details class="stufe"><summary>Zum Nachschlagen: Sinus- und Kosinusfunktionen <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: f(x) = a · sin(b(x − c)) + d</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">Grundform</td><td class="rform">f(x) = a · sin(b(x − c)) + d</td><td class="rtext">Vier Parameter, jeder mit einer eigenen Aufgabe. Für den Kosinus gilt alles genauso — cos ist nur ein um <span class="bruch"><span class="z">π</span><span class="n">2</span></span> nach links verschobener Sinus.</td></tr>
+        <tr><td class="rname">a — Amplitude</td><td class="rform">Ausschlag nach oben und unten</td><td class="rtext">|a| ist der Abstand von der Mittellinie bis zum höchsten Punkt. a = 3 heißt: die Kurve schwingt zwischen −3 und 3. Ein negatives a spiegelt an der Mittellinie.</td></tr>
+        <tr><td class="rname">b — Periode</td><td class="rform">Periode = 2π / b</td><td class="rtext"><strong>b staucht, es streckt nicht.</strong> sin(2x) schwingt doppelt so schnell, die Periode halbiert sich auf π. Das ist der häufigste Denkfehler.</td></tr>
+        <tr><td class="rname">c — Verschiebung waagrecht</td><td class="rform">Minus in der Klammer → nach rechts</td><td class="rtext">Wie bei allen Funktionen wirkt es innen gegenläufig: sin(x − <span class="bruch"><span class="z">π</span><span class="n">2</span></span>) ist <span class="bruch"><span class="z">π</span><span class="n">2</span></span> nach <strong>rechts</strong> verschoben.</td></tr>
+        <tr><td class="rname">d — Mittellinie</td><td class="rform">Verschiebung senkrecht</td><td class="rtext">Die Kurve schwingt nicht mehr um die x-Achse, sondern um y = d.</td></tr>
+        <tr><td class="rname">Wertebereich</td><td class="rform">von d − |a| bis d + |a|</td><td class="rtext">Ohne Parameter also [−1; 1]. Mit f(x) = 2·sin(x) + 3 entsprechend [1; 5].</td></tr>
+        <tr><td class="rname">Nullstellen</td><td class="rform">sin: k·π · cos: <span class="bruch"><span class="z">π</span><span class="n">2</span></span> + k·π</td><td class="rtext">Unendlich viele, jeweils im Abstand einer <strong>halben</strong> Periode. k steht für jede ganze Zahl.</td></tr>
+        <tr><td class="rname">Symmetrie</td><td class="rform">sin ungerade · cos gerade</td><td class="rtext">sin(−x) = −sin(x), also punktsymmetrisch zum Ursprung. cos(−x) = cos(x), also achsensymmetrisch zur y-Achse.</td></tr>
+        <tr><td class="rname">Wichtige Werte</td><td class="rform">sin 0 = 0, sin(<span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = 1, sin π = 0</td><td class="rtext">cos 0 = 1, cos(<span class="bruch"><span class="z">π</span><span class="n">2</span></span>) = 0, cos π = −1. Dazu der „Trigonometrische Pythagoras": sin²x + cos²x = 1 für jedes x.</td></tr>
+        <tr><td class="rname">Alle Lösungen finden</td><td class="rform">Rechner liefert nur eine</td><td class="rtext">Bei sin x = c gibt der Rechner x₁ = arcsin(c). Die zweite Lösung im Periodenfenster ist x₂ = π − x₁, danach kommt jeweils + k·2π dazu. Bei cos x = c ist x₂ = −x₁.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+</section>
+
+</main>
+<div class="beamer-hinweis">B = Beamer · ◀ ▶ = Navigation · L = Lösungen</div>
+
+<script id="gen-lib">
+"use strict";
+function mulberry(seed){
+  var t = seed >>> 0;
+  return function(){
+    t = (t + 0x6D2B79F5) >>> 0;
+    var r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ganz(rnd, von, bis){ return von + Math.floor(rnd() * (bis - von + 1)); }
+
+function sinMake(seed, level){
+  var rnd = mulberry(seed * 4 + level + 600);
+  var v = ganz(rnd, 0, 2);
+  var a = ganz(rnd, 2, 4);
+  var d = ganz(rnd, -3, 3);
+  var b = (level === 1) ? 1 : [1, 2, 3, 4][ganz(rnd, 0, 3)];
+  function pTxt(bb){ return bb === 1 ? "2π" : (bb === 2 ? "π" : "2π/" + bb); }
+  function termA(aa, bb, dd){
+    return (aa === 1 ? "" : (aa === -1 ? "−" : aa + "·")) + "sin(" + (bb === 1 ? "x" : bb + "x") + ")" +
+      (dd === 0 ? "" : (dd > 0 ? " + " + dd : " − " + (-dd)));
+  }
+  var text, schritte, extra = {};
+  if (level === 1){
+    var lo1 = d - a, hi1 = d + a;
+    if (v === 0){
+      text = "Gegeben ist f(x) = " + termA(a, 1, d) + ". Geben Sie Amplitude, Mittellinie und Wertebereich an.";
+      schritte = ["Amplitude |a| = " + a + ", Mittellinie y = " + d,
+        "Wertebereich [" + lo1 + "; " + hi1 + "]"];
+    } else if (v === 1){
+      text = "Eine Funktion f(x) = a·sin(x) + d mit a > 0 hat den Wertebereich [" + lo1 + "; " + hi1 + "]. Bestimmen Sie a und d.";
+      schritte = ["Mittellinie = Intervallmitte: d = (" + lo1 + " + " + hi1 + ")/2 = " + d,
+        "Amplitude = halbe Intervallbreite: a = (" + hi1 + " − (" + lo1 + "))/2 = " + a];
+    } else {
+      var a2 = a + ganz(rnd, 1, 2), d2 = d + ganz(rnd, -1, 1), hi2 = d2 + a2;
+      extra.a2 = a2; extra.d2 = d2; extra.hi2 = hi2;
+      text = "Gegeben sind f(x) = " + termA(a, 1, d) + " und g(x) = " + termA(a2, 1, d2) +
+        ". Welche Funktion hat den groesseren groessten Funktionswert? Begruenden Sie ueber Mittellinie und Amplitude.";
+      schritte = ["f: groesster Wert = Mittellinie + Amplitude = " + d + " + " + a + " = " + hi1,
+        "g: groesster Wert = " + d2 + " + " + a2 + " = " + hi2,
+        hi2 > hi1 ? "g liegt hoeher" : (hi2 < hi1 ? "f liegt hoeher" : "beide gleich gross")];
+    }
+  } else if (level === 2){
+    var lo2 = d - a, hi2b = d + a;
+    if (v === 0){
+      text = "Gegeben ist f(x) = " + termA(a, b, d) + ". Geben Sie Amplitude, Periode, Mittellinie und Wertebereich an.";
+      schritte = ["Amplitude " + a + ", Mittellinie y = " + d,
+        "Periode 2π/b = " + pTxt(b),
+        "Wertebereich [" + lo2 + "; " + hi2b + "]"];
+    } else if (v === 1){
+      text = "Eine Funktion f(x) = a·sin(bx) + d mit a, b > 0 hat den Wertebereich [" + lo2 + "; " + hi2b + "] und die Periode " + pTxt(b) + ". Bestimmen Sie a, b und d.";
+      schritte = ["Mittellinie = Intervallmitte: d = " + d + "; Amplitude = halbe Breite: a = " + a,
+        "Periode 2π/b = " + pTxt(b) + " → b = " + b];
+    } else {
+      if (b === 1) b = ganz(rnd, 2, 4);
+      text = "Ein Schueler behauptet: f(x) = sin(" + b + "x) hat die Periode " + b + "·2π, weil der Faktor " + b + " die Kurve streckt. Finden Sie den Fehler und geben Sie die richtige Periode an.";
+      schritte = ["Fehler: b wirkt INNEN und damit gegenlaeufig - die Kurve wird gestaucht, nicht gestreckt",
+        "richtige Periode: 2π/b = " + pTxt(b)];
+    }
+  } else if (level === 3){
+    var lo3 = d - a, hi3 = d + a;
+    if (v === 0){
+      var aa = (rnd() < 0.4) ? -a : a;
+      extra.aSig = aa;
+      text = "Gegeben ist f(x) = " + termA(aa, b, d) + ". Geben Sie Amplitude, Periode, Mittellinie, Wertebereich und den groessten Funktionswert an.";
+      schritte = ["Amplitude |a| = " + a + (aa < 0 ? " (Betrag!)" : "") + ", Mittellinie y = " + d,
+        "Periode 2π/b = " + pTxt(b),
+        "Wertebereich [" + lo3 + "; " + hi3 + "], groesster Wert " + hi3];
+    } else if (v === 1){
+      var xs = (b === 1) ? "π/2" : (b === 2 ? "π/4" : "π/" + (2 * b));
+      text = "Gegeben ist f(x) = " + termA(a, b, d) + ". Geben Sie den groessten Funktionswert an und die kleinste positive Stelle, an der er angenommen wird.";
+      schritte = ["groesster Wert: d + a = " + d + " + " + a + " = " + hi3,
+        "sin(" + (b === 1 ? "x" : b + "x") + ") = 1 erstmals fuer " + (b === 1 ? "x" : b + "x") + " = π/2",
+        "Stelle x = " + xs];
+    } else {
+      text = "Gegeben sind f(x) = " + termA(a, b, d) + " und g(x) = " + termA(-a, b, d) + ". Entscheiden Sie mit Begruendung: Haben beide Funktionen denselben Wertebereich?";
+      schritte = ["Der Wertebereich haengt nur von |a| und d ab: [d − |a|; d + |a|]",
+        "|" + (-a) + "| = " + a + " → beide: [" + lo3 + "; " + hi3 + "] - ja"];
+    }
+  } else {
+    var lo4 = d - a, hi4 = d + a;
+    if (v === 0){
+      text = "Eine Sinusfunktion f(x) = a·sin(bx) + d (a, b > 0) hat den Wertebereich [" + lo4 + "; " + hi4 + "] und die Periode " + pTxt(b) + ". Bestimmen Sie a, b und d und geben Sie den Funktionsterm an.";
+      schritte = ["Mittellinie = Intervallmitte: d = " + d + "; Amplitude = halbe Breite: a = " + a,
+        "Periode 2π/b = " + pTxt(b) + " → b = " + b,
+        "f(x) = " + termA(a, b, d)];
+    } else if (v === 1){
+      text = "Eine Sinusfunktion f(x) = a·sin(bx) + d (a, b > 0) hat die Mittellinie y = " + d + ", den groessten Funktionswert " + hi4 + " und die Periode " + pTxt(b) + ". Bestimmen Sie a, b, d und den kleinsten Funktionswert.";
+      schritte = ["d = " + d + " (Mittellinie direkt gegeben)",
+        "a = groesster Wert − d = " + hi4 + " − (" + d + ") = " + a,
+        "Periode 2π/b = " + pTxt(b) + " → b = " + b,
+        "kleinster Wert: d − a = " + lo4];
+    } else {
+      text = "Ein Schueler liest aus f(x) = " + termA(-a, 1, d) + " den Wertebereich [" + d + " − (" + (-a) + "); " + d + " + (" + (-a) + ")] = [" + hi4 + "; " + lo4 + "] ab. Finden Sie den Fehler und geben Sie den richtigen Wertebereich an.";
+      schritte = ["Fehler: fuer den Wertebereich zaehlt der BETRAG |a| = " + a + ", nicht a = " + (-a),
+        "richtig: [d − |a|; d + |a|] = [" + lo4 + "; " + hi4 + "]"];
+    }
+  }
+  var out = { typ: "sinusKennwerte", seed: seed, level: level, v: v, variante: v, a: a, b: b, d: d,
+    text: text, schritte: schritte, ergebnis: { lo: d - a, hi: d + a, b: b, d: d } };
+  for (var k in extra) out[k] = extra[k];
+  return out;
+}
+function sinVerify(t){
+  if (t.b < 1 || t.b > 4 || t.a < 1) return "Parameter unzulaessig";
+  if (t.ergebnis.lo !== t.d - t.a || t.ergebnis.hi !== t.d + t.a) return "Wertebereich falsch";
+  if ((t.ergebnis.lo + t.ergebnis.hi) / 2 !== t.d) return "Mittellinie inkonsistent";
+  if ([t.a, t.b, t.d].some(function(z){ return z !== Math.round(z) || Math.abs(z) > 8; })) return "Parameter unsauber";
+  if (t.level === 1 && t.v === 2){
+    if (t.a2 <= t.a) return "Vergleichsfunktion nicht groesser";
+    if (t.hi2 !== t.d2 + t.a2) return "Vergleichswert falsch";
+  }
+  if (t.level === 2 && t.v === 2 && t.b < 2) return "Fehlersuche braucht b >= 2";
+  if (t.level === 3 && t.v === 0 && Math.abs(t.aSig) !== t.a) return "Vorzeichenvariante inkonsistent";
+  if (t.level === 1 && t.b !== 1) return "Stufe 1 nur mit b = 1";
+  if (!t.schritte || t.schritte.length < 2) return "Loesungsweg unvollstaendig";
+  for (var i = 0; i < t.schritte.length; i++){
+    if (/undefined|NaN|Infinity/.test(String(t.schritte[i]))) return "Schritt fehlerhaft";
+  }
+  return null;
+}
+var GENERATORS = { sinusKennwerte: { make: sinMake, verify: sinVerify } };
+
+</script>
+
+<script>
+
+"use strict";
+(function(){
+  var alleOffen = false;
+  document.querySelectorAll("[data-loesung]").forEach(function(knopf){
+    knopf.addEventListener("click", function(){
+      var ziel = document.getElementById(knopf.getAttribute("data-loesung"));
+      if (ziel) ziel.classList.toggle("offen");
+    });
+  });
+  function alleLoesungen(){
+    alleOffen = !alleOffen;
+    document.querySelectorAll(".loesung").forEach(function(el){ el.classList.toggle("offen", alleOffen); });
+  }
+  document.getElementById("alleLoesungenKnopf").addEventListener("click", alleLoesungen);
+
+  var HOCH = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+               "-":"⁻","−":"⁻","+":"⁺","(":"⁽",")":"⁾",".":"˙",",":"˙",
+               "x":"ˣ","n":"ⁿ","k":"ᵏ","a":"ᵃ","b":"ᵇ","i":"ⁱ","j":"ʲ","m":"ᵐ","t":"ᵗ","u":"ᵘ",
+               "h":"ʰ","p":"ᵖ","r":"ʳ","s":"ˢ","v":"ᵛ","w":"ʷ","y":"ʸ","z":"ᶻ",
+               "c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ","l":"ˡ","o":"ᵒ"," ":" ",
+               // schon hochgestellte Zeichen bleiben, wie sie sind: e^(x²) -> eˣ²
+               "⁰":"⁰","¹":"¹","²":"²","³":"³","⁴":"⁴","⁵":"⁵","⁶":"⁶","⁷":"⁷","⁸":"⁸","⁹":"⁹",
+               "⁻":"⁻","⁺":"⁺" };
+  // Tiefgestellte Zeichen fuer Scharen und indizierte Groessen: f_a wird zu fₐ,
+  // x_1 zu x₁. Unicode kennt nur diese Buchstaben tiefgestellt - fehlt einer,
+  // bleibt der Term unveraendert stehen (lieber f_b als ein halb gesetztes fᵇ).
+  var TIEF = { "a":"ₐ","e":"ₑ","h":"ₕ","i":"ᵢ","j":"ⱼ","k":"ₖ",
+               "l":"ₗ","m":"ₘ","n":"ₙ","o":"ₒ","p":"ₚ","r":"ᵣ",
+               "s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","x":"ₓ",
+               "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄",
+               "5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" };
+  function tief(z){
+    var aus = "";
+    for (var i = 0; i < z.length; i++){
+      if (!TIEF[z[i]]) return null;
+      aus += TIEF[z[i]];
+    }
+    return aus;
+  }
+  // Vorzeichen- und Faktornormalisierung. Hier stehen nur Umformungen, die IMMER
+  // richtig sind, unabhaengig vom Kontext - "x − -4" heisst auch in einem zitierten
+  // Schuelerfehler "x + 4". Kontextabhaengiges (1x, + 0) gehoert in die Generatoren.
+  function termNormal(s){
+    var t = String(s), vorher;
+    do {
+      vorher = t;
+      t = t
+        // Vorzeichenketten: "− -4" -> "+ 4", "+ -4" -> "− 4"
+        .replace(/([−-])\s*[−-]\s*(?=[\dxa-z(])/g, "+ ")
+        .replace(/\+\s*[−-]\s*(?=[\dxa-z(])/g, "− ")
+        // nur nach Variablen/Klammern kuerzen: x^1 -> x, aber 2^1 · 2^x bleibt
+        .replace(/([a-zA-Z)])(?:\^1(?![\d,.])|\^\(1\))/g, "$1")
+        .replace(/\s*\/\s*1(?![\d,.])/g, "")
+        .replace(/(^|[^0-9a-zA-Z.,])1\s*[·*]\s*(?=[a-z(])/g, "$1")
+        .replace(/(^|[^0-9a-zA-Z.,])1(?=[a-z])/g, "$1")
+        .replace(/\s*[·*]\s*1(?![\d,.])/g, "")
+        .replace(/\(\s*([a-z])\s*[+−-]\s*0\s*\)/g, "$1")
+        // "+ 0" nur nach einem Term mit Variable streichen. Kein Wort davor
+        // ("wird + 0 −"), keine Hochzahl danach ("p − 0²" ist ein eingesetzter
+        // Wert) und kein Vorzeichen danach (Monotoniefolge "+ 0 −").
+        .replace(/(^|[^a-zA-Z])([a-z][0-9²³]*)\s*[+−-]\s*0(?![\d,.²³⁰¹⁴-⁹^])(?!\s*[+−-])/g, "$1$2");
+    } while (t !== vorher);
+    return t.replace(/[ 	]{2,}/g, " ");
+  }
+  // Setzt einen Exponenten hoch - aber nur, wenn JEDES Zeichen ein Hochzeichen hat.
+  // Sonst bliebe eine Mischung wie "2ˣ⁺?" stehen, die schlechter lesbar ist als 2^(x + ?).
+  function hoch(z){
+    // Das Malzeichen entfaellt im Exponenten: e^(a·x) wird zu eᵃˣ - so schreibt man es
+    // auch von Hand, und ein hochgestellter Malpunkt ist typografisch nicht vorgesehen.
+    // innere Exponenten zuerst aufloesen, sonst scheitert e^(x^2) am "^" im Inneren
+    var t = z.replace(/\^(-?\d+)/g, function(_, d){
+              return d.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+             .replace(/([0-9a-z])\s*[·*]\s*(?=[0-9a-z])/g, "$1");
+    var aus = "";
+    for (var i = 0; i < t.length; i++){
+      if (!HOCH[t[i]]) return null;
+      aus += HOCH[t[i]];
+    }
+    return aus;
+  }
+  function schoenMathe(s){
+    return termNormal(String(s))
+      // geklammerte Exponenten zuerst: 2^(x−1) -> 2ˣ⁻¹, e^(2x) -> e²ˣ
+      .replace(/\^\(([^()]{1,12})\)/g, function(ganz, z){
+        var h = hoch(z);
+        if (h === null) return ganz;
+        // Zusammengesetzte Exponenten bekommen hochgestellte Klammern: sonst liest sich
+        // 2^(x-1) als 2 hoch x hoch -1. Ein blosses Vorzeichen (e^(-x)) ist eindeutig.
+        return /[^-−+].*[-−+]/.test(z) ? "⁽" + h + "⁾" : h;
+      })
+      .replace(/\^(-?\d+)/g, function(_, z){ return z.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+      .replace(/\^([a-z])(?![a-zA-Z0-9])/g, function(ganz, z){ return HOCH[z] || ganz; })
+      .replace(/(\d)\.(\d)/g, "$1,$2");
+  }
+  function maskiere(s){
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  // Was schoenMathe() nicht in Unicode setzen konnte, wird hier echtes <sup>/<sub>:
+  // x^(1/2), e^(v(x)), Integralgrenzen ∫0^√a, und Indizes mit beliebigem Buchstaben.
+  // Dateinamen, Pfade und Adressen sind keine Formeln - dort bedeutet "_" nichts.
+  function istKeineFormel(s){
+    return /\.(?:md|html|py|json|txt)\b|:\/\//.test(s);
+  }
+  function markup(s){
+    if (istKeineFormel(s)) { return maskiere(s); }
+    return maskiere(s)
+      // Exponent mit eigener Klammer zuerst: e^(v(x)), 2^(f(x) + 1)
+      .replace(/\^\(((?:[^()]|\([^()]*\)){1,28})\)/g, "<sup>$1</sup>")
+      .replace(/\^([A-Za-z0-9,.√−α-ωΑ-Ω+-]+)/g, "<sup>$1</sup>")
+      .replace(/([A-Za-z])_\(([^()]{1,24})\)/g, "$1<sub>$2</sub>")
+      .replace(/([A-Za-z])_([A-Za-z0-9]+)/g, "$1<sub>$2</sub>");
+  }
+  // Notation vereinheitlichen: Hochzahlen auch im statischen Folientext (x^2 -> x2 hoch)
+  (function hochAlles(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var knoten = [];
+    while (walker.nextNode()){
+      var t = walker.currentNode, el = t.parentNode;
+      if (el && el.tagName !== "SCRIPT" && el.tagName !== "STYLE" &&
+          (t.nodeValue.indexOf("^") >= 0 || t.nodeValue.indexOf("_") >= 0)) knoten.push(t);
+    }
+    knoten.forEach(function(t){
+      var neu = schoenMathe(t.nodeValue);
+      var mk = markup(neu);
+      if (mk === maskiere(neu)) { t.nodeValue = neu; return; }
+      // Echtes Markup noetig: den Textknoten durch ein <span> ersetzen.
+      var sp = document.createElement("span");
+      sp.innerHTML = mk;
+      if (t.parentNode) { t.parentNode.replaceChild(sp, t); }
+    });
+  })();
+
+  function bindeCheck(feldId, knopfId, ausgabeId, pruefer){
+    var feld = document.getElementById(feldId), knopf = document.getElementById(knopfId),
+        ausgabe = document.getElementById(ausgabeId);
+    if (!feld || !knopf || !ausgabe) return;
+    function lauf(){
+      var r = pruefer((feld.value || "").trim().replace(",", "."));
+      ausgabe.textContent = schoenMathe(r.text); ausgabe.className = "feedback " + (r.ok ? "ok" : "no");
+    }
+    knopf.addEventListener("click", lauf);
+    feld.addEventListener("keydown", function(ev){ if (ev.key === "Enter") lauf(); });
+  }
+
+  // ---- Umschalten zwischen Einstiegs-Varianten ----
+  document.querySelectorAll(".vwahl").forEach(function(w){
+    w.addEventListener("click", function(ev){
+      var k = ev.target.closest(".vknopf"); if (!k) { return; }
+      var sec = w.closest("section") || document;
+      w.querySelectorAll(".vknopf").forEach(function(b){ b.classList.toggle("aktiv", b === k); });
+      var ziel = parseInt(k.getAttribute("data-ziel"), 10);
+      sec.querySelectorAll(".variante").forEach(function(v, j){ v.classList.toggle("aktiv", j === ziel); });
+    });
+  });
+
+  bindeCheck("b06a1antwort", "b06a1pruefen", "b06a1feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 2) return { ok: true, text: "Stimmt: die Amplitude ist |a| = 2, das Minus spiegelt nur." };
+    return { ok: false, text: "Noch nicht — die Amplitude ist der Betrag des Faktors vor sin." };
+  });
+  bindeCheck("b06a3antwort", "b06a3pruefen", "b06a3feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 2) return { ok: true, text: "Stimmt: b = 2*pi/p = 2. Jetzt Teil (b) mit p = 4." };
+    return { ok: false, text: "Noch nicht — stelle p = 2*pi/b nach b um." };
+  });
+  bindeCheck("b06a5antwort", "b06a5pruefen", "b06a5feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 24) return { ok: true, text: "Stimmt: 2*pi geteilt durch pi/12 ergibt 24 — ein Tag." };
+    return { ok: false, text: "Noch nicht — setze b = pi/12 in p = 2*pi/b ein." };
+  });
+  bindeCheck("b06a7antwort", "b06a7pruefen", "b06a7feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 2) return { ok: true, text: "Stimmt: der Ausschlag geht bis 2, also a = 2. Jetzt b aus der Periode." };
+    return { ok: false, text: "Noch nicht — wie weit schwingt der Graph von der Mittellinie weg?" };
+  });
+  bindeCheck("b06a8antwort", "b06a8pruefen", "b06a8feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    var z = w.replace(",", ".").replace(/\s/g, "").toLowerCase();
+    if (z === "pi/4" || Math.abs(Number(z) - Math.PI / 4) < 0.01)
+      return { ok: true, text: "Stimmt: b = 2*pi/8 = pi/4." };
+    return { ok: false, text: "Noch nicht — setze p = 8 in p = 2*pi/b ein (Antwort als pi/4 schreiben)." };
+  });
+
+
+  var genZaehler = 1, letzteAufgabe = null;
+  var genWahl = document.getElementById("genStufe");
+  var genTypWahl = document.getElementById("genTyp");
+  // Trainingsbloecke buendeln mehrere Generatoren und bieten eine Typenwahl an.
+  // Fehlt das Auswahlfeld (alle Lernbloecke), bleibt es beim einzigen Generator.
+  function genName(){
+    if (genTypWahl && genTypWahl.value && GENERATORS[genTypWahl.value]) return genTypWahl.value;
+    return Object.keys(GENERATORS)[0];
+  }
+  function genNeu(){
+    var stufe = Number(genWahl.value);
+    var g = GENERATORS[genName()];
+    // verify ist der Qualitaetswaechter: eine beanstandete Aufgabe wird verworfen
+    // und neu gewuerfelt (Gate A fuzzt dieselbe Pruefung offline).
+    var versuch = 0;
+    do {
+      letzteAufgabe = g.make(Date.now() % 100000 + genZaehler++, stufe);
+      versuch++;
+    } while (versuch < 20 && g.verify(letzteAufgabe));
+    document.getElementById("genAusgabe").textContent = schoenMathe(letzteAufgabe.text);
+    var feld = document.getElementById("genLoesungFeld");
+    feld.classList.remove("offen");
+    feld.innerHTML = "<ol><li>" + letzteAufgabe.schritte.map(schoenMathe).join("</li><li>") + "</li></ol>";
+  }
+  if (document.getElementById("genNeu")){
+    document.getElementById("genNeu").addEventListener("click", genNeu);
+    document.getElementById("genLoesung").addEventListener("click", function(){
+      if (letzteAufgabe) document.getElementById("genLoesungFeld").classList.toggle("offen");
+    });
+  }
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll("section.slide"));
+  var slideIdx = 0;
+  function zeigeSlide(i){
+    slideIdx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, j){ s.classList.toggle("aktiv", j === slideIdx); });
+  }
+  function beamerUmschalten(){
+    document.body.classList.toggle("beamer");
+    if (document.body.classList.contains("beamer")) zeigeSlide(slideIdx);
+    else slides.forEach(function(s){ s.classList.add("aktiv"); });
+  }
+  document.getElementById("beamerKnopf").addEventListener("click", beamerUmschalten);
+  document.addEventListener("keydown", function(ev){
+    if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA" || ev.target.tagName === "SELECT")) return;
+    var k = ev.key.toLowerCase();
+    if (k === "b") beamerUmschalten();
+    else if (k === "l") alleLoesungen();
+    else if (document.body.classList.contains("beamer")){
+      if (ev.key === "ArrowRight" || ev.key === "PageDown") zeigeSlide(slideIdx + 1);
+      if (ev.key === "ArrowLeft" || ev.key === "PageUp") zeigeSlide(slideIdx - 1);
+    }
+  });
+  slides.forEach(function(s){ s.classList.add("aktiv"); });
+})();
+
+</script>
+</body>
+</html>

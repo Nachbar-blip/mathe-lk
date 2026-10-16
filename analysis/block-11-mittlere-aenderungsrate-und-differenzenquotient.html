@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block 11 · Mittlere Änderungsrate und Differenzenquotient</title>
+<!--
+  analysis-lk Block 11 (Mathematik LK, eA). MasterMind-Aufbau, neutrales Design.
+  Single-File, keine externen Abhaengigkeiten, ASCII-only JS-Bezeichner, kein Browser-Storage.
+  Tasten: B Beamer, Pfeile Abschnitt (Beamer), L alle Loesungen.
+  Erzeugt aus _skelett.py - Aenderungen am Rahmen dort vornehmen, Inhalt in _inhalt_bXX.py.
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --accent-soft:#eaf1f7; --ok:#2e7d5a; --warn:#b06a2e;
+    --maxw:920px; --radius:10px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  main{max-width:var(--maxw);margin:0 auto;padding:28px 18px 64px;}
+  h1{font-size:1.5rem;margin:.2em 0 .1em}
+  h2{font-size:1.2rem;margin:1.5em 0 .4em;border-bottom:2px solid var(--line);padding-bottom:.2em}
+  p{margin:.5em 0}
+  .lead{color:var(--muted)}
+  .formel{white-space:nowrap}
+  sub,sup{font-size:.72em;line-height:0}
+  .spvek{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.08;font-size:.94em;padding:0 .12em;margin:0 .1em;position:relative}
+  .spvek::before,.spvek::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;
+    border:1.5px solid currentColor}
+  .spvek::before{left:-.22em;border-right:none;border-radius:.5em 0 0 .5em}
+  .spvek::after{right:-.22em;border-left:none;border-radius:0 .5em .5em 0}
+  .spvek span{display:block;padding:0 .18em}
+  .phase{display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.02em;
+    padding:.18em .6em;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid #cfe0ee;margin:.2em .3em .2em 0;}
+  .badge-kern{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .badge-vert{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .bluete{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;overflow:hidden;background:#fff;}
+  .bluete>summary{cursor:pointer;padding:.7em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;}
+  .bluete>summary::-webkit-details-marker{display:none}
+  .lvl{font-size:.74rem;font-weight:600;padding:.1em .5em;border-radius:6px}
+  .lvl.l1{background:#eef6f0;color:var(--ok)}
+  .lvl.l2{background:#eef2f8;color:var(--accent)}
+  .lvl.l3{background:#f7efe6;color:var(--warn)}
+  .bluete[open]>summary{border-bottom:1px solid var(--line)}
+  .bluete .body{padding:.3em .9em .9em}
+  .iqb{margin:.45em 0 0;font-size:.82rem}
+  .iqb>summary{cursor:pointer;color:var(--muted);list-style:none;display:inline-flex;
+    align-items:center;gap:.4em;padding:.12em .6em;border:1px solid var(--line);
+    border-radius:999px;background:#fbfbf9}
+  .iqb>summary::-webkit-details-marker{display:none}
+  .iqb>summary::before{content:"IQB";font-weight:700;font-size:.72rem;letter-spacing:.03em;
+    color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:.05em .35em}
+  .iqb>summary:hover{border-color:var(--accent);color:var(--accent)}
+  .iqb .iqb-text{margin:.4em 0 0;padding:.5em .7em;background:#fbfbf9;border-left:3px solid var(--line);
+    border-radius:0 6px 6px 0;color:var(--muted);line-height:1.5}
+  .iqb .iqb-text .iqb-fund{display:block;margin-top:.3em;font-size:.95em;opacity:.85}
+  .hinfuehrung{border:1px solid #ecd9c2;border-left:4px solid var(--warn);border-radius:0 var(--radius) var(--radius) 0;
+    background:#fffdf5;padding:.85em 1em;margin:.4em 0 1em}
+  .hinfuehrung h3{margin:0 0 .4em;font-size:1rem;color:var(--warn)}
+  .hinfuehrung p{margin:.35em 0}
+  .hinfuehrung .frage{font-weight:600;font-size:1.02rem}
+  .hinfuehrung .aufloesung{margin-top:.6em;padding-top:.5em;border-top:1px dashed #ecd9c2;
+    font-size:.94rem;color:var(--muted)}
+  table.wertereihe{border-collapse:collapse;margin:.3em 0 .4em;font-size:.9rem;background:#fff}
+  table.wertereihe th,table.wertereihe td{border:1px solid var(--line);padding:.25em .6em;text-align:center}
+  table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .hinfuehrung table.wertereihe{border-collapse:collapse;margin:.5em 0;font-size:.92rem;background:#fff}
+  .hinfuehrung table.wertereihe th,.hinfuehrung table.wertereihe td{border:1px solid var(--line);
+    padding:.3em .7em;text-align:center}
+  .hinfuehrung table.wertereihe th{background:#fbfbf9;font-weight:600}
+  .tafel{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;margin:.8em 0;overflow:hidden}
+  .tafel>h3{margin:0;padding:.6em .9em;background:var(--accent);color:#fff;font-size:1rem}
+  .tafel .tafel-koerper{padding:.85em .9em}
+  .tafel-form{text-align:center;font-size:1.15rem;margin:.2em 0 .9em;padding:.5em;
+    background:var(--accent-soft);border-radius:6px;color:var(--accent);font-weight:600}
+  .tafel-form .zeiger{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:.25em}
+  table.param{border-collapse:collapse;width:100%;margin:.3em 0}
+  table.param th,table.param td{border:1px solid var(--line);padding:.5em .65em;text-align:left;vertical-align:top}
+  table.param thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  table.param .pz{font-weight:700;color:var(--accent);font-size:1.05rem;text-align:center;width:2.4em}
+  table.param .pbsp{font-size:.9rem;color:var(--muted)}
+  table.param .pbsp code{background:#fbfbf9;padding:.05em .3em;border-radius:3px;color:var(--fg)}
+  .tafel-merk{margin:.5em 0 0;padding:.45em .7em;background:#fffdf5;border-left:3px solid var(--warn);
+    border-radius:0 6px 6px 0;font-size:.93rem}
+  .tafel-merk::before{content:"Merke: ";font-weight:700;color:var(--warn)}
+  ol.schritte{counter-reset:s;list-style:none;padding:0;margin:.4em 0 0}
+  ol.schritte li{counter-increment:s;position:relative;padding:.5em .7em .5em 2.6em;margin:.4em 0;
+    background:#fafaf7;border-radius:6px}
+  ol.schritte li::before{content:counter(s);position:absolute;left:.7em;top:.5em;width:1.5em;height:1.5em;
+    background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:.82rem;font-weight:700}
+  ol.schritte .frage{font-weight:600;display:block}
+  ol.schritte .ergebnis{display:block;margin-top:.25em;font-size:.9rem;color:var(--ok);font-weight:600}
+  table.reihen{border-collapse:collapse;width:100%;margin:.3em 0;font-size:.93rem}
+  table.reihen th,table.reihen td{border:1px solid var(--line);padding:.45em .65em;text-align:left}
+  table.reihen thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .stufe{border:1px solid var(--line);border-radius:var(--radius);margin:.6em 0;background:#fff;overflow:hidden}
+  .stufe>summary{cursor:pointer;padding:.6em .9em;font-weight:600;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;gap:1em;background:#fbfbf9}
+  .stufe>summary::-webkit-details-marker{display:none}
+  .stufe>summary::before{content:"\25b8";color:var(--accent);font-weight:400}
+  .stufe[open]>summary::before{content:"\25be"}
+  .stufe .stufe-koerper{padding:.7em .9em}
+  .tauf{margin:0 0 .9em;padding-bottom:.7em;border-bottom:1px dashed var(--line)}
+  .tauf:last-child{margin-bottom:0;padding-bottom:0;border-bottom:0}
+  .tauf .tfrage{margin:0 0 .4em}
+  .tauf .tfrage strong.nr{color:var(--accent);margin-right:.3em}
+  .ueberblick{border:1px solid #cfe0ee;border-radius:var(--radius);background:#fff;margin:.2em 0 1.1em}
+  .ueberblick>summary{cursor:pointer;padding:.7em .9em;font-weight:600;color:var(--accent);
+    background:var(--accent-soft);list-style:none;border-radius:var(--radius);
+    display:flex;justify-content:space-between;align-items:center;gap:1em}
+  .ueberblick>summary::-webkit-details-marker{display:none}
+  .ueberblick>summary::before{content:"\25b8";font-weight:400;margin-right:.15em}
+  .ueberblick[open]>summary::before{content:"\25be"}
+  .ueberblick[open]>summary{border-radius:var(--radius) var(--radius) 0 0}
+  .ueberblick .ub-zusatz{font-weight:400;font-size:.85rem;color:var(--muted)}
+  .ueberblick .ub-koerper{padding:.8em .9em}
+  .ub-huelle{overflow-x:auto}
+  table.ub{border-collapse:collapse;width:100%;min-width:660px;font-size:.9rem}
+  table.ub th,table.ub td{border:1px solid var(--line);padding:.42em .6em;text-align:left;vertical-align:top}
+  table.ub thead th{background:#fbfbf9;font-size:.82rem;color:var(--muted);font-weight:600}
+  table.ub tbody th{white-space:nowrap;font-weight:600}
+  table.ub .ub-bsp{white-space:nowrap;color:var(--accent);font-size:.88rem}
+  .ub-detail{margin:.9em 0 0;padding:.6em .8em;border-left:3px solid var(--line);background:#fafaf7;border-radius:0 6px 6px 0}
+  .ub-detail h4{margin:0 0 .25em;font-size:.93rem;color:var(--accent)}
+  .ub-detail p{margin:.2em 0;font-size:.93rem}
+  .ub-detail .ub-fehler{color:var(--warn)}
+  .ub-detail ol{margin:.3em 0 0;padding-left:1.4em;font-size:.93rem}
+  .ub-detail ol li{margin:.25em 0}
+  .ub-link{margin:.9em 0 0;font-size:.92rem}
+  .ub-link a{color:var(--accent);font-weight:600}
+  .grundtafel table.regeln{border-collapse:collapse;width:100%;margin:.3em 0}
+  .grundtafel table.regeln th,.grundtafel table.regeln td{border:1px solid var(--line);
+    padding:.5em .65em;text-align:left;vertical-align:top}
+  .grundtafel table.regeln thead th{background:#fbfbf9;font-size:.83rem;color:var(--muted)}
+  .grundtafel table.regeln td.rname{font-weight:600;white-space:nowrap;width:11em}
+  .grundtafel table.regeln td.rform{color:var(--accent);font-weight:600;white-space:nowrap}
+  .grundtafel table.regeln td.rtext{font-size:.93rem}
+  .aufgabe{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);
+    background:#fff;padding:.8em 1em;margin:1em 0}
+  .aufgabe .kopf{display:flex;gap:.5em;flex-wrap:wrap;align-items:center;margin-bottom:.3em}
+  .loesung{display:none;margin-top:.7em;padding:.7em .9em;background:#f2f7f3;border:1px solid #cbe4d4;border-radius:8px}
+  .loesung.offen{display:block}
+  .lknopf{font:inherit;font-size:.85rem;padding:.3em .7em;border:1px solid var(--line);
+    border-radius:6px;background:#fff;cursor:pointer;color:var(--accent)}
+  .check{margin:.8em 0;padding:.8em .9em;background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .check input,.check select{font:inherit;padding:.35em .5em;border:1px solid var(--line);border-radius:6px}
+  .check button,.gen button{font:inherit;padding:.4em .8em;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-left:.4em}
+  .feedback{margin-top:.5em;font-size:.95rem;min-height:1.4em}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--warn)}
+  textarea{width:100%;min-height:4.5em;font:inherit;padding:.5em;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .gen{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.8em 1em;margin:1em 0}
+  .gen .genaufgabe{margin:.6em 0;padding:.6em .8em;background:#fafaf7;border-radius:8px}
+  table.sortier{border-collapse:collapse;margin:.6em 0}
+  table.sortier td,table.sortier th{border:1px solid var(--line);padding:.35em .7em}
+  #toolbar{position:fixed;top:0;left:0;right:0;background:#20242b;color:#f3f4f6;
+    display:flex;gap:1em;align-items:center;justify-content:flex-end;padding:.35em 1em;font-size:.95rem;z-index:50}
+  #toolbar button{font:inherit;font-size:.8rem;background:#3a4150;color:#fff;border:0;border-radius:5px;padding:.15em .6em;cursor:pointer}
+  body{padding-top:2.4em}
+  body.beamer{font-size:26px;background:#fff}
+  body.beamer main{max-width:1180px}
+  body.beamer .nur-arbeit{display:none}
+  body.beamer section.slide{display:none;min-height:60vh}
+  body.beamer section.slide.aktiv{display:block}
+  body.beamer h2{font-size:1.5em}
+  /* ---- neue Bausteinfolge: Problem, Klaerung, Beispiel, Merksatz, Aufgaben ---- */
+  .vwahl{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .8em}
+  .vknopf{font:inherit;font-size:.88rem;padding:.25em .85em;border:1px solid var(--line);
+    border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .vknopf.aktiv{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .variante{display:none}
+  .variante.aktiv{display:block}
+  .problemkasten{border:2px solid var(--accent);border-radius:var(--radius);background:#fff;
+    padding:.9em 1em;margin:.3em 0 1em;text-align:center;font-size:1.2rem;line-height:1.5}
+  .pfrage{font-weight:600;margin:.9em 0 .15em}
+  .pantwort{color:var(--ok);margin:.1em 0 .8em}
+  .bsp{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.5em .95em;margin:.7em 0}
+  .bsp h3{margin:.25em 0 .45em;color:var(--accent);font-size:1rem}
+  ol.bzeilen{list-style:none;margin:.2em 0;padding:0}
+  ol.bzeilen li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:.2em 1.2em;
+    align-items:baseline;padding:.3em 0;border-top:1px solid var(--line)}
+  ol.bzeilen li:first-child{border-top:0}
+  .brechnung{font-size:1.05em}
+  .bhinweis{color:var(--muted);font-size:.93em}
+  @media (max-width:800px){ol.bzeilen li{grid-template-columns:1fr}}
+  .merk{border:2px solid var(--accent);border-left-width:5px;border-radius:var(--radius);
+    background:#fff;padding:.6em 1em .7em;margin:.5em 0}
+  .merk ul{margin:.2em 0;padding-left:1.1em}
+  .merk li{margin:.5em 0}
+  .merk .regel{font-weight:600;display:block}
+  .merk .kurz{display:block;margin-top:.2em;color:var(--accent)}
+  .fehler{border:1px solid #e9cfcf;border-left:4px solid #b04a4a;border-radius:0 6px 6px 0;
+    background:#fdf6f6;padding:.55em .85em;margin:.5em 0}
+  .fehler p{margin:.2em 0;font-size:.95rem}
+  .typ,.afb{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;
+    padding:.14em .55em;border-radius:6px;margin:.2em .3em .2em 0;border:1px solid transparent}
+  .t-vor{background:#eef6f0;color:var(--ok);border-color:#cbe4d4}
+  .t-rueck{background:#eef2f8;color:var(--accent);border-color:#cfe0ee}
+  .t-par{background:#f4eef8;color:#6b4a95;border-color:#ddd0ea}
+  .t-beur{background:#f7efe6;color:var(--warn);border-color:#ecd9c2}
+  .afb1{background:#fbfbf9;color:var(--muted);border-color:var(--line)}
+  .afb2{background:#fbfbf9;color:var(--accent);border-color:#cfe0ee}
+  .afb3{background:#fbfbf9;color:var(--warn);border-color:#ecd9c2}
+  .spiegel{border:1px dashed var(--line);border-radius:var(--radius);background:#fbfbf9;margin:.5em 0 1em}
+  .spiegel>summary{cursor:pointer;padding:.5em .9em;font-size:.9rem;color:var(--muted);list-style:none}
+  .spiegel>summary::-webkit-details-marker{display:none}
+  .spiegel>summary::before{content:"\25b8 ";color:var(--accent)}
+  .spiegel[open]>summary::before{content:"\25be "}
+  .spiegel table.param,.spiegel p{margin:.2em .9em .7em}
+  .spiegel table.param th,.spiegel table.param td{text-align:center;padding:.35em .6em}
+  .bruch{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.15;margin:0 .12em;font-size:.92em;text-align:center}
+  .bruch .z{padding:0 .25em .05em;border-bottom:1.5px solid currentColor}
+  .bruch .n{padding:.05em .25em 0}
+  ol.bzeilen details.klapp{display:inline-block;margin:0}
+  ol.bzeilen details.klapp>summary{cursor:pointer;list-style:none;display:inline-block;font-size:.85rem;
+    padding:.1em .6em;border:1px solid var(--line);border-radius:999px;color:var(--accent);background:#fff}
+  ol.bzeilen details.klapp>summary::-webkit-details-marker{display:none}
+  ol.bzeilen details.klapp[open]>summary{background:var(--accent-soft)}
+  ol.bzeilen details.klapp .erg{margin-left:.6em;color:var(--ok);font-weight:600}
+  ol.bzeilen details.klapp:not([open]) .erg{display:none}
+  svg.plot{display:block;max-width:100%;height:auto;margin:.4em 0;background:#fff;border:1px solid var(--line);border-radius:6px}
+  svg.plot .gitter{stroke:#eceae4;stroke-width:1}
+  svg.plot .achse{stroke:#555;stroke-width:1.3}
+  svg.plot .tick{font-size:10px;fill:var(--muted)}
+  svg.plot .beschriftung{font-size:11px}
+  ol.bzeilen li:has(svg.plot){grid-template-columns:1fr}
+  .doppelbild .loesung{background:transparent;border:0;padding:0;margin-top:.3em}
+  .doppelbild .lknopf{margin:.2em 0}
+  .plots{display:flex;flex-wrap:wrap;gap:.6em;align-items:flex-start}
+  .plots svg.plot{margin:0}
+  body.beamer svg.plot{width:auto;height:auto}
+  .wurzel{display:inline-block;white-space:nowrap;vertical-align:baseline;line-height:1.15}
+  .wurzel .rad{display:inline-block;border-top:1.5px solid currentColor;padding:.04em .12em 0 .08em;
+    vertical-align:baseline;line-height:1.15}
+  ol.teile{margin:.4em 0 .2em;padding-left:1.6em}
+  ol.teile li{margin:.3em 0}
+  ol.teile li::marker{color:var(--accent);font-weight:700}
+  .limes{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;
+    line-height:1.05;margin:0 .25em 0 .1em}
+  .limes .unter{font-size:.68em;color:var(--muted);white-space:nowrap}
+  body.beamer .problemkasten{font-size:1.15em}
+  .beamer-hinweis{position:fixed;bottom:.5em;right:1em;color:var(--muted);font-size:.75rem}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <a href="./" style="margin-right:auto;color:#fff;text-decoration:none;font:600 14px system-ui,sans-serif;padding:4px 6px">← Übersicht</a>
+  <button id="beamerKnopf">Beamer (B)</button>
+  <button id="alleLoesungenKnopf">Lösungen (L)</button>
+</div>
+
+<main>
+
+<section class="slide aktiv">
+  <h1>Block 11 · Mittlere Änderungsrate und Differenzenquotient</h1>
+  <p class="lead">Mathematik LK (eA) · <strong>Ziel:</strong> Mittlere Änderungsraten berechnen, als Sekantensteigung und im Sachzusammenhang deuten, den h-Term als Sprungbrett aufstellen.</p>
+  <p class="nur-arbeit"><em>Tasten: B Beamer · Pfeile Abschnitt · L Lösungen</em></p>
+</section>
+
+<section class="slide">
+  <span class="phase">1 · Problem</span>
+  <h2>Wie schnell, im Durchschnitt? <span class="phase badge-kern">Einstieg</span></h2>
+  <div class="vwahl" role="group" aria-label="Einstieg wählen"><button type="button" class="vknopf aktiv" data-ziel="0">Problemorientiert</button><button type="button" class="vknopf" data-ziel="1">Handlungsorientiert</button></div>
+  <div class="variante aktiv">
+    <div class="problemkasten">Ein Tank enthält nach t Minuten <span class="formel">V(t) = 100 − 2t²</span> Liter (<span class="formel">0 ≤ t ≤ 7</span>). Wie schnell läuft er in den ersten 5 Minuten leer?</div>
+    <p class="pfrage">Rechnet.</p>
+    <button class="lknopf" data-loesung="pant1">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant1"><span class="formel">V(0) = 100</span>, <span class="formel">V(5) = 100 − 50 = 50</span>. In 5 Minuten verschwinden 50 Liter, also <span class="formel"><span class="bruch"><span class="z">50 − 100</span><span class="n">5 − 0</span></span> = −10</span> Liter pro Minute im Mittel.</p>
+    <p class="pfrage">Stimmt dieser Wert zu jedem Zeitpunkt?</p>
+    <button class="lknopf" data-loesung="pant2">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant2">Nein. In der ersten Minute sind es nur 2 Liter (<span class="formel">V(1) = 98</span>), in der fünften schon 18 (<span class="formel">V(4) = 68</span> gegen <span class="formel">V(5) = 50</span>). Der Mittelwert verwischt diesen Unterschied vollständig.<svg class="plot" viewBox="0 0 380 250" width="380" height="250" role="img"><title>Tank: zwei Sekanten</title><line x1="26.0" y1="224.0" x2="26.0" y2="26.0" class="gitter"/><line x1="69.7" y1="224.0" x2="69.7" y2="26.0" class="gitter"/><line x1="113.5" y1="224.0" x2="113.5" y2="26.0" class="gitter"/><line x1="157.2" y1="224.0" x2="157.2" y2="26.0" class="gitter"/><line x1="200.9" y1="224.0" x2="200.9" y2="26.0" class="gitter"/><line x1="244.7" y1="224.0" x2="244.7" y2="26.0" class="gitter"/><line x1="288.4" y1="224.0" x2="288.4" y2="26.0" class="gitter"/><line x1="332.1" y1="224.0" x2="332.1" y2="26.0" class="gitter"/><line x1="26.0" y1="188.0" x2="354.0" y2="188.0" class="gitter"/><line x1="26.0" y1="152.0" x2="354.0" y2="152.0" class="gitter"/><line x1="26.0" y1="116.0" x2="354.0" y2="116.0" class="gitter"/><line x1="26.0" y1="80.0" x2="354.0" y2="80.0" class="gitter"/><line x1="26.0" y1="44.0" x2="354.0" y2="44.0" class="gitter"/><line x1="26.0" y1="224.0" x2="354.0" y2="224.0" class="achse"/><line x1="26.0" y1="224.0" x2="26.0" y2="26.0" class="achse"/><text x="69.7" y="237.0" class="tick" text-anchor="middle">1</text><text x="113.5" y="237.0" class="tick" text-anchor="middle">2</text><text x="157.2" y="237.0" class="tick" text-anchor="middle">3</text><text x="200.9" y="237.0" class="tick" text-anchor="middle">4</text><text x="244.7" y="237.0" class="tick" text-anchor="middle">5</text><text x="288.4" y="237.0" class="tick" text-anchor="middle">6</text><text x="332.1" y="237.0" class="tick" text-anchor="middle">7</text><text x="22.0" y="192.0" class="tick" text-anchor="end">20</text><text x="22.0" y="156.0" class="tick" text-anchor="end">40</text><text x="22.0" y="120.0" class="tick" text-anchor="end">60</text><text x="22.0" y="84.0" class="tick" text-anchor="end">80</text><text x="22.0" y="48.0" class="tick" text-anchor="end">100</text><path d="M26.0 44.0 L27.9 44.0 L29.8 44.0 L31.7 44.1 L33.7 44.1 L35.6 44.2 L37.5 44.2 L39.4 44.3 L41.3 44.4 L43.2 44.6 L45.1 44.7 L47.0 44.8 L49.0 45.0 L50.9 45.2 L52.8 45.4 L54.7 45.6 L56.6 45.8 L58.5 46.0 L60.4 46.2 L62.4 46.5 L64.3 46.8 L66.2 47.0 L68.1 47.3 L70.0 47.6 L71.9 48.0 L73.8 48.3 L75.7 48.7 L77.7 49.0 L79.6 49.4 L81.5 49.8 L83.4 50.2 L85.3 50.6 L87.2 51.1 L89.1 51.5 L91.1 52.0 L93.0 52.4 L94.9 52.9 L96.8 53.4 L98.7 54.0 L100.6 54.5 L102.5 55.0 L104.4 55.6 L106.4 56.2 L108.3 56.7 L110.2 57.3 L112.1 58.0 L114.0 58.6 L115.9 59.2 L117.8 59.9 L119.8 60.5 L121.7 61.2 L123.6 61.9 L125.5 62.6 L127.4 63.4 L129.3 64.1 L131.2 64.8 L133.1 65.6 L135.1 66.4 L137.0 67.2 L138.9 68.0 L140.8 68.8 L142.7 69.6 L144.6 70.5 L146.5 71.3 L148.5 72.2 L150.4 73.1 L152.3 74.0 L154.2 74.9 L156.1 75.9 L158.0 76.8 L159.9 77.8 L161.8 78.7 L163.8 79.7 L165.7 80.7 L167.6 81.7 L169.5 82.8 L171.4 83.8 L173.3 84.9 L175.2 85.9 L177.2 87.0 L179.1 88.1 L181.0 89.2 L182.9 90.3 L184.8 91.5 L186.7 92.6 L188.6 93.8 L190.5 95.0 L192.5 96.2 L194.4 97.4 L196.3 98.6 L198.2 99.8 L200.1 101.1 L202.0 102.3 L203.9 103.6 L205.9 104.9 L207.8 106.2 L209.7 107.5 L211.6 108.8 L213.5 110.2 L215.4 111.5 L217.3 112.9 L219.2 114.3 L221.2 115.7 L223.1 117.1 L225.0 118.5 L226.9 120.0 L228.8 121.4 L230.7 122.9 L232.6 124.4 L234.6 125.9 L236.5 127.4 L238.4 128.9 L240.3 130.4 L242.2 132.0 L244.1 133.6 L246.0 135.1 L247.9 136.7 L249.9 138.3 L251.8 139.9 L253.7 141.6 L255.6 143.2 L257.5 144.9 L259.4 146.6 L261.3 148.2 L263.3 150.0 L265.2 151.7 L267.1 153.4 L269.0 155.1 L270.9 156.9 L272.8 158.7 L274.7 160.5 L276.6 162.3 L278.6 164.1 L280.5 165.9 L282.4 167.7 L284.3 169.6 L286.2 171.4 L288.1 173.3 L290.0 175.2 L292.0 177.1 L293.9 179.1 L295.8 181.0 L297.7 182.9 L299.6 184.9 L301.5 186.9 L303.4 188.9 L305.3 190.9 L307.3 192.9 L309.2 194.9 L311.1 197.0 L313.0 199.0 L314.9 201.1 L316.8 203.2 L318.7 205.3 L320.7 207.4 L322.6 209.5 L324.5 211.7 L326.4 213.8 L328.3 216.0 L330.2 218.2 L332.1 220.4" fill="none" stroke="var(--accent)" stroke-width="2.2"/><line x1="-0.2" y1="33.2" x2="270.9" y2="144.8" stroke="var(--warn)" stroke-width="1.8" stroke-dasharray="5 3"/><line x1="148.5" y1="62.7" x2="297.1" y2="172.9" stroke="var(--ok)" stroke-width="1.8" stroke-dasharray="5 3"/><circle cx="26.0" cy="44.0" r="4.5" fill="var(--accent)"/><circle cx="200.9" cy="101.6" r="4.5" fill="var(--accent)"/><circle cx="244.7" cy="134.0" r="4.5" fill="var(--accent)"/><text x="257.8" y="112.4" class="beschriftung" fill="var(--warn)">Sekante [0; 5]: −10</text><text x="39.1" y="170.0" class="beschriftung" fill="var(--ok)">Sekante [4; 5]: −18</text></svg></p>
+    <p class="pfrage">Was bräuchte man, um genauer zu werden?</p>
+    <button class="lknopf" data-loesung="pant3">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant3">Immer kürzere Intervalle. Der Bauplan bleibt derselbe: Wertunterschied geteilt durch Stellenunterschied. Dieser Quotient heißt <b>Differenzenquotient</b>, und im Bild ist er die Steigung einer <b>Sekante</b>.</p>
+  </div>
+  <div class="variante">
+    <div class="problemkasten">Ein 100-m-Lauf wurde in fünf Abschnitte zerlegt: nach 1 s bei 5,4 m, nach 3 s bei 21 m, nach 6 s bei 56 m, nach 8 s bei 81 m, nach 9,6 s im Ziel. Wo war der Läufer am schnellsten?</div>
+    <p class="pfrage">Wie misst man „schnell“ in einem Abschnitt?</p>
+    <button class="lknopf" data-loesung="pant4">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant4">Wegunterschied durch Zeitunterschied. Abschnitt [3; 6]: <span class="formel"><span class="bruch"><span class="z">56 − 21</span><span class="n">6 − 3</span></span> = <span class="bruch"><span class="z">35</span><span class="n">3</span></span> ≈ 11,7</span> m/s.</p>
+    <p class="pfrage">Alle fünf Abschnitte.</p>
+    <button class="lknopf" data-loesung="pant5">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant5"><table class="wertereihe"><thead><tr><th>Abschnitt</th><th>[0; 1]</th><th>[1; 3]</th><th>[3; 6]</th><th>[6; 8]</th><th>[8; 9,6]</th></tr></thead><tbody><tr><td>m/s</td><td>5,4</td><td>7,8</td><td>11,7</td><td>12,5</td><td>11,9</td></tr></tbody></table>Am schnellsten in [6; 8] mit 12,5 m/s, das sind 45 km/h.</p>
+    <p class="pfrage">Was sagt 12,5 m/s über die Sekunde 7 aus?</p>
+    <button class="lknopf" data-loesung="pant6">Antwort ein/aus</button>
+    <p class="pantwort loesung" id="pant6">Nur, dass es im Mittel über zwei Sekunden so schnell war. Für einen einzelnen Zeitpunkt bräuchte man ein kürzeres Intervall. Das Werkzeug dafür bauen wir heute, den Grenzübergang macht Block 12.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">2 · Klärung</span>
+  <h2>Klärung — Definition und Schreibweise</h2>
+  <p class="lead">Ob Tank, Läufer oder ein Graph ohne Sachbezug: die Frage „wie schnell ändert sich f“ hat auf einem Intervall immer dieselbe Antwort.</p>
+  <ol class="schritte">
+    <li><span class="frage">Definition: Differenzenquotient und mittlere Änderungsrate</span><span class="ergebnis">f sei auf <span class="formel">[a; b]</span> definiert. Der Quotient <span class="formel"><span class="bruch"><span class="z">Δf</span><span class="n">Δx</span></span> = <span class="bruch"><span class="z">f(b) − f(a)</span><span class="n">b − a</span></span></span> heißt <b>Differenzenquotient</b> von f auf <span class="formel">[a; b]</span> oder <b>mittlere Änderungsrate</b>. Δ (Delta) steht für „Unterschied“: <span class="formel">Δx = b − a</span> ist der Stellenunterschied, <span class="formel">Δf = f(b) − f(a)</span> der Wertunterschied.</span></li>
+    <li><span class="frage">Geometrisch: die Sekante</span><span class="ergebnis">Die Gerade durch <span class="formel">P(a | f(a))</span> und <span class="formel">Q(b | f(b))</span> heißt <b>Sekante</b>. Der Differenzenquotient ist genau ihre Steigung, also das Steigungsdreieck mit <span class="formel">Δx</span> als waagerechter und <span class="formel">Δf</span> als senkrechter Kathete.</span></li>
+    <li><span class="frage">Rechnen in drei Schritten</span><span class="ergebnis">Erst beide Randwerte <span class="formel">f(a)</span> und <span class="formel">f(b)</span> ausrechnen, dann den Bruch bilden, dann deuten. Die Reihenfolge oben und unten muss gleich sein: <span class="formel"><span class="bruch"><span class="z">f(b) − f(a)</span><span class="n">b − a</span></span></span> oder <span class="formel"><span class="bruch"><span class="z">f(a) − f(b)</span><span class="n">a − b</span></span></span>, beides ergibt dasselbe.</span></li>
+    <li><span class="frage">Im Sachzusammenhang deuten</span><span class="ergebnis">Einheit von f geteilt durch Einheit von x: Liter pro Minute, Meter pro Sekunde, Einwohner pro Jahr. Positiv heißt Zunahme, negativ Abnahme, null heißt: am Ende steht derselbe Wert wie am Anfang, auch wenn dazwischen viel passiert ist.</span></li>
+    <li><span class="frage">Das Intervall [a; a + h]</span><span class="ergebnis">Setzt man <span class="formel">b = a + h</span>, wird der Nenner einfach h: <span class="formel"><span class="bruch"><span class="z">f(a + h) − f(a)</span><span class="n">h</span></span></span>. Mit dieser Form kann man h beliebig klein machen. Das ist die Vorbereitung auf Block 12.</span></li>
+  </ol>
+  <p class="tafel-merk">Mittlere Änderungsrate = Sekantensteigung = <span class="formel"><span class="bruch"><span class="z">f(b) − f(a)</span><span class="n">b − a</span></span></span>. Sie beschreibt das ganze Intervall, nicht einen Zeitpunkt.</p>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Beispiel — Differenzenquotient und Sekante</h2>
+  <div class="bsp"><h3>Sachkontext: <span class="formel">V(t) = 100 − 2t²</span> (Liter nach t Minuten)</h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">V(0) = 100</span>, <span class="formel">V(4) = 68</span>, <span class="formel">V(5) = 50</span></span><span class="bhinweis">Randwerte zuerst</span></li><li><span class="brechnung"><span class="formel">[0; 5]: <span class="bruch"><span class="z">V(5) − V(0)</span><span class="n">5 − 0</span></span> = <span class="bruch"><span class="z">50 − 100</span><span class="n">5</span></span> = −10</span></span><span class="bhinweis">im Mittel 10 Liter pro Minute weniger</span></li><li><span class="brechnung"><span class="formel">[4; 5]: <span class="bruch"><span class="z">V(5) − V(4)</span><span class="n">5 − 4</span></span> = <span class="bruch"><span class="z">50 − 68</span><span class="n">1</span></span> = −18</span></span><span class="bhinweis">im letzten Abschnitt fast doppelt so schnell</span></li><li><span class="brechnung">Einheit Liter pro Minute; negativ heißt Abnahme</span><span class="bhinweis">der Tank leert sich immer schneller; im Bild oben: die grüne Sekante ist steiler als die orange</span></li></ol>
+  </div>
+  <div class="bsp"><h3>Sekante zeichnen: <span class="formel">f(x) = x²</span> auf <span class="formel">[1; 3]</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">f(1) = 1</span>, <span class="formel">f(3) = 9</span></span><span class="bhinweis">Randpunkte <span class="formel">P(1 | 1)</span> und <span class="formel">Q(3 | 9)</span></span></li><li><span class="brechnung"><span class="formel">m = <span class="bruch"><span class="z">9 − 1</span><span class="n">3 − 1</span></span> = <span class="bruch"><span class="z">8</span><span class="n">2</span></span> = 4</span></span><span class="bhinweis">Wertunterschied durch Stellenunterschied</span></li><li><span class="brechnung"><svg class="plot" viewBox="0 0 380 250" width="380" height="250" role="img"><title>Sekante durch P(1|1) und Q(3|9)</title><line x1="26.0" y1="224.0" x2="26.0" y2="26.0" class="gitter"/><line x1="117.1" y1="224.0" x2="117.1" y2="26.0" class="gitter"/><line x1="208.2" y1="224.0" x2="208.2" y2="26.0" class="gitter"/><line x1="299.3" y1="224.0" x2="299.3" y2="26.0" class="gitter"/><line x1="26.0" y1="191.0" x2="354.0" y2="191.0" class="gitter"/><line x1="26.0" y1="158.0" x2="354.0" y2="158.0" class="gitter"/><line x1="26.0" y1="125.0" x2="354.0" y2="125.0" class="gitter"/><line x1="26.0" y1="92.0" x2="354.0" y2="92.0" class="gitter"/><line x1="26.0" y1="59.0" x2="354.0" y2="59.0" class="gitter"/><line x1="26.0" y1="26.0" x2="354.0" y2="26.0" class="gitter"/><line x1="26.0" y1="224.0" x2="354.0" y2="224.0" class="achse"/><line x1="26.0" y1="224.0" x2="26.0" y2="26.0" class="achse"/><text x="117.1" y="237.0" class="tick" text-anchor="middle">1</text><text x="208.2" y="237.0" class="tick" text-anchor="middle">2</text><text x="299.3" y="237.0" class="tick" text-anchor="middle">3</text><text x="22.0" y="195.0" class="tick" text-anchor="end">2</text><text x="22.0" y="162.0" class="tick" text-anchor="end">4</text><text x="22.0" y="129.0" class="tick" text-anchor="end">6</text><text x="22.0" y="96.0" class="tick" text-anchor="end">8</text><text x="22.0" y="63.0" class="tick" text-anchor="end">10</text><text x="22.0" y="30.0" class="tick" text-anchor="end">12</text><path d="M26.0 224.0 L28.1 224.0 L30.1 224.0 L32.1 223.9 L34.2 223.9 L36.2 223.8 L38.3 223.7 L40.4 223.6 L42.4 223.5 L44.5 223.3 L46.5 223.2 L48.5 223.0 L50.6 222.8 L52.7 222.6 L54.7 222.4 L56.8 222.1 L58.8 221.9 L60.9 221.6 L62.9 221.3 L65.0 221.0 L67.0 220.7 L69.1 220.3 L71.1 220.0 L73.2 219.6 L75.2 219.2 L77.2 218.8 L79.3 218.4 L81.3 217.9 L83.4 217.5 L85.5 217.0 L87.5 216.5 L89.6 216.0 L91.6 215.4 L93.6 214.9 L95.7 214.3 L97.8 213.8 L99.8 213.2 L101.9 212.6 L103.9 211.9 L106.0 211.3 L108.0 210.6 L110.0 210.0 L112.1 209.3 L114.1 208.6 L116.2 207.8 L118.2 207.1 L120.3 206.3 L122.4 205.5 L124.4 204.8 L126.5 203.9 L128.5 203.1 L130.6 202.3 L132.6 201.4 L134.7 200.5 L136.7 199.6 L138.8 198.7 L140.8 197.8 L142.9 196.9 L144.9 195.9 L146.9 194.9 L149.0 193.9 L151.1 192.9 L153.1 191.9 L155.2 190.8 L157.2 189.8 L159.2 188.7 L161.3 187.6 L163.3 186.5 L165.4 185.4 L167.4 184.2 L169.5 183.1 L171.5 181.9 L173.6 180.7 L175.7 179.5 L177.7 178.3 L179.8 177.0 L181.8 175.8 L183.8 174.5 L185.9 173.2 L188.0 171.9 L190.0 170.5 L192.1 169.2 L194.1 167.8 L196.2 166.5 L198.2 165.1 L200.2 163.6 L202.3 162.2 L204.3 160.8 L206.4 159.3 L208.5 157.8 L210.5 156.3 L212.6 154.8 L214.6 153.3 L216.7 151.8 L218.7 150.2 L220.8 148.6 L222.8 147.0 L224.9 145.4 L226.9 143.8 L229.0 142.1 L231.0 140.5 L233.0 138.8 L235.1 137.1 L237.1 135.4 L239.2 133.7 L241.2 131.9 L243.3 130.1 L245.3 128.4 L247.4 126.6 L249.5 124.8 L251.5 122.9 L253.5 121.1 L255.6 119.2 L257.6 117.3 L259.7 115.4 L261.8 113.5 L263.8 111.6 L265.9 109.7 L267.9 107.7 L270.0 105.7 L272.0 103.7 L274.0 101.7 L276.1 99.7 L278.1 97.6 L280.2 95.6 L282.2 93.5 L284.3 91.4 L286.3 89.3 L288.4 87.1 L290.4 85.0 L292.5 82.8 L294.6 80.7 L296.6 78.5 L298.7 76.2 L300.7 74.0 L302.8 71.8 L304.8 69.5 L306.8 67.2 L308.9 64.9 L311.0 62.6 L313.0 60.3 L315.1 57.9 L317.1 55.6 L319.2 53.2 L321.2 50.8 L323.2 48.4 L325.3 45.9 L327.3 43.5 L329.4 41.0 L331.4 38.6 L333.5 36.1 L335.6 33.5 L337.6 31.0 L339.7 28.5 L341.7 25.9 L343.7 23.3 L345.8 20.7 L347.9 18.1 L349.9 15.5 L351.9 12.8 L354.0 10.2" fill="none" stroke="var(--accent)" stroke-width="2.2"/><line x1="80.7" y1="233.9" x2="335.8" y2="49.1" stroke="var(--warn)" stroke-width="1.8" stroke-dasharray="5 3"/><line x1="117.1" y1="207.5" x2="299.3" y2="207.5" stroke="var(--ok)" stroke-width="1.8" stroke-dasharray="5 3"/><line x1="299.3" y1="207.5" x2="299.3" y2="75.5" stroke="var(--ok)" stroke-width="1.8" stroke-dasharray="5 3"/><circle cx="117.1" cy="207.5" r="4.5" fill="var(--accent)"/><circle cx="299.3" cy="75.5" r="4.5" fill="var(--accent)"/><text x="190.0" y="217.4" class="beschriftung" fill="var(--ok)">Δx = 2</text><text x="308.4" y="149.8" class="beschriftung" fill="var(--ok)">Δf = 8</text><text x="53.3" y="50.8" class="beschriftung" fill="var(--warn)">Sekante, m = 4</text></svg></span><span class="bhinweis">Steigungsdreieck: 2 nach rechts, 8 nach oben; die Sekante hat die Steigung 4</span></li></ol>
+  </div>
+  <div class="bsp"><h3>Das Intervall wird kürzer: <span class="formel">f(x) = x²</span> auf <span class="formel">[1; 1 + h]</span></h3>
+    <ol class="bzeilen"><li><span class="brechnung"><span class="formel">f(1 + h) = 1 + 2h + h²</span></span><span class="bhinweis">binomisch ausmultiplizieren</span></li><li><span class="brechnung"><span class="formel"><span class="bruch"><span class="z">f(1 + h) − f(1)</span><span class="n">h</span></span> = <span class="bruch"><span class="z">2h + h²</span><span class="n">h</span></span> = 2 + h</span> für <span class="formel">h ≠ 0</span></span><span class="bhinweis">h kürzen, erlaubt weil <span class="formel">h ≠ 0</span></span></li><li><span class="brechnung"><span class="formel">h = 1: m = 3</span>, <span class="formel">h = 0,5: m = 2,5</span>, <span class="formel">h = 0,1: m = 2,1</span></span><span class="bhinweis">die Sekanten werden flacher</span></li><li><span class="brechnung"><svg class="plot" viewBox="0 0 380 250" width="380" height="250" role="img"><title>Sekanten für kleiner werdendes h</title><line x1="26.0" y1="224.0" x2="26.0" y2="26.0" class="gitter"/><line x1="152.2" y1="224.0" x2="152.2" y2="26.0" class="gitter"/><line x1="278.3" y1="224.0" x2="278.3" y2="26.0" class="gitter"/><line x1="26.0" y1="191.0" x2="354.0" y2="191.0" class="gitter"/><line x1="26.0" y1="158.0" x2="354.0" y2="158.0" class="gitter"/><line x1="26.0" y1="125.0" x2="354.0" y2="125.0" class="gitter"/><line x1="26.0" y1="92.0" x2="354.0" y2="92.0" class="gitter"/><line x1="26.0" y1="59.0" x2="354.0" y2="59.0" class="gitter"/><line x1="26.0" y1="26.0" x2="354.0" y2="26.0" class="gitter"/><line x1="26.0" y1="224.0" x2="354.0" y2="224.0" class="achse"/><line x1="26.0" y1="224.0" x2="26.0" y2="26.0" class="achse"/><text x="152.2" y="237.0" class="tick" text-anchor="middle">1</text><text x="278.3" y="237.0" class="tick" text-anchor="middle">2</text><text x="22.0" y="195.0" class="tick" text-anchor="end">1</text><text x="22.0" y="162.0" class="tick" text-anchor="end">2</text><text x="22.0" y="129.0" class="tick" text-anchor="end">3</text><text x="22.0" y="96.0" class="tick" text-anchor="end">4</text><text x="22.0" y="63.0" class="tick" text-anchor="end">5</text><text x="22.0" y="30.0" class="tick" text-anchor="end">6</text><path d="M26.0 224.0 L28.1 224.0 L30.1 224.0 L32.1 223.9 L34.2 223.9 L36.2 223.8 L38.3 223.7 L40.4 223.6 L42.4 223.4 L44.5 223.3 L46.5 223.1 L48.5 222.9 L50.6 222.7 L52.7 222.5 L54.7 222.3 L56.8 222.0 L58.8 221.8 L60.9 221.5 L62.9 221.2 L64.9 220.9 L67.0 220.5 L69.1 220.2 L71.1 219.8 L73.2 219.4 L75.2 219.0 L77.2 218.6 L79.3 218.1 L81.3 217.6 L83.4 217.2 L85.5 216.7 L87.5 216.2 L89.6 215.6 L91.6 215.1 L93.6 214.5 L95.7 213.9 L97.7 213.3 L99.8 212.7 L101.9 212.1 L103.9 211.4 L106.0 210.7 L108.0 210.1 L110.0 209.4 L112.1 208.6 L114.1 207.9 L116.2 207.1 L118.2 206.4 L120.3 205.6 L122.4 204.8 L124.4 203.9 L126.5 203.1 L128.5 202.2 L130.6 201.3 L132.6 200.4 L134.6 199.5 L136.7 198.6 L138.8 197.6 L140.8 196.7 L142.9 195.7 L144.9 194.7 L146.9 193.7 L149.0 192.6 L151.1 191.6 L153.1 190.5 L155.2 189.4 L157.2 188.3 L159.2 187.2 L161.3 186.0 L163.3 184.9 L165.4 183.7 L167.5 182.5 L169.5 181.3 L171.5 180.1 L173.6 178.8 L175.7 177.6 L177.7 176.3 L179.8 175.0 L181.8 173.7 L183.9 172.3 L185.9 171.0 L187.9 169.6 L190.0 168.2 L192.0 166.8 L194.1 165.4 L196.2 164.0 L198.2 162.5 L200.2 161.0 L202.3 159.6 L204.3 158.0 L206.4 156.5 L208.5 155.0 L210.5 153.4 L212.5 151.8 L214.6 150.2 L216.6 148.6 L218.7 147.0 L220.8 145.4 L222.8 143.7 L224.9 142.0 L226.9 140.3 L229.0 138.6 L231.0 136.9 L233.0 135.1 L235.1 133.3 L237.2 131.6 L239.2 129.7 L241.2 127.9 L243.3 126.1 L245.3 124.2 L247.4 122.4 L249.5 120.5 L251.5 118.6 L253.6 116.6 L255.6 114.7 L257.6 112.7 L259.7 110.8 L261.8 108.8 L263.8 106.7 L265.9 104.7 L267.9 102.7 L270.0 100.6 L272.0 98.5 L274.0 96.4 L276.1 94.3 L278.1 92.2 L280.2 90.0 L282.2 87.8 L284.3 85.7 L286.3 83.5 L288.4 81.2 L290.5 79.0 L292.5 76.7 L294.6 74.5 L296.6 72.2 L298.6 69.9 L300.7 67.5 L302.8 65.2 L304.8 62.8 L306.8 60.4 L308.9 58.0 L310.9 55.6 L313.0 53.2 L315.1 50.8 L317.1 48.3 L319.1 45.8 L321.2 43.3 L323.2 40.8 L325.3 38.3 L327.3 35.7 L329.4 33.1 L331.4 30.5 L333.5 27.9 L335.6 25.3 L337.6 22.7 L339.7 20.0 L341.7 17.3 L343.7 14.6 L345.8 11.9 L347.8 9.2 L349.9 6.5 L351.9 3.7 L354.0 0.9" fill="none" stroke="var(--accent)" stroke-width="2.2"/><line x1="101.7" y1="230.6" x2="328.8" y2="52.4" stroke="var(--warn)" stroke-width="1.8" stroke-dasharray="5 3"/><line x1="76.5" y1="240.5" x2="290.9" y2="100.2" stroke="#c98a4a" stroke-width="1.8" stroke-dasharray="5 3"/><line x1="38.6" y1="253.4" x2="278.3" y2="121.7" stroke="var(--ok)" stroke-width="1.8" stroke-dasharray="5 3"/><circle cx="152.2" cy="191.0" r="4.5" fill="var(--accent)"/><circle cx="278.3" cy="92.0" r="4.5" fill="var(--accent)"/><circle cx="215.2" cy="149.8" r="4.5" fill="var(--accent)"/><circle cx="164.8" cy="184.1" r="4.5" fill="var(--accent)"/><text x="44.9" y="39.2" class="beschriftung" fill="var(--warn)">h = 1: m = 3</text><text x="44.9" y="59.0" class="beschriftung" fill="#c98a4a">h = 0,5: m = 2,5</text><text x="44.9" y="78.8" class="beschriftung" fill="var(--ok)">h = 0,1: m = 2,1</text></svg></span><span class="bhinweis">die Sekanten kippen auf eine Grenzlage zu, die Steigung strebt gegen 2: das ist der Faden zu Block 12</span></li></ol>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">3 · Beispiel</span>
+  <h2>Jetzt ihr — drei Differenzenquotienten</h2>
+  <div class="aufgabe" id="b11u1">
+    <div class="kopf"><strong>Übung 1</strong><span class="typ t-vor">Vorwärts</span></div>
+    <p>Bestimmt die mittlere Änderungsrate von <span class="formel">f(x) = 0,5x²</span> auf <span class="formel">[1; 4]</span> und beschreibt die zugehörige Sekante.</p>
+    <button class="lknopf" data-loesung="b11u1l">Lösung ein/aus</button>
+    <div class="loesung" id="b11u1l"><p><span class="formel">f(1) = 0,5</span>, <span class="formel">f(4) = 8</span>. <span class="formel"><span class="bruch"><span class="z">8 − 0,5</span><span class="n">4 − 1</span></span> = <span class="bruch"><span class="z">7,5</span><span class="n">3</span></span> = 2,5</span>. Die Sekante durch <span class="formel">(1 | 0,5)</span> und <span class="formel">(4 | 8)</span> steigt mit 2,5.</p></div>
+  </div>
+  <div class="aufgabe" id="b11u2">
+    <div class="kopf"><strong>Übung 2</strong><span class="typ t-vor">Vorwärts</span></div>
+    <p>Ein Fahrzeug bewegt sich nach <span class="formel">s(t) = 0,9t²</span> (s in m, t in s). Bestimmt die mittlere Geschwindigkeit in den ersten 3 Sekunden und in der Zehntelsekunde danach.</p>
+    <button class="lknopf" data-loesung="b11u2l">Lösung ein/aus</button>
+    <div class="loesung" id="b11u2l"><p><span class="formel">s(3) = 8,1</span>, also <span class="formel"><span class="bruch"><span class="z">8,1 − 0</span><span class="n">3</span></span> = 2,7</span> m/s. <span class="formel">s(3,1) = 8,649</span>, also <span class="formel"><span class="bruch"><span class="z">8,649 − 8,1</span><span class="n">0,1</span></span> = 5,49</span> m/s. Das Fahrzeug wird schneller: der kurze Abschnitt zeigt das, der Durchschnitt über drei Sekunden verdeckt es.</p></div>
+  </div>
+  <div class="aufgabe" id="b11u3">
+    <div class="kopf"><strong>Übung 3</strong><span class="typ t-vor">Vorwärts</span></div>
+    <p>Für welches a hat <span class="formel">f(x) = a·x²</span> auf <span class="formel">[1; 4]</span> die mittlere Änderungsrate 15?</p>
+    <button class="lknopf" data-loesung="b11u3l">Lösung ein/aus</button>
+    <div class="loesung" id="b11u3l"><p><span class="formel"><span class="bruch"><span class="z">16a − a</span><span class="n">4 − 1</span></span> = <span class="bruch"><span class="z">15a</span><span class="n">3</span></span> = 5a</span>. Aus <span class="formel">5a = 15</span> folgt <span class="formel">a = 3</span>.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">4 · Merksatz</span>
+  <h2>Merksatz — mittlere Änderungsrate</h2>
+  <div class="merk"><ul><li><span class="regel">Mittlere Änderungsrate von f auf [a; b]: Wertunterschied geteilt durch Stellenunterschied.</span><span class="kurz"><span class="formel"><span class="bruch"><span class="z">Δf</span><span class="n">Δx</span></span> = <span class="bruch"><span class="z">f(b) − f(a)</span><span class="n">b − a</span></span></span></span></li><li><span class="regel">Im Bild ist das die Steigung der Sekante durch P(a | f(a)) und Q(b | f(b)).</span><span class="kurz"><span class="formel">x²</span> auf <span class="formel">[1; 3]</span>: <span class="formel"><span class="bruch"><span class="z">9 − 1</span><span class="n">3 − 1</span></span> = 4</span></span></li><li><span class="regel">Erst Randwerte, dann Bruch, dann deuten. Oben und unten dieselbe Reihenfolge.</span><span class="kurz"><span class="formel"><span class="bruch"><span class="z">f(b) − f(a)</span><span class="n">b − a</span></span></span> oder <span class="formel"><span class="bruch"><span class="z">f(a) − f(b)</span><span class="n">a − b</span></span></span>, nie gemischt</span></li><li><span class="regel">Einheit: Einheit von f pro Einheit von x. Vorzeichen: plus Zunahme, minus Abnahme.</span><span class="kurz">Liter pro Minute, Meter pro Sekunde, Einwohner pro Jahr</span></li><li><span class="regel">Die mittlere Änderungsrate gehört zum ganzen Intervall, nicht zu einem Zeitpunkt.</span><span class="kurz">Ein Läufer mit 8,3 m/s im Schnitt startet trotzdem bei 0 m/s</span></li><li><span class="regel">Auf [a; a + h] wird der Nenner zu h; kürzen liefert einen Term in h.</span><span class="kurz"><span class="formel">x²</span> auf <span class="formel">[1; 1 + h]</span>: <span class="formel"><span class="bruch"><span class="z">2h + h²</span><span class="n">h</span></span> = 2 + h</span></span></li></ul></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> „Die mittlere Änderungsrate ist die Geschwindigkeit zu einem bestimmten Zeitpunkt.“</p><p><strong>Richtig:</strong> Nein, sie gehört zum ganzen Intervall. Für einen Zeitpunkt braucht man immer kürzere Intervalle (Block 12).</p></div>
+  <div class="fehler"><p><strong>Typischer Fehler:</strong> Zähler und Nenner in verschiedener Reihenfolge.</p><p><strong>Richtig:</strong> <span class="formel"><span class="bruch"><span class="z">f(a) − f(b)</span><span class="n">b − a</span></span></span> kehrt das Vorzeichen um. Oben und unten muss dieselbe Richtung stehen.</p></div>
+</section>
+
+<section class="slide">
+  <span class="phase">Buch</span>
+  <h2>Zum Üben — rotes Buch, Klasse 11</h2>
+  <p class="lead">Seitenzahlen nach der Kursausgabe.</p>
+  <ul style="font-size:1.15em;line-height:1.8"><li>S. 21 Übung 1</li><li>S. 22 Übung 2</li><li>S. 22 Übung 3</li><li>S. 23 Übung 4</li><li>S. 24 Übung 5 und 6</li></ul>
+</section>
+
+<section class="slide">
+  <h2 class="nur-arbeit">Aufgabengenerator: Mittlere Änderungsraten</h2>
+  <div class="gen nur-arbeit">
+    <p>Stufe:
+      <select id="genStufe">
+        <option value="1">1 · aus Funktionswerten</option>
+        <option value="2">2 · quadratische Funktion</option>
+        <option value="3">3 · im Sachkontext</option>
+        <option value="4">4 · h-Term aufstellen</option>
+      </select>
+      <button id="genNeu">Neue Aufgabe</button>
+      <button id="genLoesung">Lösungsweg ein/aus</button>
+    </p>
+    <div class="genaufgabe" id="genAusgabe"><em>Noch keine Aufgabe erzeugt.</em></div>
+    <div class="loesung" id="genLoesungFeld"></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="phase">5 · Aufgaben</span>
+  <h2>Aufgaben</h2>
+  <details class="spiegel nur-arbeit"><summary>Aufgabenspiegel: Typ × Anforderungsbereich</summary>
+    <table class="param"><thead><tr><th></th><th>AFB I</th><th>AFB II</th><th>AFB III</th></tr></thead><tbody><tr><th>Vorwärts</th><td>2</td><td>2</td><td>1</td></tr><tr><th>Rückwärts</th><td>2</td><td>1</td><td>—</td></tr><tr><th>Parameter</th><td>—</td><td>2</td><td>—</td></tr><tr><th>Beurteilen</th><td>—</td><td>1</td><td>1</td></tr></tbody></table>
+    <p class="lead">Verteilung der Bewertungseinheiten: AFB I 32 %; AFB II 47 %; AFB III 21 % (Richtwert 30 / 50 / 20).</p>
+  </details>
+  <details class="stufe" open><summary>Anforderungsbereich I — Reproduzieren <span class="lead">· angeben, berechnen, ablesen</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b11a1">
+    <div class="kopf"><strong>Aufgabe 1</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Berechnet für <span class="formel">f(x) = x²</span> die mittlere Änderungsrate auf dem Intervall <span class="formel">[1; 3]</span> und deutet das Ergebnis am Graphen.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Mittlere Änderungsrate?</p>
+      <input id="b11a1antwort" inputmode="text" placeholder="z. B. 2" aria-label="Antwort Aufgabe 1">
+      <button id="b11a1pruefen">Prüfen</button>
+      <div class="feedback" id="b11a1feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b11a1l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a1l"><p><span class="formel"><span class="bruch"><span class="z">f(3) − f(1)</span><span class="n">3 − 1</span></span> = <span class="bruch"><span class="z">9 − 1</span><span class="n">2</span></span> = <span class="bruch"><span class="z">8</span><span class="n">2</span></span> = 4</span>.<br>Deutung: 4 ist die Steigung der <b>Sekante</b> durch die Punkte <span class="formel">(1 | 1)</span> und <span class="formel">(3 | 9)</span>. Zwischen den beiden Stellen steigt der Graph im Mittel um 4 Einheiten pro Schritt — an der Stelle 1 ist er flacher, an der Stelle 3 steiler.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a2">
+    <div class="kopf"><strong>Aufgabe 2</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Ein Ball fällt; die Fallstrecke beträgt nach t Sekunden <span class="formel">s(t) = 5t²</span> Meter. Berechnet die mittlere Geschwindigkeit auf <span class="formel">[1; 2]</span> und auf <span class="formel">[1; 1,5]</span>.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Mittlere Geschwindigkeit auf [1; 2] in m/s?</p>
+      <input id="b11a2antwort" inputmode="text" placeholder="z. B. 10" aria-label="Antwort Aufgabe 2">
+      <button id="b11a2pruefen">Prüfen</button>
+      <div class="feedback" id="b11a2feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b11a2l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a2l"><p><span class="formel">s(1) = 5</span>, <span class="formel">s(1,5) = 11,25</span>, <span class="formel">s(2) = 20</span>. · <span class="formel">[1; 2]: <span class="bruch"><span class="z">20 − 5</span><span class="n">1</span></span> = 15 m/s</span>. · <span class="formel">[1; 1,5]: <span class="bruch"><span class="z">11,25 − 5</span><span class="n">0,5</span></span> = 12,5 m/s</span>. Das kürzere Intervall liefert den kleineren Wert — der Ball wird ja immer schneller, und im kurzen Intervall zählt die spätere, schnellere Phase weniger mit.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a3">
+    <div class="kopf"><strong>Aufgabe 3</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt ein Intervall an, auf dem <span class="formel">f(x) = x²</span> die mittlere Änderungsrate 6 hat, und begründet eure Wahl.</p>
+    <button class="lknopf" data-loesung="b11a3l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a3l"><p>Allgemein ist <span class="formel"><span class="bruch"><span class="z">b² − a²</span><span class="n">b − a</span></span> = <span class="bruch"><span class="z">(b − a)(b + a)</span><span class="n">b − a</span></span> = a + b</span>. Gesucht ist also ein Intervall mit <span class="formel">a + b = 6</span> — zum Beispiel <span class="formel">[2; 4]</span> oder <span class="formel">[1; 5]</span> oder <span class="formel">[0; 6]</span>. Probe für <span class="formel">[2; 4]</span>: <span class="formel"><span class="bruch"><span class="z">16 − 4</span><span class="n">2</span></span> = 6</span> ✓.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a4">
+    <div class="kopf"><strong>Aufgabe 4</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb1">AFB I</span><span class="phase">3 BE</span></div>
+    <p>Gebt eine Funktion an, deren mittlere Änderungsrate auf <b>jedem</b> Intervall gleich 3 ist, und begründet.</p>
+    <button class="lknopf" data-loesung="b11a4l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a4l"><p>Jede lineare Funktion mit der Steigung 3, also <span class="formel">f(x) = 3x + c</span>. Begründung: <span class="formel"><span class="bruch"><span class="z">f(b) − f(a)</span><span class="n">b − a</span></span> = <span class="bruch"><span class="z">3b + c − 3a − c</span><span class="n">b − a</span></span> = <span class="bruch"><span class="z">3(b − a)</span><span class="n">b − a</span></span> = 3</span> — unabhängig von a und b. Umgekehrt sind es <b>nur</b> die linearen Funktionen: bei jeder anderen unterscheiden sich die Sekantensteigungen.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich II — Zusammenhänge herstellen <span class="lead">· bestimmen, untersuchen, erläutern</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b11a5">
+    <div class="kopf"><strong>Aufgabe 5</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p><span class="formel">n(t) = −2t² + 20t</span> beschreibt die Anzahl der Besucher einer Ausstellung t Stunden nach der Öffnung (<span class="formel">0 ≤ t ≤ 10</span>). Berechnet die mittlere Änderungsrate auf <span class="formel">[1; 4]</span> und auf <span class="formel">[6; 9]</span>, deutet beide im Sachzusammenhang und erklärt den Vorzeichenwechsel.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Mittlere Änderungsrate auf [1; 4]?</p>
+      <input id="b11a5antwort" inputmode="text" placeholder="z. B. 5" aria-label="Antwort Aufgabe 5">
+      <button id="b11a5pruefen">Prüfen</button>
+      <div class="feedback" id="b11a5feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b11a5l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a5l"><p><span class="formel">n(1) = 18</span>, <span class="formel">n(4) = −32 + 80 = 48</span>, <span class="formel">n(6) = −72 + 120 = 48</span>, <span class="formel">n(9) = −162 + 180 = 18</span>. · <span class="formel">[1; 4]: <span class="bruch"><span class="z">48 − 18</span><span class="n">3</span></span> = 10</span> Besucher pro Stunde (Zustrom). · <span class="formel">[6; 9]: <span class="bruch"><span class="z">18 − 48</span><span class="n">3</span></span> = −10</span> Besucher pro Stunde (Abfluss).<br>Der Vorzeichenwechsel liegt am Scheitel bei <span class="formel">t = 5</span>: bis dahin füllt sich die Ausstellung, danach leert sie sich. Dass die Beträge gleich sind, liegt an der Symmetrie der Parabel zu <span class="formel">t = 5</span>.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a6">
+    <div class="kopf"><strong>Aufgabe 6</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Stellt für <span class="formel">s(t) = 5t²</span> die mittlere Geschwindigkeit auf dem Intervall <span class="formel">[1; 1 + h]</span> als Term auf und vereinfacht ihn so weit wie möglich.</p>
+    <button class="lknopf" data-loesung="b11a6l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a6l"><p><span class="formel">s(1 + h) = 5(1 + h)² = 5 + 10h + 5h²</span> und <span class="formel">s(1) = 5</span>.<br>Differenzenquotient: <span class="formel"><span class="bruch"><span class="z">5 + 10h + 5h² − 5</span><span class="n">h</span></span> = <span class="bruch"><span class="z">10h + 5h²</span><span class="n">h</span></span></span>.<br>Kürzen (erlaubt, da <span class="formel">h ≠ 0</span>): <span class="formel">10 + 5h</span>.<br>Probe: <span class="formel">h = 1</span> liefert 15 m/s, <span class="formel">h = 0,5</span> liefert 12,5 m/s — genau die Werte aus Aufgabe 2.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a7">
+    <div class="kopf"><strong>Aufgabe 7</strong><span class="typ t-rueck">Rückwärts</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Der Graph einer Funktion f verläuft durch <span class="formel">(2 | 5)</span>, und die mittlere Änderungsrate auf <span class="formel">[2; 6]</span> beträgt <span class="formel">−1,5</span>. Bestimmt <span class="formel">f(6)</span> und die Gleichung der zugehörigen Sekante.</p>
+    <button class="lknopf" data-loesung="b11a7l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a7l"><p>Aus <span class="formel"><span class="bruch"><span class="z">f(6) − 5</span><span class="n">6 − 2</span></span> = −1,5</span> folgt <span class="formel">f(6) − 5 = −6</span>, also <span class="formel">f(6) = −1</span>.<br>Die Sekante geht durch <span class="formel">(2 | 5)</span> mit der Steigung <span class="formel">−1,5</span>: <span class="formel">y = −1,5(x − 2) + 5 = −1,5x + 8</span>. Probe: <span class="formel">x = 6</span> ergibt <span class="formel">−9 + 8 = −1</span> ✓.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a8">
+    <div class="kopf"><strong>Aufgabe 8</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Bestimmt für <span class="formel">f(x) = x²</span> die mittlere Änderungsrate auf dem Intervall <span class="formel">[a; a + 2]</span> in Abhängigkeit von a und gebt den Wert für <span class="formel">a = 3</span> an.</p>
+    <div class="check nur-arbeit">
+      <p><strong>Selbstcheck:</strong> Wert für a = 3?</p>
+      <input id="b11a8antwort" inputmode="text" placeholder="z. B. 6" aria-label="Antwort Aufgabe 8">
+      <button id="b11a8pruefen">Prüfen</button>
+      <div class="feedback" id="b11a8feedback" role="status"></div>
+    </div>
+    <button class="lknopf" data-loesung="b11a8l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a8l"><p><span class="formel">f(a + 2) = a² + 4a + 4</span>, also <span class="formel"><span class="bruch"><span class="z">a² + 4a + 4 − a²</span><span class="n">2</span></span> = <span class="bruch"><span class="z">4a + 4</span><span class="n">2</span></span> = 2a + 2</span>.<br>Für <span class="formel">a = 3</span>: <span class="formel">2·3 + 2 = 8</span> (Probe: <span class="formel"><span class="bruch"><span class="z">25 − 9</span><span class="n">2</span></span> = 8</span> ✓). Die Rate hängt linear von a ab — je weiter rechts das Intervall liegt, desto steiler die Sekante.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a9">
+    <div class="kopf"><strong>Aufgabe 9</strong><span class="typ t-par">Parameter</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Gegeben ist die Schar <span class="formel">f_c(x) = c·x²</span> mit <span class="formel">c ≠ 0</span>. Bestimmt die mittlere Änderungsrate auf <span class="formel">[1; 3]</span> in Abhängigkeit von c und ermittelt, für welches c sie 12 beträgt.</p>
+    <button class="lknopf" data-loesung="b11a9l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a9l"><p><span class="formel"><span class="bruch"><span class="z">f_c(3) − f_c(1)</span><span class="n">2</span></span> = <span class="bruch"><span class="z">9c − c</span><span class="n">2</span></span> = <span class="bruch"><span class="z">8c</span><span class="n">2</span></span> = 4c</span>.<br><span class="formel">4c = 12</span> ergibt <span class="formel">c = 3</span>.<br>Deutung: der Streckfaktor c geht linear in die Sekantensteigung ein — eine doppelt so steile Parabel hat doppelt so steile Sekanten.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a10">
+    <div class="kopf"><strong>Aufgabe 10</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb2">AFB II</span><span class="phase">3 BE</span></div>
+    <p>Beurteilt: „Ist die mittlere Änderungsrate einer Funktion auf <span class="formel">[0; 2]</span> gleich null, so ist die Funktion auf diesem Intervall konstant.“</p>
+    <button class="lknopf" data-loesung="b11a10l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a10l"><p><b>Falsch.</b> Gegenbeispiel <span class="formel">f(x) = x(2 − x)</span>: <span class="formel">f(0) = 0</span> und <span class="formel">f(2) = 0</span>, also ist die mittlere Änderungsrate <span class="formel"><span class="bruch"><span class="z">0 − 0</span><span class="n">2</span></span> = 0</span> — die Funktion ist aber nicht konstant, denn <span class="formel">f(1) = 1</span>. Die Rate vergleicht nur die beiden <b>Randwerte</b>; was dazwischen geschieht, bleibt unsichtbar.</p></div>
+  </div>
+    </div>
+  </details>
+  <details class="stufe"><summary>Anforderungsbereich III — Verallgemeinern und beurteilen <span class="lead">· begründen, beurteilen, entwickeln</span></summary>
+    <div class="stufe-koerper">
+  <div class="aufgabe" id="b11a11">
+    <div class="kopf"><strong>Aufgabe 11</strong><span class="typ t-vor">Vorwärts</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Untersucht für <span class="formel">s(t) = 5t²</span>, wie sich der Term der mittleren Geschwindigkeit auf <span class="formel">[1; 1 + h]</span> für immer kleinere h verhält. Deutet das Ergebnis im Sachzusammenhang und erklärt, warum man <span class="formel">h = 0</span> nicht einfach einsetzen darf.</p>
+    <button class="lknopf" data-loesung="b11a11l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a11l"><p>Der Term lautet <span class="formel">10 + 5h</span> (Aufgabe 6).<br>Für <span class="formel">h = 0,1</span>: 10,5 m/s · <span class="formel">h = 0,01</span>: 10,05 m/s · <span class="formel">h = 0,001</span>: 10,005 m/s. Die Werte stabilisieren sich bei <b>10 m/s</b>.<br>Deutung: das ist die Momentangeschwindigkeit des Balls genau zum Zeitpunkt <span class="formel">t = 1</span> s.<br><span class="formel">h = 0</span> darf man im <b>ursprünglichen</b> Bruch nicht einsetzen: dort stünde <span class="formel"><span class="bruch"><span class="z">s(1) − s(1)</span><span class="n">0</span></span> = <span class="bruch"><span class="z">0</span><span class="n">0</span></span></span>, das ist kein Ergebnis. Erst nach dem Kürzen von h ist der Term <span class="formel">10 + 5h</span> harmlos — und dann liefert der Grenzübergang die Zahl. Genau diese Denkfigur wird in Block 12 zur Ableitung.</p></div>
+  </div>
+  <div class="aufgabe" id="b11a12">
+    <div class="kopf"><strong>Aufgabe 12</strong><span class="typ t-beur">Beurteilen</span><span class="afb afb3">AFB III</span><span class="phase">4 BE</span></div>
+    <p>Beurteilt; begründet wahre Aussagen allgemein und widerlegt falsche durch ein konkretes Gegenbeispiel. <ol class="teile"><li>„Die mittlere Änderungsrate auf <span class="formel">[a; b]</span> ist die Steigung der Sekante durch <span class="formel">(a | f(a))</span> und <span class="formel">(b | f(b))</span>.“</li><li>„Ist f auf <span class="formel">[a; b]</span> streng monoton wachsend, so ist die mittlere Änderungsrate auf <b>jedem</b> Teilintervall positiv.“</li><li>„Verdoppelt man die Intervalllänge, so verdoppelt sich die mittlere Änderungsrate.“</li></ol></p>
+    <button class="lknopf" data-loesung="b11a12l">Lösung ein/aus</button>
+    <div class="loesung" id="b11a12l"><p><ol class="teile"><li><b>wahr</b>: die Sekante durch die beiden Punkte hat definitionsgemäß die Steigung <span class="formel"><span class="bruch"><span class="z">f(b) − f(a)</span><span class="n">b − a</span></span></span> — das ist genau der Differenzenquotient.</li><li><b>wahr</b>: für <span class="formel">c &lt; d</span> aus <span class="formel">[a; b]</span> ist <span class="formel">f(d) &gt; f(c)</span>, also <span class="formel">f(d) − f(c) &gt; 0</span>, und <span class="formel">d − c &gt; 0</span> — ein Quotient zweier positiver Zahlen ist positiv.</li><li><b>falsch</b>: bei <span class="formel">f(x) = x²</span> ist die Rate auf <span class="formel">[1; 2]</span> gleich <span class="formel"><span class="bruch"><span class="z">4 − 1</span><span class="n">1</span></span> = 3</span>, auf <span class="formel">[1; 3]</span> aber <span class="formel"><span class="bruch"><span class="z">9 − 1</span><span class="n">2</span></span> = 4</span> und nicht 6. Die Rate ist ein <b>Quotient</b>; Zähler und Nenner wachsen beide mit.</li></ol></p></div>
+  </div>
+    </div>
+  </details>
+  
+</section>
+
+<section class="slide">
+  <details class="stufe"><summary>Zum Nachschlagen: Mittlere Änderungsrate und Differenzenquotient <span class="lead">· die vollständige Systematik</span></summary>
+    <div class="stufe-koerper">
+  <div class="tafel grundtafel">
+    <h3>Tafelbild: Mittlere Änderungsrate</h3>
+    <div class="tafel-koerper">
+      <table class="regeln">
+        <thead><tr><th></th><th>Formel / Kurz</th><th>Erklärung</th></tr></thead>
+        <tbody>
+        <tr><td class="rname">Mittlere Änderungsrate</td><td class="rform">m = (f(b) − f(a)) / (b − a)</td><td class="rtext">Wie stark ändert sich der Funktionswert im Durchschnitt, wenn x von a nach b läuft? Dieselbe Formel wie die Steigung einer Geraden durch zwei Punkte.</td></tr>
+        <tr><td class="rname">Was sie geometrisch ist</td><td class="rform">Sekantensteigung</td><td class="rtext">Die Gerade durch die beiden Punkte (a|f(a)) und (b|f(b)) heißt <strong>Sekante</strong>. Die mittlere Änderungsrate ist genau ihre Steigung.</td></tr>
+        <tr><td class="rname">Die zweite Schreibweise</td><td class="rform">(f(a + h) − f(a)) / h</td><td class="rtext">Statt eines zweiten Punktes b nimmt man den Abstand h = b − a. Beide Formeln bedeuten dasselbe — die h-Form wird gleich beim Grenzübergang gebraucht.</td></tr>
+        <tr><td class="rname">Einheiten mitdenken</td><td class="rform">y-Einheit je x-Einheit</td><td class="rtext">Bei einer Weg-Zeit-Funktion ist es km/h, beim Wachstum Stück pro Tag. Die Änderungsrate hat immer eine Einheit — im Sachkontext gehört sie dazu.</td></tr>
+        <tr><td class="rname">Vorzeichen deuten</td><td class="rform">positiv steigt, negativ fällt</td><td class="rtext">Eine negative mittlere Änderungsrate heißt: Der Funktionswert ist insgesamt gesunken. Über den Verlauf dazwischen sagt sie nichts.</td></tr>
+        <tr><td class="rname">Was sie nicht kann</td><td class="rform">nichts über einzelne Momente</td><td class="rtext">Die mittlere Änderungsrate mittelt weg, was dazwischen passiert. Zwei ganz verschiedene Verläufe können dieselbe mittlere Rate haben.</td></tr>
+        <tr><td class="rname">Der Weg zur Momentanrate</td><td class="rform">h immer kleiner</td><td class="rtext">Lässt man b gegen a wandern (also h gegen 0), wird aus der Sekante eine <strong>Tangente</strong> — und aus der mittleren Änderungsrate die momentane.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+    </div>
+  </details>
+</section>
+
+</main>
+<div class="beamer-hinweis">B = Beamer · ◀ ▶ = Navigation · L = Lösungen</div>
+
+<script id="gen-lib">
+"use strict";
+function mulberry(seed){
+  var t = seed >>> 0;
+  return function(){
+    t = (t + 0x6D2B79F5) >>> 0;
+    var r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function ganz(rnd, von, bis){ return von + Math.floor(rnd() * (bis - von + 1)); }
+
+function rateMake(seed, level){
+  var rnd = mulberry(seed * 4 + level + 1100);
+  var p = ganz(rnd, -3, 3);
+  var a = ganz(rnd, -3, 2), b = a + ganz(rnd, 1, 4);
+  var rate = a + b + p;                       // f(x) = x^2 + p x: mittlere Rate auf [a;b] = a + b + p
+  function fx(xq){ return xq * xq + p * xq; }
+  var text, schritte;
+  var basis = { typ: "aenderungsrate", seed: seed, level: level, p: p, a: a, b: b };
+  function fertig(v, felder){
+    basis.variante = v; basis.text = text; basis.schritte = schritte;
+    for (var k in felder) basis[k] = felder[k];
+    if (!basis.ergebnis) basis.ergebnis = {};
+    return basis;
+  }
+  // zentrale Anzeige-Helfer
+  function Z(z){ return z < 0 ? "−" + (-z) : "" + z; }
+  function K(z){ return z < 0 ? "(−" + (-z) + ")" : "" + z; }
+  function summ(z){ return z === 0 ? "" : (z > 0 ? " + " + z : " − " + (-z)); }
+  function summX(z){ return z === 0 ? "" : (z > 0 ? " + " + (z === 1 ? "" : z) + "x" : " − " + (z === -1 ? "" : -z) + "x"); }
+  var pTxt = summX(p);
+  function dq(xa, xb){
+    return "(" + K(fx(xb)) + " − " + K(fx(xa)) + ")/(" + K(xb) + " − " + K(xa) + ") = "
+         + Z(fx(xb) - fx(xa)) + "/" + (xb - xa) + " = " + Z(xa + xb + p);
+  }
+  if (level === 1){
+    var v1 = ganz(rnd, 0, 2);
+    if (v1 === 0){
+      text = "Fuer eine Funktion f gilt f(" + Z(a) + ") = " + Z(fx(a)) + " und f(" + Z(b) + ") = " + Z(fx(b))
+           + ". Berechnen Sie die mittlere Aenderungsrate von f auf dem Intervall [" + Z(a) + "; " + Z(b) + "].";
+      schritte = [
+        "Differenzenquotient: (f(" + Z(b) + ") − f(" + Z(a) + "))/(" + K(b) + " − " + K(a) + ")",
+        "einsetzen: " + dq(a, b)
+      ];
+      return fertig(0, { ergebnis: { rate: rate } });
+    }
+    if (v1 === 1){
+      var t0 = ganz(rnd, 0, 3), t1 = t0 + ganz(rnd, 1, 4);
+      var pk = ganz(rnd, 1, 4);
+      var V = function(tt){ return tt * tt + pk * tt; };
+      var rK = t0 + t1 + pk;
+      text = "In einen Behaelter fliesst Wasser; die Fuellmenge in Litern nach t Minuten ist V(t) = t²" + summX(pk)
+           + ". Berechnen Sie die mittlere Aenderungsrate von V auf [" + t0 + "; " + t1
+           + "] und geben Sie ihre Bedeutung mit Einheit an.";
+      schritte = [
+        "V(" + t1 + ") = " + V(t1) + ", V(" + t0 + ") = " + V(t0),
+        "(" + V(t1) + " − " + V(t0) + ")/(" + t1 + " − " + t0 + ") = " + (V(t1) - V(t0)) + "/" + (t1 - t0) + " = " + rK,
+        "Bedeutung: im Mittel fliessen in diesem Zeitraum " + rK + " Liter pro Minute zu"
+      ];
+      return fertig(1, { t0: t0, t1: t1, pk: pk, ergebnis: { rate: rK, einheit: "Liter pro Minute" } });
+    }
+    text = "Fuer eine Funktion f gilt f(" + Z(a) + ") = " + Z(fx(a)) + ". Die mittlere Aenderungsrate von f auf ["
+         + Z(a) + "; " + Z(b) + "] betraegt " + Z(rate) + ". Berechnen Sie f(" + Z(b) + ").";
+    schritte = [
+      "Differenzenquotient umstellen: f(" + Z(b) + ") = f(" + Z(a) + ") + Rate · (" + K(b) + " − " + K(a) + ")",
+      "f(" + Z(b) + ") = " + K(fx(a)) + (rate === 0 ? " + 0" : " + " + K(rate) + "·" + (b - a)) + " = " + Z(fx(b))
+    ];
+    return fertig(2, { ergebnis: { fb: fx(b), rate: rate } });
+  }
+  if (level === 2){
+    var v2 = ganz(rnd, 0, 2);
+    if (v2 === 0){
+      text = "Gegeben ist f(x) = x²" + pTxt + ". Berechnen Sie die mittlere Aenderungsrate von f auf ["
+           + Z(a) + "; " + Z(b) + "].";
+      schritte = [
+        "f(" + Z(b) + ") = " + Z(fx(b)) + ", f(" + Z(a) + ") = " + Z(fx(a)),
+        "Differenzenquotient: " + dq(a, b)
+      ];
+      return fertig(0, { ergebnis: { rate: rate } });
+    }
+    if (v2 === 1){
+      text = "Gegeben ist f(x) = x²" + pTxt + ". Die mittlere Aenderungsrate von f auf dem Intervall [" + Z(a)
+           + "; b] betraegt " + Z(rate) + ". Bestimmen Sie die rechte Intervallgrenze b.";
+      schritte = [
+        "allgemein gilt fuer f(x) = x²" + pTxt + ": mittlere Rate auf [u; v] = u + v" + summ(p),
+        "Gleichung: " + K(a) + " + b" + summ(p) + " = " + Z(rate),
+        "b = " + Z(rate) + " − " + K(a) + " − " + K(p) + " = " + Z(b)
+      ];
+      return fertig(1, { ergebnis: { b: b, rate: rate } });
+    }
+    var bF = b, rF = rate;
+    if (rF === 0){ bF = b + 1; rF = a + bF + p; }      // Vorzeichenfehler nur sichtbar, wenn Rate ungleich 0
+    text = "Fehlersuche: Zur Berechnung der mittleren Aenderungsrate von f(x) = x²" + pTxt + " auf [" + Z(a) + "; " + Z(bF)
+         + "] rechnet ein Schueler (f(" + Z(a) + ") − f(" + Z(bF) + "))/(" + K(bF) + " − " + K(a) + ") und erhaelt " + Z(-rF)
+         + ". Beurteilen Sie und geben Sie den richtigen Wert an.";
+    schritte = [
+      "Zaehler und Nenner muessen in gleicher Reihenfolge gebildet werden: (f(" + Z(bF) + ") − f(" + Z(a) + "))/(" + K(bF) + " − " + K(a) + ")",
+      "richtig: " + dq(a, bF),
+      "der Schuelerwert " + Z(-rF) + " hat das falsche Vorzeichen"
+    ];
+    return fertig(2, { b: bF, ergebnis: { rate: rF, schuelerwert: -rF, behauptungRichtig: false } });
+  }
+  if (level === 3){
+    var v3 = ganz(rnd, 0, 2);
+    if (v3 === 0){
+      text = "Ein Bestand wird beschrieben durch f(x) = x²" + pTxt + " (x in Tagen). Berechnen Sie die mittlere"
+           + " Aenderungsrate auf [" + Z(a) + "; " + Z(b) + "] und deuten Sie ihr Vorzeichen.";
+      schritte = [
+        "f(" + Z(b) + ") = " + Z(fx(b)) + ", f(" + Z(a) + ") = " + Z(fx(a)),
+        "Differenzenquotient: " + dq(a, b),
+        (rate > 0 ? "positiv: der Bestand nimmt in diesem Zeitraum im Mittel zu"
+                  : (rate < 0 ? "negativ: der Bestand nimmt in diesem Zeitraum im Mittel ab"
+                              : "null: Anfangs- und Endbestand stimmen ueberein"))
+      ];
+      return fertig(0, { ergebnis: { rate: rate, vorzeichen: (rate > 0 ? 1 : (rate < 0 ? -1 : 0)) } });
+    }
+    if (v3 === 1){
+      var kk = ganz(rnd, 1, 3), c = b + kk;
+      var r1 = a + b + p, r2 = b + c + p;
+      text = "Gegeben ist f(x) = x²" + pTxt + ". Vergleichen Sie die mittleren Aenderungsraten auf [" + Z(a) + "; " + Z(b)
+           + "] und auf [" + Z(b) + "; " + Z(c) + "]. Auf welchem Intervall waechst f im Mittel staerker?";
+      schritte = [
+        "erstes Intervall: " + dq(a, b),
+        "zweites Intervall: " + dq(b, c),
+        "Vergleich: " + Z(r1) + " < " + Z(r2) + " → auf [" + Z(b) + "; " + Z(c) + "] waechst f im Mittel staerker"
+      ];
+      return fertig(1, { c: c, ergebnis: { rate1: r1, rate2: r2, staerker: "zweites" } });
+    }
+    text = "Fuer f(x) = x² + px betraegt die mittlere Aenderungsrate auf [" + Z(a) + "; " + Z(b) + "] genau " + Z(rate)
+         + ". Bestimmen Sie den Parameter p.";
+    schritte = [
+      "mittlere Rate auf [" + Z(a) + "; " + Z(b) + "]: (" + K(b) + "² + p·" + K(b) + " − " + K(a) + "² − p·" + K(a) + ")/" + (b - a),
+      "vereinfacht: " + K(a) + " + " + K(b) + " + p = " + Z(a + b) + " + p",
+      "Gleichung: " + Z(a + b) + " + p = " + Z(rate) + " → p = " + Z(p)
+    ];
+    return fertig(2, { ergebnis: { p: p, rate: rate } });
+  }
+  var x0 = ganz(rnd, 0, 3);
+  var kons = 2 * x0 + p;
+  function hTerm(koef, exp){                    // Summand koef*h^exp mit Vorzeichen, ohne 0 und ohne fuehrende 1
+    if (koef === 0) return "";
+    var betragT = (Math.abs(koef) === 1 ? "" : Math.abs(koef)) + "h" + (exp === 2 ? "²" : "");
+    return (koef > 0 ? " + " : " − ") + betragT;
+  }
+  function hSumme(k1, k2){                      // k1*h + k2*h^2 als Term (fuehrendes Pluszeichen entfaellt)
+    var t = hTerm(k1, 1) + hTerm(k2, 2);
+    t = t.replace(/^ \+ /, "");
+    t = t.replace(/^ − /, "−");
+    return t === "" ? "0" : t;
+  }
+  var kPlusH = (kons === 0) ? "h" : Z(kons) + " + h";
+  var v4 = ganz(rnd, 0, 2);
+  if (v4 === 0){
+    text = "Gegeben ist f(x) = x²" + pTxt + ". Stellen Sie den Differenzenquotienten von f auf dem Intervall ["
+         + x0 + "; " + x0 + " + h] (h > 0) auf und vereinfachen Sie ihn so weit wie moeglich.";
+    schritte = [
+      "f(" + x0 + " + h) = (" + x0 + " + h)²" + (p === 0 ? "" : (p > 0 ? " + " + p + "·(" + x0 + " + h)" : " − " + (-p) + "·(" + x0 + " + h)")),
+      "Zaehler: f(" + x0 + " + h) − f(" + x0 + ") = " + hSumme(kons, 1),
+      "durch h teilen (h ≠ 0): " + kPlusH
+    ];
+    return fertig(0, { x0: x0, ergebnis: { konstante: kons, form: "konstante + h" } });
+  }
+  if (v4 === 1){
+    var hz = ganz(rnd, 1, 4);
+    var W = kons + hz;
+    text = "Gegeben ist f(x) = x²" + pTxt + ". Fuer welches h > 0 hat der Differenzenquotient von f auf ["
+         + x0 + "; " + x0 + " + h] den Wert " + Z(W) + "?";
+    schritte = [
+      "Differenzenquotient auf [" + x0 + "; " + x0 + " + h] vereinfacht sich zu " + kPlusH,
+      "Gleichung: " + kPlusH + " = " + Z(W),
+      "h = " + Z(W) + " − " + K(kons) + " = " + hz
+    ];
+    return fertig(1, { x0: x0, h: hz, ziel: W, ergebnis: { h: hz, konstante: kons } });
+  }
+  text = "Der Differenzenquotient von f(x) = x²" + pTxt + " auf [" + x0 + "; " + x0 + " + h] laesst sich zu "
+       + kPlusH + " vereinfachen. Erklaeren Sie, was mit diesem Ausdruck fuer h → 0 geschieht und was"
+       + " das geometrisch bedeutet.";
+  schritte = [
+    "der Differenzenquotient ist die Steigung der Sekante durch die Punkte an den Stellen " + x0 + " und " + x0 + " + h",
+    "fuer h → 0 strebt " + kPlusH + " gegen " + Z(kons),
+    "geometrisch: die Sekante geht in die Tangente an der Stelle " + x0 + " ueber; " + Z(kons)
+      + " ist die lokale Aenderungsrate (Tangentensteigung) an der Stelle " + x0
+  ];
+  return fertig(2, { x0: x0, ergebnis: { grenzwert: kons, deutung: "Tangentensteigung" } });
+}
+function rateVerify(t){
+  if (!t.schritte || t.schritte.length < 2) return "Loesungsweg unvollstaendig";
+  for (var i = 0; i < t.schritte.length; i++){
+    if (typeof t.schritte[i] !== "string" || /undefined|NaN|Infinity/.test(t.schritte[i])) return "Schritt defekt";
+  }
+  if (typeof t.text !== "string" || /undefined|NaN|Infinity/.test(t.text)) return "Text defekt";
+  if ([t.p, t.a, t.b].some(function(z){ return typeof z !== "number" || z !== Math.round(z) || Math.abs(z) > 15; })) return "Parameter unsauber";
+  if (t.a >= t.b) return "Intervall entartet";
+  function fx(xq){ return xq * xq + t.p * xq; }
+  function mrate(xa, xb){ return (fx(xb) - fx(xa)) / (xb - xa); }
+  var e = t.ergebnis;
+  if (t.level === 1){
+    if (t.variante === 1){
+      if (!(t.t0 >= 0) || t.t1 <= t.t0) return "Zeitintervall entartet";
+      if (t.pk <= 0) return "Zuflussparameter nicht positiv";
+      var Vf = function(tt){ return tt * tt + t.pk * tt; };
+      var rK = (Vf(t.t1) - Vf(t.t0)) / (t.t1 - t.t0);
+      if (Math.abs(rK - e.rate) > 1e-9) return "Kontextrate falsch";
+      if (e.rate <= 0) return "Zuflussrate nicht positiv";
+      if (typeof e.einheit !== "string") return "Einheit fehlt";
+      return null;
+    }
+    if (t.variante === 2){
+      if (e.fb !== fx(t.b)) return "Funktionswert f(b) falsch";
+      if (Math.abs(mrate(t.a, t.b) - e.rate) > 1e-9) return "Rate inkonsistent";
+      if (fx(t.a) + e.rate * (t.b - t.a) !== e.fb) return "Umstellung verletzt";
+      return null;
+    }
+    if (Math.abs(mrate(t.a, t.b) - e.rate) > 1e-9) return "Rate falsch";
+    if (e.rate !== Math.round(e.rate)) return "Rate nicht ganzzahlig";
+    return null;
+  }
+  if (t.level === 2){
+    if (t.variante === 1){
+      if (e.b !== t.b) return "rueckwaerts bestimmtes b falsch";
+      if (Math.abs(mrate(t.a, e.b) - e.rate) > 1e-9) return "b passt nicht zur Rate";
+      if (e.b <= t.a) return "Intervall entartet";
+      return null;
+    }
+    if (t.variante === 2){
+      if (e.behauptungRichtig !== false) return "Fehlerbeurteilung falsch";
+      if (e.schuelerwert !== -e.rate) return "Schuelerwert inkonsistent";
+      if (e.rate === 0) return "Fehleraufgabe entartet (Rate 0)";
+    }
+    if (Math.abs(mrate(t.a, t.b) - e.rate) > 1e-9) return "Rate falsch";
+    if (e.rate !== Math.round(e.rate)) return "Rate nicht ganzzahlig";
+    return null;
+  }
+  if (t.level === 3){
+    if (t.variante === 0){
+      if (Math.abs(mrate(t.a, t.b) - e.rate) > 1e-9) return "Rate falsch";
+      var vzs = (e.rate > 0 ? 1 : (e.rate < 0 ? -1 : 0));
+      if (e.vorzeichen !== vzs) return "Vorzeichendeutung falsch";
+      return null;
+    }
+    if (t.variante === 1){
+      if (t.c <= t.b) return "zweites Intervall entartet";
+      if (Math.abs(mrate(t.a, t.b) - e.rate1) > 1e-9) return "Rate 1 falsch";
+      if (Math.abs(mrate(t.b, t.c) - e.rate2) > 1e-9) return "Rate 2 falsch";
+      if (e.rate1 >= e.rate2) return "Vergleich nicht wie behauptet";
+      if (e.staerker !== "zweites") return "Vergleichsergebnis falsch";
+      return null;
+    }
+    if (e.p !== t.p) return "rueckwaerts bestimmtes p falsch";
+    if (Math.abs((t.a + t.b + e.p) - e.rate) > 1e-9) return "p passt nicht zur Rate";
+    if (Math.abs(mrate(t.a, t.b) - e.rate) > 1e-9) return "Rate falsch";
+    return null;
+  }
+  if (typeof t.x0 !== "number" || t.x0 !== Math.round(t.x0)) return "Stelle x0 unsauber";
+  var soll = 2 * t.x0 + t.p;
+  var hk = 1e-6, num = (fx(t.x0 + hk) - fx(t.x0)) / hk;
+  if (t.variante === 0){
+    if (e.konstante !== soll) return "konstanter Anteil falsch";
+    if (Math.abs(num - e.konstante) > 1e-4) return "numerische Probe verletzt";
+    var pruef = (fx(t.x0 + 2) - fx(t.x0)) / 2;
+    if (Math.abs(pruef - (soll + 2)) > 1e-9) return "h-Form inkonsistent";
+    return null;
+  }
+  if (t.variante === 1){
+    if (!(t.h > 0)) return "h nicht positiv";
+    if (e.konstante !== soll) return "konstanter Anteil falsch";
+    if (soll + e.h !== t.ziel) return "rueckwaerts bestimmtes h falsch";
+    if (Math.abs(mrate(t.x0, t.x0 + e.h) - t.ziel) > 1e-9) return "h liefert nicht den Zielwert";
+    return null;
+  }
+  if (e.grenzwert !== soll) return "Grenzwert falsch";
+  if (Math.abs(num - e.grenzwert) > 1e-4) return "numerische Probe verletzt";
+  if (typeof e.deutung !== "string") return "Deutung fehlt";
+  return null;
+}
+var GENERATORS = { aenderungsrate: { make: rateMake, verify: rateVerify } };
+
+</script>
+
+<script>
+
+"use strict";
+(function(){
+  var alleOffen = false;
+  document.querySelectorAll("[data-loesung]").forEach(function(knopf){
+    knopf.addEventListener("click", function(){
+      var ziel = document.getElementById(knopf.getAttribute("data-loesung"));
+      if (ziel) ziel.classList.toggle("offen");
+    });
+  });
+  function alleLoesungen(){
+    alleOffen = !alleOffen;
+    document.querySelectorAll(".loesung").forEach(function(el){ el.classList.toggle("offen", alleOffen); });
+  }
+  document.getElementById("alleLoesungenKnopf").addEventListener("click", alleLoesungen);
+
+  var HOCH = { "0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",
+               "-":"⁻","−":"⁻","+":"⁺","(":"⁽",")":"⁾",".":"˙",",":"˙",
+               "x":"ˣ","n":"ⁿ","k":"ᵏ","a":"ᵃ","b":"ᵇ","i":"ⁱ","j":"ʲ","m":"ᵐ","t":"ᵗ","u":"ᵘ",
+               "h":"ʰ","p":"ᵖ","r":"ʳ","s":"ˢ","v":"ᵛ","w":"ʷ","y":"ʸ","z":"ᶻ",
+               "c":"ᶜ","d":"ᵈ","e":"ᵉ","f":"ᶠ","g":"ᵍ","l":"ˡ","o":"ᵒ"," ":" ",
+               // schon hochgestellte Zeichen bleiben, wie sie sind: e^(x²) -> eˣ²
+               "⁰":"⁰","¹":"¹","²":"²","³":"³","⁴":"⁴","⁵":"⁵","⁶":"⁶","⁷":"⁷","⁸":"⁸","⁹":"⁹",
+               "⁻":"⁻","⁺":"⁺" };
+  // Tiefgestellte Zeichen fuer Scharen und indizierte Groessen: f_a wird zu fₐ,
+  // x_1 zu x₁. Unicode kennt nur diese Buchstaben tiefgestellt - fehlt einer,
+  // bleibt der Term unveraendert stehen (lieber f_b als ein halb gesetztes fᵇ).
+  var TIEF = { "a":"ₐ","e":"ₑ","h":"ₕ","i":"ᵢ","j":"ⱼ","k":"ₖ",
+               "l":"ₗ","m":"ₘ","n":"ₙ","o":"ₒ","p":"ₚ","r":"ᵣ",
+               "s":"ₛ","t":"ₜ","u":"ᵤ","v":"ᵥ","x":"ₓ",
+               "0":"₀","1":"₁","2":"₂","3":"₃","4":"₄",
+               "5":"₅","6":"₆","7":"₇","8":"₈","9":"₉" };
+  function tief(z){
+    var aus = "";
+    for (var i = 0; i < z.length; i++){
+      if (!TIEF[z[i]]) return null;
+      aus += TIEF[z[i]];
+    }
+    return aus;
+  }
+  // Vorzeichen- und Faktornormalisierung. Hier stehen nur Umformungen, die IMMER
+  // richtig sind, unabhaengig vom Kontext - "x − -4" heisst auch in einem zitierten
+  // Schuelerfehler "x + 4". Kontextabhaengiges (1x, + 0) gehoert in die Generatoren.
+  function termNormal(s){
+    var t = String(s), vorher;
+    do {
+      vorher = t;
+      t = t
+        // Vorzeichenketten: "− -4" -> "+ 4", "+ -4" -> "− 4"
+        .replace(/([−-])\s*[−-]\s*(?=[\dxa-z(])/g, "+ ")
+        .replace(/\+\s*[−-]\s*(?=[\dxa-z(])/g, "− ")
+        // nur nach Variablen/Klammern kuerzen: x^1 -> x, aber 2^1 · 2^x bleibt
+        .replace(/([a-zA-Z)])(?:\^1(?![\d,.])|\^\(1\))/g, "$1")
+        .replace(/\s*\/\s*1(?![\d,.])/g, "")
+        .replace(/(^|[^0-9a-zA-Z.,])1\s*[·*]\s*(?=[a-z(])/g, "$1")
+        .replace(/(^|[^0-9a-zA-Z.,])1(?=[a-z])/g, "$1")
+        .replace(/\s*[·*]\s*1(?![\d,.])/g, "")
+        .replace(/\(\s*([a-z])\s*[+−-]\s*0\s*\)/g, "$1")
+        // "+ 0" nur nach einem Term mit Variable streichen. Kein Wort davor
+        // ("wird + 0 −"), keine Hochzahl danach ("p − 0²" ist ein eingesetzter
+        // Wert) und kein Vorzeichen danach (Monotoniefolge "+ 0 −").
+        .replace(/(^|[^a-zA-Z])([a-z][0-9²³]*)\s*[+−-]\s*0(?![\d,.²³⁰¹⁴-⁹^])(?!\s*[+−-])/g, "$1$2");
+    } while (t !== vorher);
+    return t.replace(/[ 	]{2,}/g, " ");
+  }
+  // Setzt einen Exponenten hoch - aber nur, wenn JEDES Zeichen ein Hochzeichen hat.
+  // Sonst bliebe eine Mischung wie "2ˣ⁺?" stehen, die schlechter lesbar ist als 2^(x + ?).
+  function hoch(z){
+    // Das Malzeichen entfaellt im Exponenten: e^(a·x) wird zu eᵃˣ - so schreibt man es
+    // auch von Hand, und ein hochgestellter Malpunkt ist typografisch nicht vorgesehen.
+    // innere Exponenten zuerst aufloesen, sonst scheitert e^(x^2) am "^" im Inneren
+    var t = z.replace(/\^(-?\d+)/g, function(_, d){
+              return d.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+             .replace(/([0-9a-z])\s*[·*]\s*(?=[0-9a-z])/g, "$1");
+    var aus = "";
+    for (var i = 0; i < t.length; i++){
+      if (!HOCH[t[i]]) return null;
+      aus += HOCH[t[i]];
+    }
+    return aus;
+  }
+  function schoenMathe(s){
+    return termNormal(String(s))
+      // geklammerte Exponenten zuerst: 2^(x−1) -> 2ˣ⁻¹, e^(2x) -> e²ˣ
+      .replace(/\^\(([^()]{1,12})\)/g, function(ganz, z){
+        var h = hoch(z);
+        if (h === null) return ganz;
+        // Zusammengesetzte Exponenten bekommen hochgestellte Klammern: sonst liest sich
+        // 2^(x-1) als 2 hoch x hoch -1. Ein blosses Vorzeichen (e^(-x)) ist eindeutig.
+        return /[^-−+].*[-−+]/.test(z) ? "⁽" + h + "⁾" : h;
+      })
+      .replace(/\^(-?\d+)/g, function(_, z){ return z.split("").map(function(c){ return HOCH[c] || c; }).join(""); })
+      .replace(/\^([a-z])(?![a-zA-Z0-9])/g, function(ganz, z){ return HOCH[z] || ganz; })
+      .replace(/(\d)\.(\d)/g, "$1,$2");
+  }
+  function maskiere(s){
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  // Was schoenMathe() nicht in Unicode setzen konnte, wird hier echtes <sup>/<sub>:
+  // x^(1/2), e^(v(x)), Integralgrenzen ∫0^√a, und Indizes mit beliebigem Buchstaben.
+  // Dateinamen, Pfade und Adressen sind keine Formeln - dort bedeutet "_" nichts.
+  function istKeineFormel(s){
+    return /\.(?:md|html|py|json|txt)\b|:\/\//.test(s);
+  }
+  function markup(s){
+    if (istKeineFormel(s)) { return maskiere(s); }
+    return maskiere(s)
+      // Exponent mit eigener Klammer zuerst: e^(v(x)), 2^(f(x) + 1)
+      .replace(/\^\(((?:[^()]|\([^()]*\)){1,28})\)/g, "<sup>$1</sup>")
+      .replace(/\^([A-Za-z0-9,.√−α-ωΑ-Ω+-]+)/g, "<sup>$1</sup>")
+      .replace(/([A-Za-z])_\(([^()]{1,24})\)/g, "$1<sub>$2</sub>")
+      .replace(/([A-Za-z])_([A-Za-z0-9]+)/g, "$1<sub>$2</sub>");
+  }
+  // Notation vereinheitlichen: Hochzahlen auch im statischen Folientext (x^2 -> x2 hoch)
+  (function hochAlles(){
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+    var knoten = [];
+    while (walker.nextNode()){
+      var t = walker.currentNode, el = t.parentNode;
+      if (el && el.tagName !== "SCRIPT" && el.tagName !== "STYLE" &&
+          (t.nodeValue.indexOf("^") >= 0 || t.nodeValue.indexOf("_") >= 0)) knoten.push(t);
+    }
+    knoten.forEach(function(t){
+      var neu = schoenMathe(t.nodeValue);
+      var mk = markup(neu);
+      if (mk === maskiere(neu)) { t.nodeValue = neu; return; }
+      // Echtes Markup noetig: den Textknoten durch ein <span> ersetzen.
+      var sp = document.createElement("span");
+      sp.innerHTML = mk;
+      if (t.parentNode) { t.parentNode.replaceChild(sp, t); }
+    });
+  })();
+
+  function bindeCheck(feldId, knopfId, ausgabeId, pruefer){
+    var feld = document.getElementById(feldId), knopf = document.getElementById(knopfId),
+        ausgabe = document.getElementById(ausgabeId);
+    if (!feld || !knopf || !ausgabe) return;
+    function lauf(){
+      var r = pruefer((feld.value || "").trim().replace(",", "."));
+      ausgabe.textContent = schoenMathe(r.text); ausgabe.className = "feedback " + (r.ok ? "ok" : "no");
+    }
+    knopf.addEventListener("click", lauf);
+    feld.addEventListener("keydown", function(ev){ if (ev.key === "Enter") lauf(); });
+  }
+
+  // ---- Umschalten zwischen Einstiegs-Varianten ----
+  document.querySelectorAll(".vwahl").forEach(function(w){
+    w.addEventListener("click", function(ev){
+      var k = ev.target.closest(".vknopf"); if (!k) { return; }
+      var sec = w.closest("section") || document;
+      w.querySelectorAll(".vknopf").forEach(function(b){ b.classList.toggle("aktiv", b === k); });
+      var ziel = parseInt(k.getAttribute("data-ziel"), 10);
+      sec.querySelectorAll(".variante").forEach(function(v, j){ v.classList.toggle("aktiv", j === ziel); });
+    });
+  });
+
+  bindeCheck("b11a1antwort", "b11a1pruefen", "b11a1feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 4) return { ok: true, text: "Stimmt: (9 - 1)/2 = 4, die Sekantensteigung." };
+    return { ok: false, text: "Noch nicht — rechne f(3) und f(1) aus und teile durch 3 - 1." };
+  });
+  bindeCheck("b11a2antwort", "b11a2pruefen", "b11a2feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 15) return { ok: true, text: "Stimmt: (20 - 5)/1 = 15 m/s. Jetzt [1; 1,5]." };
+    return { ok: false, text: "Noch nicht — s(2) = 20 und s(1) = 5, geteilt durch die Zeitspanne." };
+  });
+  bindeCheck("b11a5antwort", "b11a5pruefen", "b11a5feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 10) return { ok: true, text: "Stimmt: (48 - 18)/3 = 10 Besucher pro Stunde." };
+    return { ok: false, text: "Noch nicht — rechne n(1) und n(4) aus und teile durch 3." };
+  });
+  bindeCheck("b11a8antwort", "b11a8pruefen", "b11a8feedback", function(w){
+    if (w === "") return { ok: false, text: "Bitte zuerst ein Ergebnis eintragen." };
+    if (Number(w) === 8) return { ok: true, text: "Stimmt: 2a + 2 mit a = 3 ergibt 8." };
+    return { ok: false, text: "Noch nicht — bilde (f(a+2) - f(a))/2 und setze dann a = 3." };
+  });
+
+
+  var genZaehler = 1, letzteAufgabe = null;
+  var genWahl = document.getElementById("genStufe");
+  var genTypWahl = document.getElementById("genTyp");
+  // Trainingsbloecke buendeln mehrere Generatoren und bieten eine Typenwahl an.
+  // Fehlt das Auswahlfeld (alle Lernbloecke), bleibt es beim einzigen Generator.
+  function genName(){
+    if (genTypWahl && genTypWahl.value && GENERATORS[genTypWahl.value]) return genTypWahl.value;
+    return Object.keys(GENERATORS)[0];
+  }
+  function genNeu(){
+    var stufe = Number(genWahl.value);
+    var g = GENERATORS[genName()];
+    // verify ist der Qualitaetswaechter: eine beanstandete Aufgabe wird verworfen
+    // und neu gewuerfelt (Gate A fuzzt dieselbe Pruefung offline).
+    var versuch = 0;
+    do {
+      letzteAufgabe = g.make(Date.now() % 100000 + genZaehler++, stufe);
+      versuch++;
+    } while (versuch < 20 && g.verify(letzteAufgabe));
+    document.getElementById("genAusgabe").textContent = schoenMathe(letzteAufgabe.text);
+    var feld = document.getElementById("genLoesungFeld");
+    feld.classList.remove("offen");
+    feld.innerHTML = "<ol><li>" + letzteAufgabe.schritte.map(schoenMathe).join("</li><li>") + "</li></ol>";
+  }
+  if (document.getElementById("genNeu")){
+    document.getElementById("genNeu").addEventListener("click", genNeu);
+    document.getElementById("genLoesung").addEventListener("click", function(){
+      if (letzteAufgabe) document.getElementById("genLoesungFeld").classList.toggle("offen");
+    });
+  }
+
+  var slides = Array.prototype.slice.call(document.querySelectorAll("section.slide"));
+  var slideIdx = 0;
+  function zeigeSlide(i){
+    slideIdx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, j){ s.classList.toggle("aktiv", j === slideIdx); });
+  }
+  function beamerUmschalten(){
+    document.body.classList.toggle("beamer");
+    if (document.body.classList.contains("beamer")) zeigeSlide(slideIdx);
+    else slides.forEach(function(s){ s.classList.add("aktiv"); });
+  }
+  document.getElementById("beamerKnopf").addEventListener("click", beamerUmschalten);
+  document.addEventListener("keydown", function(ev){
+    if (ev.target && (ev.target.tagName === "INPUT" || ev.target.tagName === "TEXTAREA" || ev.target.tagName === "SELECT")) return;
+    var k = ev.key.toLowerCase();
+    if (k === "b") beamerUmschalten();
+    else if (k === "l") alleLoesungen();
+    else if (document.body.classList.contains("beamer")){
+      if (ev.key === "ArrowRight" || ev.key === "PageDown") zeigeSlide(slideIdx + 1);
+      if (ev.key === "ArrowLeft" || ev.key === "PageUp") zeigeSlide(slideIdx - 1);
+    }
+  });
+  slides.forEach(function(s){ s.classList.add("aktiv"); });
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kl. 11 &middot; Mathe LK &middot; Grenzwerte, Ableitungen, Funktionsuntersuchung &mdash; &Uuml;bungen</title>
+<!--
+  Uebungssammlung Kl. 11 EAN (Vorbereitung erste LK-Klausur): Grenzwerte/Stetigkeit, Ableitungen/Aenderungsraten,
+  Funktionsuntersuchung, Tangenten. Single-File, keine externen Abhaengigkeiten, offline lauffaehig.
+  Formeln als HTML/CSS (Bruchsatz per inline-flex). Aufgaben im JS-Datenarray, Rendering per innerHTML.
+  Alle Ergebnisse mit sympy verifiziert; Funktionsterme bewusst verschieden von Test und Klausur.
+  Gliederung: Block -> Thema (THEMEN) -> Aufgabe mit Kurztitel (TITEL); Inhaltsverzeichnis und Sprungleiste
+  werden daraus erzeugt. Je Thema Links zu Erklaervideos von Daniel Jung (YouTube, brauchen Internet).
+-->
+<style>
+  :root{
+    --bg:#fbfbf9; --fg:#1d1f23; --muted:#5a5f68; --line:#e3e2dd;
+    --accent:#2d6a9f; --okbg:#eaf6ef; --tipbg:#fff8ec;
+    --g:#2e7d5a; --a:#2d6a9f; --v:#b06a2e; --radius:10px; --maxw:900px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  main{max-width:var(--maxw);margin:0 auto;padding:22px 16px 72px}
+  h1{font-size:1.5rem;margin:.2em 0 .4em}
+  h2{font-size:1.25rem;margin:1.8em 0 .3em;padding-bottom:.2em;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:.5em}
+  h2 .dot{width:.7em;height:.7em;border-radius:50%;background:var(--accent);display:inline-block}
+  h3{font-size:1.02rem;margin:1.3em 0 .25em;color:var(--accent)}
+  h2,h3,.aufgabe,.toc{scroll-margin-top:calc(var(--barh,110px) + 10px)}
+  section.hidden,.toc .hidden{display:none}
+  /* Sprungleiste */
+  .nav{display:flex;gap:.3em;flex-wrap:wrap;width:100%}
+  .nav a{font-size:.82rem;padding:.12em .7em;border-radius:999px;background:#eef2f6;color:var(--accent);text-decoration:none;white-space:nowrap}
+  .nav a.hidden{display:none}
+  /* Inhaltsverzeichnis */
+  details.toc{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.6em .9em;margin:.6em 0 0}
+  details.toc>summary{font-size:1rem}
+  .toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:.2em 1.6em;margin-top:.5em}
+  .toc a{color:var(--fg);text-decoration:none}
+  .toc a:hover{color:var(--accent);text-decoration:underline}
+  .toc-h{display:block;font-weight:700;margin-top:.5em}
+  .toc-t{display:block;font-size:.9rem;font-weight:600;color:var(--accent) !important;margin-top:.45em}
+  .toc ul{list-style:none;margin:0;padding:0}
+  .toc li{font-size:.9rem;line-height:1.45;padding-left:2.4em;text-indent:-2.4em}
+  .toc li .a-num{display:inline-block;width:2.4em;text-indent:0;font-size:.85em}
+  .tdot{display:inline-block;width:.55em;height:.55em;border-radius:50%;background:currentColor;margin-left:.3em;text-indent:0}
+  .tdot.b-g{background:var(--g)} .tdot.b-a{background:var(--a)} .tdot.b-v{background:var(--v)}
+  /* Erklaervideos */
+  .videos{font-size:.9rem;border-left:3px solid #c9302c;background:#fbf3f2;border-radius:0 8px 8px 0;padding:.4em .8em;margin:.3em 0 .6em}
+  .videos .v-label{font-weight:600;display:block}
+  .videos a{display:inline-block;color:#a02622;text-decoration:none;margin:.1em 1.1em .1em 0}
+  .videos a:hover{text-decoration:underline}
+  .videos .v-hinweis{display:block;color:var(--muted);font-size:.92em}
+  .a-titel{font-weight:600}
+  p{margin:.4em 0}
+  .bar{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:.5em;padding:.5em 0;margin-bottom:.4em;z-index:5;flex-wrap:wrap}
+  .filter{display:flex;gap:.3em;flex-wrap:wrap}
+  .fbtn{font:inherit;font-size:.9rem;padding:.3em .8em;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--fg);cursor:pointer}
+  .fbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn{font:inherit;font-size:.9rem;padding:.35em .8em;border:0;border-radius:7px;background:#eef2f6;color:var(--accent);cursor:pointer}
+  .aufgabe{border:1px solid var(--line);border-radius:var(--radius);background:#fff;padding:.7em .9em;margin:.6em 0}
+  .aufgabe.hidden{display:none}
+  .a-head{display:flex;align-items:center;gap:.5em;cursor:pointer;user-select:none}
+  .a-num{font-family:ui-monospace,Consolas,monospace;font-weight:700;color:var(--muted)}
+  .a-badge{font-size:.72rem;font-weight:600;padding:.1em .55em;border-radius:6px}
+  .b-g{background:#eef6f0;color:var(--g)} .b-a{background:#eef2f8;color:var(--a)} .b-v{background:#f7efe6;color:var(--v)}
+  .a-caret{margin-left:auto;color:var(--muted);transition:transform .2s}
+  .aufgabe.collapsed .a-caret{transform:rotate(-90deg)}
+  .aufgabe.collapsed .a-body{display:none}
+  .a-body{margin-top:.3em}
+  ol.tl{list-style:none;counter-reset:tl;margin:.3em 0 .3em .2em;padding:0}
+  ol.tl li{counter-increment:tl;margin:.35em 0;padding-left:1.7em;text-indent:-1.7em}
+  ol.tl li *{text-indent:0}
+  ol.tl li::before{content:counter(tl,lower-alpha) ")";display:inline-block;width:1.7em;text-indent:0}
+  details{margin-top:.45em;border-top:1px dashed var(--line);padding-top:.35em}
+  details>summary{cursor:pointer;font-size:.94rem;font-weight:600;list-style:none}
+  details>summary::-webkit-details-marker{display:none}
+  details>summary::before{content:"\25B8  ";color:var(--muted)}
+  details[open]>summary::before{content:"\25BE  "}
+  details.tipp>summary{color:var(--v)}
+  details.loes>summary{color:var(--g)}
+  .tipp .body{background:var(--tipbg);border:1px solid #f0dfc0;border-radius:8px;padding:.45em .8em;margin-top:.35em}
+  .loes .body{background:var(--okbg);border:1px solid #cfe7d7;border-radius:8px;padding:.45em .8em;margin-top:.35em}
+  /* Formelsatz */
+  .m{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-style:italic;white-space:nowrap}
+  .m sup,.m sub{font-size:.72em;line-height:0}
+  .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .12em;font-size:.95em;line-height:1.25}
+  .fr>span:first-child{border-bottom:1px solid currentColor;padding:0 .2em .05em}
+  .fr>span:last-child{padding:.05em .2em 0}
+  .lim{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-style:normal;line-height:1.05;margin-right:.2em}
+  .lim small{font-size:.68em;font-style:italic}
+  .pw{display:inline-flex;align-items:center;vertical-align:middle}
+  .pw .br{font-size:2.3em;font-style:normal;font-weight:300;line-height:1;margin-right:.1em}
+  .pw .rows{line-height:1.5;white-space:pre}
+  .ov{border-top:1px solid currentColor;padding-left:.05em}
+  body.beamer{font-size:20px} body.beamer main{max-width:1150px}
+  @media (max-width:560px){ .m{white-space:normal} .toc-grid{grid-template-columns:1fr} .nav{flex-wrap:nowrap;overflow-x:auto} }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">
+    <div class="filter" role="group" aria-label="Nach Stufe filtern">
+      <button class="fbtn active" data-f="alle">Alle</button>
+      <button class="fbtn" data-f="g">Grundlage</button>
+      <button class="fbtn" data-f="a">Anwenden</button>
+      <button class="fbtn" data-f="v">Vertiefen</button>
+    </div>
+    <span>
+      <button class="btn" id="collapseAll">Alle einklappen</button>
+      <button class="btn" id="beamer">Beamer-Modus</button>
+    </span>
+    <nav class="nav" id="nav" aria-label="Zu einem Block springen"></nav>
+  </div>
+  <h1>Kl. 11 &middot; Mathe LK &middot; Grenzwerte, Ableitungen, Funktionsuntersuchung &mdash; &Uuml;bungen</h1>
+  <details class="toc" id="toc" open>
+    <summary>Inhalt &ndash; was finde ich wo?</summary>
+    <div class="toc-grid" id="tocGrid"></div>
+  </details>
+  <div id="inhalt"></div>
+</main>
+<script>
+"use strict";
+(function(){
+  var DATA = {"bloecke": [{"nr": 1, "titel": "Grenzwerte und Stetigkeit"}, {"nr": 2, "titel": "Ableitungen und Änderungsraten"}, {"nr": 3, "titel": "Funktionsuntersuchung"}, {"nr": 4, "titel": "Tangenten"}], "aufgaben": [{"nr": "1.1", "stufe": "g", "text": "<p>Berechne die Grenzwerte bzw. beschreibe das Verhalten im Unendlichen.</p><ol class=\"tl\"><li><span class=\"m\"><span class=\"lim\">lim<small>x→∞</small></span><span class=\"fr\"><span>5x<sup>4</sup>−2x</span><span>10x<sup>4</sup></span></span></span></li><li><span class=\"m\"><span class=\"lim\">lim<small>x→∞</small></span><span class=\"fr\"><span>3x−x<sup>3</sup></span><span>x<sup>3</sup></span></span></span></li><li>Verhalten von <span class=\"m\">f(x)=−2x<sup>3</sup>+x</span> für <span class=\"m\">x→+∞</span> und <span class=\"m\">x→−∞</span></li></ol>", "tipps": ["Teile jeden Summanden im Zähler einzeln durch den Nenner.", "Terme wie <span class=\"m\"><span class=\"fr\"><span>1</span><span>x<sup>3</sup></span></span></span> werden für <span class=\"m\">x→∞</span> beliebig klein, sie gehen gegen 0. In c) entscheidet nur der Summand mit dem höchsten Exponenten."], "loes": "<ol class=\"tl\"><li><span class=\"m\"><span class=\"fr\"><span>5x<sup>4</sup>−2x</span><span>10x<sup>4</sup></span></span>=<span class=\"fr\"><span>1</span><span>2</span></span>−<span class=\"fr\"><span>1</span><span>5x<sup>3</sup></span></span></span> → Grenzwert <span class=\"m\"><span class=\"fr\"><span>1</span><span>2</span></span></span></li><li><span class=\"m\"><span class=\"fr\"><span>3x−x<sup>3</sup></span><span>x<sup>3</sup></span></span>=<span class=\"fr\"><span>3</span><span>x<sup>2</sup></span></span>−1</span> → Grenzwert <span class=\"m\">−1</span></li><li>Entscheidend ist <span class=\"m\">−2x<sup>3</sup></span>: für <span class=\"m\">x→+∞</span> gilt <span class=\"m\">f(x)→−∞</span>, für <span class=\"m\">x→−∞</span> gilt <span class=\"m\">f(x)→+∞</span>.</li></ol>"}, {"nr": "1.2", "stufe": "g", "text": "<p>Berechne die Grenzwerte.</p><ol class=\"tl\"><li><span class=\"m\"><span class=\"lim\">lim<small>x→−3</small></span><span class=\"fr\"><span>x<sup>2</sup>−9</span><span>x+3</span></span></span></li><li><span class=\"m\"><span class=\"lim\">lim<small>x→2</small></span><span class=\"fr\"><span>x<sup>2</sup>−5x+6</span><span>x−2</span></span></span></li><li><span class=\"m\"><span class=\"lim\">lim<small>x→0</small></span><span class=\"fr\"><span>2x<sup>2</sup>+x</span><span>x</span></span></span></li></ol>", "tipps": ["Einsetzen liefert jeweils „<span class=\"m\"><span class=\"fr\"><span>0</span><span>0</span></span></span>“ – das ist kein Ergebnis, sondern ein Signal: Der Zähler lässt sich so umformen, dass man kürzen kann.", "a) dritte binomische Formel, b) Nullstellen des Zählers mit der pq-Formel, c) <span class=\"m\">x</span> ausklammern."], "loes": "<ol class=\"tl\"><li><span class=\"m\"><span class=\"fr\"><span>(x−3)(x+3)</span><span>x+3</span></span>=x−3</span> → Grenzwert <span class=\"m\">−6</span></li><li><span class=\"m\">x<sup>2</sup>−5x+6=(x−2)(x−3)</span>, also <span class=\"m\"><span class=\"fr\"><span>(x−2)(x−3)</span><span>x−2</span></span>=x−3</span> → Grenzwert <span class=\"m\">−1</span></li><li><span class=\"m\"><span class=\"fr\"><span>x(2x+1)</span><span>x</span></span>=2x+1</span> → Grenzwert <span class=\"m\">1</span></li></ol>"}, {"nr": "1.3", "stufe": "a", "text": "<p>Untersuche jeweils, ob die Funktion an der angegebenen Stelle stetig ist.</p><ol class=\"tl\"><li><span class=\"m\">f(x)=<span class=\"pw\"><span class=\"br\">{</span><span class=\"rows\">x<sup>2</sup>−2  für x≤2<br>3x−4  für x&gt;2</span></span></span>  an der Stelle <span class=\"m\">x<sub>0</sub>=2</span></li><li><span class=\"m\">g(x)=<span class=\"pw\"><span class=\"br\">{</span><span class=\"rows\">x<sup>3</sup>  für x&lt;1<br>2x  für x≥1</span></span></span>  an der Stelle <span class=\"m\">x<sub>0</sub>=1</span></li></ol>", "tipps": ["Stetig heißt: Der Graph lässt sich an dieser Stelle ohne Absetzen zeichnen. Beide Teilstücke müssen also am selben Punkt ankommen.", "Berechne den Funktionswert an der Stelle und den Grenzwert des anderen Teilstücks. Stimmen beide überein?"], "loes": "<ol class=\"tl\"><li><span class=\"m\">f(2)=2<sup>2</sup>−2=2</span>; von rechts: <span class=\"m\">3·2−4=2</span>. Beide Werte sind gleich → f ist an der Stelle 2 stetig.</li><li>von links: <span class=\"m\">1<sup>3</sup>=1</span>; <span class=\"m\">g(1)=2·1=2</span>. <span class=\"m\">1≠2</span> → g hat bei 1 einen Sprung, ist also nicht stetig.</li></ol>"}, {"nr": "1.4", "stufe": "a", "text": "<p>Gegeben ist <span class=\"m\">f(x)=<span class=\"pw\"><span class=\"br\">{</span><span class=\"rows\">ax<sup>2</sup>  für x≤2<br>x+a  für x&gt;2</span></span></span>.</p><p>Bestimme a so, dass f an der Stelle 2 stetig ist.</p>", "tipps": ["Setze <span class=\"m\">x=2</span> in beide Teilterme ein. Für Stetigkeit müssen beide Ergebnisse gleich sein.", "Du erhältst die Gleichung <span class=\"m\">4a=2+a</span>."], "loes": "<p><span class=\"m\">f(2)=4a</span>, von rechts: <span class=\"m\">2+a</span>. Stetigkeit: <span class=\"m\">4a=2+a</span> ⇒ <span class=\"m\">3a=2</span> ⇒ <span class=\"m\">a=<span class=\"fr\"><span>2</span><span>3</span></span></span>.</p>"}, {"nr": "1.5", "stufe": "v", "text": "<p>Gegeben ist <span class=\"m\">f(x)=<span class=\"pw\"><span class=\"br\">{</span><span class=\"rows\">x+1  für x&lt;0<br>ax<sup>2</sup>+b  für 0≤x≤2<br>5  für x&gt;2</span></span></span>.</p><p>Bestimme a und b so, dass f überall stetig ist.</p>", "tipps": ["Es gibt zwei „Nahtstellen“, bei 0 und bei 2. An jeder Nahtstelle muss es ohne Sprung weitergehen – das ergibt zwei Gleichungen.", "Fang bei 0 an: Dort fällt a weg, und du erhältst b direkt."], "loes": "<p>Bei 0: von links <span class=\"m\">0+1=1</span>, <span class=\"m\">f(0)=b</span> ⇒ <span class=\"m\">b=1</span>.</p><p>Bei 2: <span class=\"m\">f(2)=4a+b=4a+1</span>, von rechts <span class=\"m\">5</span> ⇒ <span class=\"m\">4a+1=5</span> ⇒ <span class=\"m\">a=1</span>.</p><p>Also <span class=\"m\">f(x)=x<sup>2</sup>+1</span> im mittleren Abschnitt.</p>"}, {"nr": "1.6", "stufe": "v", "text": "<p>Wahr oder falsch? Begründe deine Antwort.</p><p>„Wenn der Grenzwert <span class=\"m\"><span class=\"lim\">lim<small>x→x<sub>0</sub></small></span>f(x)</span> existiert, dann ist f an der Stelle <span class=\"m\">x<sub>0</sub></span> stetig.“</p>", "tipps": ["Schau dir noch einmal Aufgabe 1.2 a) an. Ist die Funktion <span class=\"m\">f(x)=<span class=\"fr\"><span>x<sup>2</sup>−9</span><span>x+3</span></span></span> an der Stelle <span class=\"m\">−3</span> überhaupt definiert?", "Für Stetigkeit braucht man zwei Dinge: Der Grenzwert muss existieren UND mit dem Funktionswert übereinstimmen."], "loes": "<p>Falsch. Gegenbeispiel: <span class=\"m\">f(x)=<span class=\"fr\"><span>x<sup>2</sup>−9</span><span>x+3</span></span></span> hat bei <span class=\"m\">−3</span> den Grenzwert <span class=\"m\">−6</span>, ist dort aber gar nicht definiert (Division durch 0) – der Graph hat ein „Loch“.</p><p>Ebenso unstetig wäre eine Funktion, die überall <span class=\"m\">x−3</span> ist, bei <span class=\"m\">x=−3</span> aber den Wert 5 hat. Stetig ist f in <span class=\"m\">x<sub>0</sub></span> erst, wenn <span class=\"m\"><span class=\"lim\">lim<small>x→x<sub>0</sub></small></span>f(x)=f(x<sub>0</sub>)</span> gilt.</p>"}, {"nr": "2.1", "stufe": "g", "text": "<p>Bilde jeweils die erste Ableitung. Forme vorher um, wo es nötig ist.</p><ol class=\"tl\"><li><span class=\"m\">f(x)=−<span class=\"fr\"><span>3</span><span>4</span></span>x<sup>4</sup>+2x<sup>3</sup>−x</span></li><li><span class=\"m\">f(x)=<span class=\"fr\"><span>7</span><span>x</span></span></span></li><li><span class=\"m\">f(x)=<span class=\"fr\"><span>1</span><span>2</span></span>x<sup>−4</sup></span></li><li><span class=\"m\">f(x)=x<sup>2</sup>(3x−1)</span></li><li><span class=\"m\">f(x)=(x+2)<sup>2</sup></span></li><li><span class=\"m\">f(x)=<span class=\"fr\"><span>2x<sup>3</sup>−5</span><span>x</span></span></span></li></ol>", "tipps": ["d) und e): Erst ausmultiplizieren, dann ableiten. Für Produkte haben wir (noch) keine Regel!", "b) <span class=\"m\"><span class=\"fr\"><span>7</span><span>x</span></span>=7x<sup>−1</sup></span>. f) Teile jeden Summanden durch x: <span class=\"m\"><span class=\"fr\"><span>2x<sup>3</sup>−5</span><span>x</span></span>=2x<sup>2</sup>−5x<sup>−1</sup></span>."], "loes": "<ol class=\"tl\"><li><span class=\"m\">f′(x)=−3x<sup>3</sup>+6x<sup>2</sup>−1</span></li><li><span class=\"m\">f′(x)=−7x<sup>−2</sup>=−<span class=\"fr\"><span>7</span><span>x<sup>2</sup></span></span></span></li><li><span class=\"m\">f′(x)=−2x<sup>−5</sup>=−<span class=\"fr\"><span>2</span><span>x<sup>5</sup></span></span></span></li><li><span class=\"m\">f(x)=3x<sup>3</sup>−x<sup>2</sup></span> ⇒ <span class=\"m\">f′(x)=9x<sup>2</sup>−2x</span></li><li><span class=\"m\">f(x)=x<sup>2</sup>+4x+4</span> ⇒ <span class=\"m\">f′(x)=2x+4</span></li><li><span class=\"m\">f(x)=2x<sup>2</sup>−5x<sup>−1</sup></span> ⇒ <span class=\"m\">f′(x)=4x+5x<sup>−2</sup>=4x+<span class=\"fr\"><span>5</span><span>x<sup>2</sup></span></span></span></li></ol>"}, {"nr": "2.2", "stufe": "a", "text": "<p>Derselbe Term – drei verschiedene Funktionen! Bilde jeweils die Ableitung nach der Funktionsvariablen.</p><ol class=\"tl\"><li><span class=\"m\">f(a)=a<sup>2</sup>x+3a</span></li><li><span class=\"m\">g(x)=a<sup>2</sup>x+3a</span></li><li><span class=\"m\">h(t)=t<sup>3</sup>+4t·k<sup>2</sup>−k</span></li></ol>", "tipps": ["Die Variable in der Klammer verrät, wonach abgeleitet wird. Alle anderen Buchstaben sind feste Zahlen (Konstanten).", "In a) ist x ein konstanter Faktor wie z. B. 5 in <span class=\"m\">5a<sup>2</sup></span>. In b) ist <span class=\"m\">a<sup>2</sup></span> der Faktor vor x und <span class=\"m\">3a</span> ein konstanter Summand."], "loes": "<ol class=\"tl\"><li><span class=\"m\">f′(a)=2ax+3</span></li><li><span class=\"m\">g′(x)=a<sup>2</sup></span>  (<span class=\"m\">3a</span> fällt als Konstante weg)</li><li><span class=\"m\">h′(t)=3t<sup>2</sup>+4k<sup>2</sup></span>  (<span class=\"m\">k</span> fällt weg, <span class=\"m\">4k<sup>2</sup></span> ist Faktor vor t)</li></ol>"}, {"nr": "2.3", "stufe": "a", "text": "<p>Berechne die Ableitung an der angegebenen Stelle mithilfe des Differentialquotienten <span class=\"m\"><span class=\"lim\">lim<small>x→x<sub>0</sub></small></span><span class=\"fr\"><span>f(x)−f(x<sub>0</sub>)</span><span>x−x<sub>0</sub></span></span></span>. Kontrolliere anschließend mit den Ableitungsregeln.</p><ol class=\"tl\"><li><span class=\"m\">f(x)=x<sup>2</sup>+4x</span> an der Stelle <span class=\"m\">x<sub>0</sub>=1</span></li><li><span class=\"m\">f(x)=3x<sup>2</sup>−x</span> an der Stelle <span class=\"m\">x<sub>0</sub>=−1</span></li></ol>", "tipps": ["Berechne zuerst <span class=\"m\">f(x<sub>0</sub>)</span> und stelle den Zähler <span class=\"m\">f(x)−f(x<sub>0</sub>)</span> auf.", "<span class=\"m\">x<sub>0</sub></span> ist immer eine Nullstelle des Zählers. Faktorisiere ihn (pq-Formel), dann kürzt sich <span class=\"m\">(x−x<sub>0</sub>)</span> heraus."], "loes": "<ol class=\"tl\"><li><span class=\"m\">f(1)=5</span>: <span class=\"m\"><span class=\"fr\"><span>x<sup>2</sup>+4x−5</span><span>x−1</span></span>=<span class=\"fr\"><span>(x−1)(x+5)</span><span>x−1</span></span>=x+5</span> → <span class=\"m\">f′(1)=6</span>. Kontrolle: <span class=\"m\">f′(x)=2x+4</span>, <span class=\"m\">f′(1)=6</span> ✓</li><li><span class=\"m\">f(−1)=4</span>: <span class=\"m\"><span class=\"fr\"><span>3x<sup>2</sup>−x−4</span><span>x+1</span></span>=<span class=\"fr\"><span>(x+1)(3x−4)</span><span>x+1</span></span>=3x−4</span> → <span class=\"m\">f′(−1)=−7</span>. Kontrolle: <span class=\"m\">f′(x)=6x−1</span>, <span class=\"m\">f′(−1)=−7</span> ✓</li></ol>"}, {"nr": "2.4", "stufe": "a", "text": "<p>Die Höhe einer Sonnenblume wird in den ersten sechs Wochen nach dem Umtopfen beschrieben durch <span class=\"m\">p(t)=−<span class=\"fr\"><span>1</span><span>2</span></span>t<sup>2</sup>+6t</span> (t in Wochen, <span class=\"m\">p(t)</span> in cm Zuwachs).</p><ol class=\"tl\"><li>Berechne die mittlere Wachstumsgeschwindigkeit zwischen der 2. und der 4. Woche.</li><li>Berechne die momentane Wachstumsgeschwindigkeit zum Zeitpunkt <span class=\"m\">t=2</span>.</li><li>Zu welchem Zeitpunkt ist die momentane Wachstumsgeschwindigkeit genauso groß wie die mittlere aus a)?</li><li>Wann hört die Pflanze laut Modell auf zu wachsen?</li></ol>", "tipps": ["a) Differenzenquotient <span class=\"m\"><span class=\"fr\"><span>p(4)−p(2)</span><span>4−2</span></span></span>. b) bis d) brauchen die Ableitung <span class=\"m\">p′(t)</span>.", "c) Setze <span class=\"m\">p′(t)</span> gleich dem Ergebnis aus a). d) „Hört auf zu wachsen“ bedeutet: Wachstumsgeschwindigkeit 0."], "loes": "<ol class=\"tl\"><li><span class=\"m\">p(4)=16</span>, <span class=\"m\">p(2)=10</span> ⇒ <span class=\"m\"><span class=\"fr\"><span>16−10</span><span>2</span></span>=3</span> cm pro Woche</li><li><span class=\"m\">p′(t)=−t+6</span> ⇒ <span class=\"m\">p′(2)=4</span> cm pro Woche</li><li><span class=\"m\">−t+6=3</span> ⇒ <span class=\"m\">t=3</span> – genau in der Mitte des Intervalls.</li><li><span class=\"m\">p′(t)=0</span> ⇒ <span class=\"m\">t=6</span>, also nach 6 Wochen.</li></ol>"}, {"nr": "2.5", "stufe": "a", "text": "<p>Rückwärts denken:</p><ol class=\"tl\"><li>Bestimme a so, dass der Graph von <span class=\"m\">f(x)=ax<sup>3</sup>−2x</span> an der Stelle 1 die Steigung 4 hat.</li><li>An welchen Stellen hat der Graph von <span class=\"m\">f(x)=x<sup>3</sup>−6x</span> die Steigung 6?</li></ol>", "tipps": ["Übersetze jede Bedingung in eine Gleichung: „Steigung 4 an der Stelle 1“ bedeutet <span class=\"m\">f′(1)=4</span>.", "b) Hier ist die Stelle gesucht, nicht ein Parameter: Löse die Gleichung <span class=\"m\">f′(x)=6</span>."], "loes": "<ol class=\"tl\"><li><span class=\"m\">f′(x)=3ax<sup>2</sup>−2</span>; <span class=\"m\">f′(1)=3a−2=4</span> ⇒ <span class=\"m\">a=2</span></li><li><span class=\"m\">f′(x)=3x<sup>2</sup>−6=6</span> ⇒ <span class=\"m\">x<sup>2</sup>=4</span> ⇒ <span class=\"m\">x=2</span> oder <span class=\"m\">x=−2</span> – es gibt zwei solche Stellen.</li></ol>"}, {"nr": "3.1", "stufe": "g", "text": "<p>Gegeben sind vier Funktionen:</p><p><span class=\"m\">f<sub>1</sub>(x)=−2x<sup>4</sup>+x<sup>2</sup></span>,   <span class=\"m\">f<sub>2</sub>(x)=x<sup>5</sup>−x</span>,   <span class=\"m\">f<sub>3</sub>(x)=<span class=\"fr\"><span>1</span><span>2</span></span>x<sup>3</sup>+x<sup>2</sup>−1</span>,   <span class=\"m\">f<sub>4</sub>(x)=3−x<sup>2</sup></span></p><ol class=\"tl\"><li>Welche Graphen sind achsensymmetrisch zur y-Achse, welche punktsymmetrisch zum Ursprung, welche keins von beiden?</li><li>Bei welchen Funktionen gilt sowohl für <span class=\"m\">x→+∞</span> als auch für <span class=\"m\">x→−∞</span>: <span class=\"m\">f(x)→−∞</span>?</li><li>Welche Funktionen haben den Wertebereich <span class=\"m\">W=ℝ</span>? Begründe.</li></ol>", "tipps": ["Symmetrie erkennst du an den Exponenten: nur gerade, nur ungerade oder gemischt? Achtung: eine Konstante zählt als <span class=\"m\">x<sup>0</sup></span>, also gerade.", "Für das Verhalten im Unendlichen zählt nur der Summand mit dem höchsten Exponenten: gerader oder ungerader Grad, positiver oder negativer Vorfaktor?"], "loes": "<ol class=\"tl\"><li>achsensymmetrisch: <span class=\"m\">f<sub>1</sub></span>, <span class=\"m\">f<sub>4</sub></span> (nur gerade Exponenten); punktsymmetrisch: <span class=\"m\">f<sub>2</sub></span> (nur ungerade); keine Symmetrie: <span class=\"m\">f<sub>3</sub></span></li><li><span class=\"m\">f<sub>1</sub></span> und <span class=\"m\">f<sub>4</sub></span>: gerader Grad mit negativem Vorfaktor</li><li><span class=\"m\">f<sub>2</sub></span> und <span class=\"m\">f<sub>3</sub></span>: ungerader Grad, die Werte laufen von <span class=\"m\">−∞</span> bis <span class=\"m\">+∞</span>, und weil der Graph keine Lücken hat (stetig), wird jeder Wert dazwischen getroffen.</li></ol>"}, {"nr": "3.2", "stufe": "a", "text": "<p>Gegeben ist <span class=\"m\">f(x)=x<sup>4</sup>−5x<sup>3</sup>+6x<sup>2</sup></span>.</p><ol class=\"tl\"><li>Gib den Definitionsbereich an und beschreibe das Verhalten für <span class=\"m\">x→±∞</span>.</li><li>Untersuche den Graphen auf Symmetrie.</li><li>Berechne die Nullstellen.</li><li>Bestimme <span class=\"m\">f′(x)</span> und die Steigung des Graphen an jeder Nullstelle. Was fällt dir bei <span class=\"m\">x=0</span> auf? Was bedeutet das für den Graphen?</li></ol>", "tipps": ["c) Klammere so viel x wie möglich aus.", "d) Bei <span class=\"m\">x=0</span> ist die Steigung 0, die Tangente ist also waagerecht. Welche Gerade ist das, wenn der Punkt auf der x-Achse liegt?"], "loes": "<ol class=\"tl\"><li><span class=\"m\">D=ℝ</span>; gerader Grad, positiver Vorfaktor: <span class=\"m\">f(x)→+∞</span> für <span class=\"m\">x→±∞</span></li><li>gerade und ungerade Exponenten gemischt ⇒ keine Symmetrie</li><li><span class=\"m\">x<sup>2</sup>(x<sup>2</sup>−5x+6)=0</span> ⇒ <span class=\"m\">x=0</span> (doppelt); pq-Formel: <span class=\"m\">x=2</span>, <span class=\"m\">x=3</span></li><li><span class=\"m\">f′(x)=4x<sup>3</sup>−15x<sup>2</sup>+12x</span>; <span class=\"m\">f′(0)=0</span>, <span class=\"m\">f′(2)=−4</span>, <span class=\"m\">f′(3)=9</span>. Bei 0 ist die Tangente die x-Achse selbst: Der Graph berührt die x-Achse dort nur und schneidet sie nicht.</li></ol>"}, {"nr": "3.3", "stufe": "v", "text": "<p>Gegeben ist für jede Zahl a die Funktion <span class=\"m\">f(x)=x<sup>3</sup>+(a−2)x<sup>2</sup>+x</span>.</p><ol class=\"tl\"><li>Für welchen Wert von a ist der Graph punktsymmetrisch zum Ursprung?</li><li>Berechne für diesen Wert die Nullstellen. Was ist überraschend?</li><li>Begründe allgemein: Jede ganzrationale Funktion mit ungeradem Grad hat mindestens eine Nullstelle.</li></ol>", "tipps": ["a) Punktsymmetrie verlangt nur ungerade Exponenten. Welcher Summand stört?", "c) Denke an das Verhalten im Unendlichen und daran, dass ganzrationale Funktionen stetig sind."], "loes": "<ol class=\"tl\"><li>Der Summand mit <span class=\"m\">x<sup>2</sup></span> muss verschwinden: <span class=\"m\">a−2=0</span> ⇒ <span class=\"m\">a=2</span></li><li><span class=\"m\">f(x)=x<sup>3</sup>+x=x(x<sup>2</sup>+1)</span>; <span class=\"m\">x<sup>2</sup>+1=0</span> hat keine Lösung ⇒ nur die Nullstelle 0, obwohl Grad 3.</li><li>Bei ungeradem Grad geht f auf der einen Seite gegen <span class=\"m\">−∞</span>, auf der anderen gegen <span class=\"m\">+∞</span>. Da der Graph ohne Sprung verläuft, muss er dazwischen die x-Achse kreuzen.</li></ol>"}, {"nr": "3.4", "stufe": "v", "text": "<p>Begründe: Eine ganzrationale Funktion geraden Grades kann nie den Wertebereich <span class=\"m\">W=ℝ</span> haben.</p>", "tipps": ["Wohin laufen die Funktionswerte bei geradem Grad für <span class=\"m\">x→+∞</span> und für <span class=\"m\">x→−∞</span>?", "Wenn beide Enden nach oben gehen: Kann der Graph dann beliebig tief nach unten reichen?"], "loes": "<p>Bei geradem Grad laufen beide Enden in dieselbe Richtung (beide gegen <span class=\"m\">+∞</span> oder beide gegen <span class=\"m\">−∞</span>). Zwischen den Enden hat der Graph einen tiefsten (bzw. höchsten) Punkt, unter (bzw. über) den er nicht kommt. Also werden nicht alle reellen Zahlen als Funktionswerte erreicht.</p><p>Beispiel: <span class=\"m\">f(x)=x<sup>2</sup></span> hat <span class=\"m\">W=[0;∞)</span>.</p>"}, {"nr": "4.1", "stufe": "g", "text": "<p>Gegeben ist <span class=\"m\">f(x)=x<sup>3</sup>−2x<sup>2</sup></span>.</p><ol class=\"tl\"><li>Bestimme die Gleichung der Tangente an den Graphen an der Stelle <span class=\"m\">x<sub>0</sub>=2</span>.</li><li>Die Tangente bildet mit den Koordinatenachsen ein Dreieck. Berechne seinen Flächeninhalt.</li></ol>", "tipps": ["Tangente: <span class=\"m\">y=mx+n</span> mit <span class=\"m\">m=f′(x<sub>0</sub>)</span>. Den Punkt <span class=\"m\">(x<sub>0</sub> | f(x<sub>0</sub>))</span> einsetzen liefert n.", "b) Berechne die Schnittpunkte der Tangente mit beiden Achsen. Das Dreieck ist rechtwinklig, die Katheten liegen auf den Achsen."], "loes": "<ol class=\"tl\"><li><span class=\"m\">f(2)=0</span>, <span class=\"m\">f′(x)=3x<sup>2</sup>−4x</span>, <span class=\"m\">f′(2)=4</span> ⇒ <span class=\"m\">0=4·2+n</span> ⇒ <span class=\"m\">n=−8</span> ⇒ <span class=\"m\">t: y=4x−8</span></li><li>Schnittpunkte (0 | −8) und (2 | 0) ⇒ <span class=\"m\">A=<span class=\"fr\"><span>1</span><span>2</span></span>·8·2=8</span> FE</li></ol>"}, {"nr": "4.2", "stufe": "a", "text": "<p>Sekante und Tangente:</p><ol class=\"tl\"><li>Berechne für <span class=\"m\">f(x)=x<sup>2</sup>−4x</span> die Steigung der Sekante durch die beiden Nullstellen. An welcher Stelle hat die Tangente dieselbe Steigung? Gib die Tangentengleichung an.</li><li>Berechne für <span class=\"m\">g(x)=x<sup>3</sup></span> die Steigung der Sekante durch (0 | 0) und (3 | 27). An welcher Stelle zwischen 0 und 3 ist die Tangente parallel zu dieser Sekante?</li></ol>", "tipps": ["Sekantensteigung = Differenzenquotient <span class=\"m\"><span class=\"fr\"><span>f(x<sub>2</sub>)−f(x<sub>1</sub>)</span><span>x<sub>2</sub>−x<sub>1</sub></span></span></span>.", "Parallel bedeutet gleiche Steigung: Setze <span class=\"m\">f′(x)</span> gleich der Sekantensteigung."], "loes": "<ol class=\"tl\"><li>Nullstellen 0 und 4, Sekantensteigung <span class=\"m\"><span class=\"fr\"><span>0−0</span><span>4−0</span></span>=0</span>. <span class=\"m\">f′(x)=2x−4=0</span> ⇒ <span class=\"m\">x=2</span>; <span class=\"m\">f(2)=−4</span> ⇒ <span class=\"m\">t: y=−4</span></li><li>Sekantensteigung <span class=\"m\"><span class=\"fr\"><span>27−0</span><span>3−0</span></span>=9</span>. <span class=\"m\">g′(x)=3x<sup>2</sup>=9</span> ⇒ <span class=\"m\">x<sup>2</sup>=3</span> ⇒ <span class=\"m\">x=&radic;<span class=\"ov\">3</span>≈1,73</span> (die Lösung <span class=\"m\">−&radic;<span class=\"ov\">3</span></span> liegt nicht zwischen 0 und 3).</li></ol>"}, {"nr": "4.3", "stufe": "a", "text": "<p>Gegeben sind <span class=\"m\">f(x)=x<sup>2</sup></span> und <span class=\"m\">g(x)=−x<sup>2</sup>+4x−2</span>.</p><p>Zeige, dass sich die beiden Graphen an der Stelle 1 berühren, und gib die gemeinsame Tangente an.</p>", "tipps": ["„Berühren“ bedeutet: gleicher Punkt UND gleiche Steigung.", "Prüfe <span class=\"m\">f(1)=g(1)</span> und <span class=\"m\">f′(1)=g′(1)</span>."], "loes": "<p><span class=\"m\">f(1)=1</span>, <span class=\"m\">g(1)=−1+4−2=1</span> ⇒ gemeinsamer Punkt (1 | 1).</p><p><span class=\"m\">f′(x)=2x</span>, <span class=\"m\">f′(1)=2</span>; <span class=\"m\">g′(x)=−2x+4</span>, <span class=\"m\">g′(1)=2</span> ⇒ gleiche Steigung, die Graphen berühren sich.</p><p>Gemeinsame Tangente: <span class=\"m\">1=2·1+n</span> ⇒ <span class=\"m\">n=−1</span> ⇒ <span class=\"m\">y=2x−1</span></p>"}, {"nr": "4.4", "stufe": "v", "text": "<p>Vom Punkt Q(0 | −4), der nicht auf der Parabel <span class=\"m\">p(x)=x<sup>2</sup></span> liegt, sollen Tangenten an die Parabel gelegt werden.</p><p>Bestimme die Berührpunkte und die Gleichungen der Tangenten.</p>", "tipps": ["Den Berührpunkt kennst du nicht. Nenne ihn B(u | u²) und stelle die Tangente in B allgemein auf.", "Tangente in B: <span class=\"m\">y=2u(x−u)+u<sup>2</sup>=2ux−u<sup>2</sup></span>. Diese Gerade soll durch Q gehen: setze <span class=\"m\">x=0</span> und <span class=\"m\">y=−4</span> ein."], "loes": "<p>Tangente in B(u | u²): <span class=\"m\">y=2ux−u<sup>2</sup></span>.</p><p>Durch Q: <span class=\"m\">−4=2u·0−u<sup>2</sup></span> ⇒ <span class=\"m\">u<sup>2</sup>=4</span> ⇒ <span class=\"m\">u=±2</span>.</p><p>Berührpunkte (2 | 4) und (−2 | 4); Tangenten <span class=\"m\">y=4x−4</span> und <span class=\"m\">y=−4x−4</span>.</p>"}, {"nr": "4.5", "stufe": "v", "text": "<p>Gegeben ist <span class=\"m\">f(x)=<span class=\"fr\"><span>1</span><span>x</span></span></span> für <span class=\"m\">x&gt;0</span>. Die Tangente im Punkt P(u | 1/u) bildet mit den Koordinatenachsen ein Dreieck.</p><ol class=\"tl\"><li>Berechne den Flächeninhalt des Dreiecks für <span class=\"m\">u=1</span>.</li><li>Berechne den Flächeninhalt für <span class=\"m\">u=2</span>.</li><li>Stelle eine Vermutung auf und beweise sie für beliebiges <span class=\"m\">u&gt;0</span>.</li></ol>", "tipps": ["<span class=\"m\">f(x)=x<sup>−1</sup></span> ⇒ <span class=\"m\">f′(x)=−x<sup>−2</sup>=−<span class=\"fr\"><span>1</span><span>x<sup>2</sup></span></span></span>.", "c) Allgemeine Tangente: <span class=\"m\">y=−<span class=\"fr\"><span>1</span><span>u<sup>2</sup></span></span>x+<span class=\"fr\"><span>2</span><span>u</span></span></span>. Berechne beide Achsenschnittpunkte in Abhängigkeit von u."], "loes": "<ol class=\"tl\"><li><span class=\"m\">f(1)=1</span>, <span class=\"m\">f′(1)=−1</span> ⇒ <span class=\"m\">y=−x+2</span>; Schnittpunkte (0 | 2), (2 | 0) ⇒ <span class=\"m\">A=2</span> FE</li><li><span class=\"m\">f(2)=<span class=\"fr\"><span>1</span><span>2</span></span></span>, <span class=\"m\">f′(2)=−<span class=\"fr\"><span>1</span><span>4</span></span></span> ⇒ <span class=\"m\">y=−<span class=\"fr\"><span>1</span><span>4</span></span>x+1</span>; Schnittpunkte (0 | 1), (4 | 0) ⇒ <span class=\"m\">A=2</span> FE</li><li>Vermutung: Die Fläche ist immer 2. Beweis: y-Achse bei <span class=\"m\"><span class=\"fr\"><span>2</span><span>u</span></span></span>, x-Achse bei <span class=\"m\">2u</span> ⇒ <span class=\"m\">A=<span class=\"fr\"><span>1</span><span>2</span></span>·<span class=\"fr\"><span>2</span><span>u</span></span>·2u=2</span> – unabhängig von u!</li></ol>"}, {"nr": "4.6", "stufe": "v", "text": "<p>Gegeben ist <span class=\"m\">f(x)=<span class=\"fr\"><span>1</span><span>4</span></span>x<sup>2</sup></span> und ein beliebiger Punkt P(u | f(u)) auf dem Graphen.</p><p>Zeige: Die Tangente in P schneidet die y-Achse immer im Punkt (0 | −f(u)).</p>", "tipps": ["Stelle die Tangente in P allgemein auf: <span class=\"m\">m=f′(u)</span>, Punkt P einsetzen.", "<span class=\"m\">f′(u)=<span class=\"fr\"><span>1</span><span>2</span></span>u</span>. Tangente: <span class=\"m\">y=<span class=\"fr\"><span>1</span><span>2</span></span>u(x−u)+<span class=\"fr\"><span>1</span><span>4</span></span>u<sup>2</sup></span>. Setze <span class=\"m\">x=0</span>."], "loes": "<p><span class=\"m\">y=<span class=\"fr\"><span>1</span><span>2</span></span>u(x−u)+<span class=\"fr\"><span>1</span><span>4</span></span>u<sup>2</sup>=<span class=\"fr\"><span>1</span><span>2</span></span>ux−<span class=\"fr\"><span>1</span><span>4</span></span>u<sup>2</sup></span>.</p><p>Für <span class=\"m\">x=0</span>: <span class=\"m\">y=−<span class=\"fr\"><span>1</span><span>4</span></span>u<sup>2</sup>=−f(u)</span> ✓</p><p>Damit kann man Tangenten an diese Parabel sogar ohne Rechnung zeichnen: P mit dem Punkt (0 | −f(u)) verbinden.</p>"}]};
+  var STUFEN = {g:["Grundlage","b-g"], a:["Anwenden","b-a"], v:["Vertiefen","b-v"]};
+  // Kurztitel je Aufgabe (fuer Kopfzeile und Inhaltsverzeichnis)
+  var TITEL = {
+    "1.1": "Grenzwerte für x → ∞",
+    "1.2": "Grenzwerte an einer Stelle („0 durch 0“)",
+    "1.3": "Stetigkeit an einer Nahtstelle prüfen",
+    "1.4": "Parameter für Stetigkeit bestimmen",
+    "1.5": "Zwei Parameter, zwei Nahtstellen",
+    "1.6": "Wahr oder falsch: Grenzwert und Stetigkeit",
+    "2.1": "Ableitungen bilden",
+    "2.2": "Ableiten mit Parametern",
+    "2.3": "Ableitung mit dem Differentialquotienten",
+    "2.4": "Sonnenblume: mittlere und momentane Änderungsrate",
+    "2.5": "Rückwärts: Steigung vorgegeben",
+    "3.1": "Symmetrie, Verhalten im Unendlichen, Wertebereich",
+    "3.2": "Funktionsuntersuchung mit Nullstellen",
+    "3.3": "Symmetrie mit Parameter, Nullstellen begründen",
+    "3.4": "Begründen: Wertebereich bei geradem Grad",
+    "4.1": "Tangentengleichung und Dreiecksfläche",
+    "4.2": "Sekante und parallele Tangente",
+    "4.3": "Zwei Graphen berühren sich",
+    "4.4": "Tangenten von einem Punkt außerhalb",
+    "4.5": "Tangente an 1/x: Dreiecksfläche",
+    "4.6": "Beweis: y-Achsenabschnitt der Tangente"
+  };
+  // Themen je Block; videos = [YouTube-ID, Linktext], alle vom Kanal "Mathe by Daniel Jung"
+  var THEMEN = [
+    {block: 1, titel: "Grenzwerte im Unendlichen", aufgaben: ["1.1"], videos: [
+      ["ttUWTu3jusA", "Grenzverhalten für x gegen Unendlich"],
+      ["UemeDwOcD2U", "Grenzverhalten bei Bruchtermen"]]},
+    {block: 1, titel: "Grenzwerte an einer Stelle", aufgaben: ["1.2"], videos: [
+      ["AFiOJfQDs6E", "Grenzwert an einer Stelle anschaulich"],
+      ["1Kg7InEco6E", "Faktorisieren und Ausklammern"]]},
+    {block: 1, titel: "Stetigkeit", aufgaben: ["1.3", "1.4", "1.5", "1.6"], videos: [
+      ["8aUoOAHbBrk", "Stetigkeit: Übersicht mit Sprung und Lücke"],
+      ["AFiOJfQDs6E", "Grenzwert von links und von rechts"]]},
+    {block: 2, titel: "Ableitungsregeln", aufgaben: ["2.1", "2.2"], videos: [
+      ["XLipzL1o1FQ", "Ableiten mit der Potenzregel"],
+      ["xP6SladIuVI", "Ableiten mit Parameter"]]},
+    {block: 2, titel: "Differentialquotient", aufgaben: ["2.3"], videos: [
+      ["vNAU0LuOu8o", "Grenzwert des Differenzenquotienten im Schaubild"],
+      ["nnZCJZQgXFs", "Differenzenquotient: Beispiel mit der h-Methode"]],
+      hinweis: "Im zweiten Video wird mit der h-Methode gerechnet (h = x − x₀). Die Idee ist dieselbe wie bei uns."},
+    {block: 2, titel: "Änderungsraten und Steigung", aufgaben: ["2.4", "2.5"], videos: [
+      ["A6D5dnXMaJE", "Durchschnittliche und momentane Änderungsrate: Übersicht"],
+      ["6mLKQOhwi7A", "Mittlere und momentane Änderung: Beispiel"]]},
+    {block: 3, titel: "Symmetrie, Verhalten im Unendlichen, Wertebereich", aufgaben: ["3.1"], videos: [
+      ["78ZvTp4lVQs", "Symmetrie: Achsen- und Punktsymmetrie"],
+      ["ttUWTu3jusA", "Grenzverhalten für x gegen Unendlich"]]},
+    {block: 3, titel: "Nullstellen und Steigung", aufgaben: ["3.2"], videos: [
+      ["1Kg7InEco6E", "Nullstellen durch Ausklammern"],
+      ["difR8pYGSeI", "pq-Formel"]]},
+    {block: 3, titel: "Begründen und Beweisen", aufgaben: ["3.3", "3.4"], videos: [
+      ["Ujvec6wDr64", "Ganzrationale Funktionen: Übersicht"]]},
+    {block: 4, titel: "Tangentengleichung aufstellen", aufgaben: ["4.1"], videos: [
+      ["bvY7K41u1Yc", "Tangentengleichung aufstellen"],
+      ["GojHSEf3sIU", "Tangentengleichung: Beispiel"]]},
+    {block: 4, titel: "Sekante, Tangente, Berühren", aufgaben: ["4.2", "4.3"], videos: [
+      ["eWGWoBKABwA", "Sekante und Tangente im Bild"],
+      ["8R7UpM7kYQE", "Berühren: gleicher Punkt und gleiche Steigung"]]},
+    {block: 4, titel: "Tangente mit unbekanntem Berührpunkt", aufgaben: ["4.4", "4.5", "4.6"], videos: [
+      ["IwcYPuk0ahM", "Tangente von einem Punkt aus an den Graphen"],
+      ["mqngiUP977g", "Tangentengleichung mit der allgemeinen Formel"]]}
+  ];
+  var AUF = {};
+  DATA.aufgaben.forEach(function(au){ AUF[au.nr] = au; });
+  var root = document.getElementById("inhalt");
+  var html = "", toc = "", nav = '<a href="#toc">&uarr; Inhalt</a>';
+  DATA.bloecke.forEach(function(bl){
+    html += '<section class="block"><h2 id="block' + bl.nr + '"><span class="dot"></span>' + bl.nr + ' &nbsp;' + bl.titel + '</h2>';
+    toc += '<div class="toc-block"><a class="toc-h" href="#block' + bl.nr + '">' + bl.nr + ' &nbsp;' + bl.titel + '</a>';
+    nav += '<a href="#block' + bl.nr + '" data-block="block' + bl.nr + '">' + bl.nr + ' ' + bl.titel + '</a>';
+    THEMEN.forEach(function(th, ti){
+      if(th.block !== bl.nr) return;
+      var tid = "thema" + ti;
+      html += '<section class="thema"><h3 id="' + tid + '">' + th.titel + '</h3>' +
+        '<div class="videos"><span class="v-label">Noch unsicher? Erkl&auml;rvideos von Daniel Jung (YouTube):</span>';
+      th.videos.forEach(function(v){
+        html += '<a href="https://www.youtube.com/watch?v=' + v[0] + '" target="_blank" rel="noopener">&#9654; ' + v[1] + '</a>';
+      });
+      if(th.hinweis) html += '<span class="v-hinweis">' + th.hinweis + '</span>';
+      html += '</div>';
+      toc += '<div class="toc-thema"><a class="toc-t" href="#' + tid + '">' + th.titel + '</a><ul>';
+      th.aufgaben.forEach(function(nr){
+        var au = AUF[nr], st = STUFEN[au.stufe], aid = "a" + nr.replace(".", "-");
+        toc += '<li data-stufe="' + au.stufe + '"><a href="#' + aid + '"><span class="a-num">' + nr + '</span>' + TITEL[nr] +
+          '</a><span class="tdot ' + st[1] + '" title="' + st[0] + '"></span></li>';
+        html += '<div class="aufgabe" id="' + aid + '" data-stufe="' + au.stufe + '">' +
+          '<div class="a-head"><span class="a-num">' + nr + '</span><span class="a-titel">' + TITEL[nr] + '</span><span class="a-badge ' + st[1] + '">' + st[0] + '</span><span class="a-caret">&#9662;</span></div>' +
+          '<div class="a-body">' + au.text;
+        au.tipps.forEach(function(tp, i){
+          html += '<details class="tipp"><summary>Tipp ' + (i + 1) + '</summary><div class="body">' + tp + '</div></details>';
+        });
+        html += '<details class="loes"><summary>Musterl&ouml;sung</summary><div class="body">' + au.loes + '</div></details></div></div>';
+      });
+      html += '</section>';
+      toc += '</ul></div>';
+    });
+    html += '</section>';
+    toc += '</div>';
+  });
+  root.innerHTML = html;
+  document.getElementById("tocGrid").innerHTML = toc;
+  document.getElementById("nav").innerHTML = nav;
+
+  // Sprungziele unter der klebenden Leiste freihalten
+  var bar = document.querySelector(".bar");
+  function barHoehe(){ document.documentElement.style.setProperty("--barh", bar.offsetHeight + "px"); }
+  barHoehe();
+  window.addEventListener("resize", barHoehe);
+  // Sprung aus dem Inhaltsverzeichnis klappt die Aufgabe auf
+  document.getElementById("tocGrid").addEventListener("click", function(ev){
+    var a = ev.target.closest("a");
+    var ziel = a && document.getElementById(a.getAttribute("href").slice(1));
+    if(ziel && ziel.classList.contains("aufgabe")) ziel.classList.remove("collapsed");
+  });
+
+  document.querySelectorAll(".a-head").forEach(function(h){
+    h.addEventListener("click", function(){ h.parentNode.classList.toggle("collapsed"); });
+  });
+  var cbtn = document.getElementById("collapseAll");
+  cbtn.addEventListener("click", function(){
+    var aufs = document.querySelectorAll(".aufgabe"), anyOpen = false;
+    aufs.forEach(function(a){ if(!a.classList.contains("collapsed")) anyOpen = true; });
+    aufs.forEach(function(a){ a.classList.toggle("collapsed", anyOpen); });
+    cbtn.textContent = anyOpen ? "Alle ausklappen" : "Alle einklappen";
+  });
+  var fbtns = document.querySelectorAll(".fbtn");
+  fbtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      fbtns.forEach(function(x){ x.classList.remove("active"); });
+      b.classList.add("active");
+      var f = b.dataset.f;
+      document.querySelectorAll(".aufgabe, .toc li").forEach(function(a){
+        a.classList.toggle("hidden", f !== "alle" && a.dataset.stufe !== f);
+      });
+      // Themen und Bloecke ohne sichtbare Aufgabe ausblenden (Seite, Inhaltsverzeichnis, Sprungleiste)
+      document.querySelectorAll("section.thema, section.block").forEach(function(s){
+        s.classList.toggle("hidden", !s.querySelector(".aufgabe:not(.hidden)"));
+      });
+      document.querySelectorAll(".toc-thema, .toc-block").forEach(function(s){
+        s.classList.toggle("hidden", !s.querySelector("li:not(.hidden)"));
+      });
+      document.querySelectorAll("#nav a[data-block]").forEach(function(a){
+        a.classList.toggle("hidden", document.getElementById(a.dataset.block).parentNode.classList.contains("hidden"));
+      });
+      barHoehe();
+    });
+  });
+  document.getElementById("beamer").addEventListener("click", function(){ document.body.classList.toggle("beamer"); });
+})();
+</script>
+</body>
+</html>
